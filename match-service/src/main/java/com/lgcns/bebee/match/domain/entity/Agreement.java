@@ -61,12 +61,14 @@ public class Agreement extends BaseTimeEntity {
     private AgreementStatus status = AgreementStatus.BEFORE;
 
     @OneToMany(mappedBy = "agreement", cascade = CascadeType.ALL, orphanRemoval = true)
+    @org.hibernate.annotations.BatchSize(size = 10)
     private List<AgreementHelpCategory> helpCategories= new ArrayList<>();
 
     @OneToOne(mappedBy = "agreement", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private AgreementPeriod period;
 
     @OneToMany(mappedBy = "agreement", cascade = CascadeType.ALL, orphanRemoval = true)
+    @org.hibernate.annotations.BatchSize(size = 10)
     private List<AgreementSchedule> schedules = new ArrayList<>();
 
     @Column

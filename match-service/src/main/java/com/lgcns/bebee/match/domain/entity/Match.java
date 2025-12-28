@@ -2,10 +2,7 @@ package com.lgcns.bebee.match.domain.entity;
 
 import com.lgcns.bebee.common.domain.BaseTimeEntity;
 import io.hypersistence.utils.hibernate.id.Tsid;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,11 +31,16 @@ public class Match extends BaseTimeEntity {
     @Column(nullable = false)
     private Long chatRoomId;
 
-    @Column(nullable = false, unique = true)
-    private Long agreementId;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "agreement_id", nullable = false, unique = true)
+    private Agreement agreement;
 
     public boolean isParticipant(Long memberId) {
         return this.helperId.equals(memberId) || this.disabledId.equals(memberId);
+    }
+
+    public Long getAgreementId() {
+        return agreement != null ? agreement.getId() : null;
     }
 
     public static Match create(
@@ -47,7 +49,7 @@ public class Match extends BaseTimeEntity {
             Long postId,
             String title,
             Long chatRoomId,
-            Long agreementId
+            Agreement agreement
     ) {
         Match match = new Match();
         match.helperId = helperId;
@@ -55,7 +57,7 @@ public class Match extends BaseTimeEntity {
         match.postId = postId;
         match.title = title;
         match.chatRoomId = chatRoomId;
-        match.agreementId = agreementId;
+        match.agreement = agreement;
 
         return match;
     }
