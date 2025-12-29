@@ -35,7 +35,7 @@ public class JwtTokenProvider implements TokenProvider {
 
     public TokenInfo reissueTokens(Member member, String refreshToken) {
         Claims claims = parseClaims(refreshToken);
-        if (!claims.getSubject().equals(member.getEmail())) {
+        if (!claims.getSubject().equals(String.valueOf(member.getId()))) {
             throw new IllegalArgumentException("Invalid refresh token owner");
         }
         return generateTokens(member);
@@ -60,4 +60,3 @@ public class JwtTokenProvider implements TokenProvider {
                 .compact();
     }
 }
-
