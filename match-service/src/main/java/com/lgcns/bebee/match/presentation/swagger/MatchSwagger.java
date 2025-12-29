@@ -1,6 +1,7 @@
 package com.lgcns.bebee.match.presentation.swagger;
 
 import com.lgcns.bebee.match.domain.entity.vo.EngagementType;
+import com.lgcns.bebee.match.presentation.dto.res.MatchCalendarGetResDTO;
 import com.lgcns.bebee.match.presentation.dto.res.MatchesByDateGetResDTO;
 import com.lgcns.bebee.match.presentation.dto.res.PostsGetResDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -189,5 +190,70 @@ public interface MatchSwagger {
                     example = "DAY"
             )
             @RequestParam EngagementType engagementType
+    );
+
+    @Operation(
+            summary = "도움 활동 날짜 조회 (캘린더용)",
+            description = "캘린더에서 특정 연도/월 기준으로 도움 활동이 존재하는 날짜 목록을 조회합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "활동일 목록 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = MatchesByDateGetResDTO.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "활동일 목록 조회 응답 예시",
+                                            description = "하루도움, 지속도움을 모두 포함해 해당 연도/월에 도움 활동이 존재하는 날을 LocalDate 배열 형식으로 반환",
+                                            value = """
+                                                    {
+                                                        "activeDates": [
+                                                            "2025-12-01",
+                                                            "2025-12-07",
+                                                            "2025-12-08",
+                                                            "2025-12-15",
+                                                            "2025-12-22",
+                                                            "2025-12-29",
+                                                        ]
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "잘못된 요청 (유효하지 않은 파라미터)",
+                    content = @Content(mediaType = "application/json")
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "서버 내부 오류",
+                    content = @Content(mediaType = "application/json")
+            )
+    })
+    ResponseEntity<MatchCalendarGetResDTO> getActiveDayByMonth(
+            @Parameter(
+                    description = "현재 로그인한 회원 ID(임시, 나중에 토큰으로 처리)",
+                    required = true,
+                    example = "791168241386394999"
+            )
+            @RequestParam String memberId,
+
+            @Parameter(
+                    description = "캘린더에서 선택한 연도",
+                    required = true,
+                    example = "2025"
+            )
+            @RequestParam Integer year,
+
+            @Parameter(
+                    description = "캘린더에서 선택한 월",
+                    required = true,
+                    example = "01"
+            )
+            @RequestParam Integer month
     );
 }
