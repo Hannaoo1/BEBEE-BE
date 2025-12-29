@@ -20,5 +20,11 @@ public class MemberSignUpReqDTO {
     private BigDecimal latitude;
     private BigDecimal longitude;
     private String districtCode;
-}
 
+    // HELPER용: 도움 유형 목록
+    private java.util.List<String> helpTypes;
+
+    // DISABLED용: 장애 유형 및 설명
+    private String disabilityType;
+    private String disabilityDescription;
+}

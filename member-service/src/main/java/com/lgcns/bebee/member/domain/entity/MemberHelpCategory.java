@@ -24,5 +24,12 @@ public class MemberHelpCategory extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
-}
 
+    public static MemberHelpCategory create(Member member, HelpCategory helpCategory) {
+        MemberHelpCategory entity = new MemberHelpCategory();
+        entity.id = new MemberHelpCategoryId(member.getId(), helpCategory.getHelpCategoryId());
+        entity.member = member;
+        entity.helpCategory = helpCategory;
+        return entity;
+    }
+}

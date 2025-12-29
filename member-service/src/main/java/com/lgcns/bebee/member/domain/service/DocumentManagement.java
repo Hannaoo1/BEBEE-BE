@@ -23,9 +23,11 @@ public class DocumentManagement {
 
     private final DocumentRepository documentRepository;
     private final DocumentVerificationRepository documentVerificationRepository;
+    private final DocumentVerificationService documentVerificationService;
 
     /**
      * Document 단건 조회
+     * 
      * @param documentId 문서 ID
      * @return Document 엔티티
      * @throws RuntimeException 문서를 찾을 수 없는 경우
@@ -36,7 +38,18 @@ public class DocumentManagement {
     }
 
     /**
+     * Document 저장
+     * 
+     * @param document 저장할 문서
+     * @return 저장된 문서
+     */
+    public Document saveDocument(Document document) {
+        return documentRepository.save(document);
+    }
+
+    /**
      * 문서 검증 단건 조회
+     * 
      * @param verificationId 검증 ID
      * @return DocumentVerification 엔티티
      * @throws RuntimeException 문서를 찾을 수 없는 경우
@@ -48,6 +61,7 @@ public class DocumentManagement {
 
     /**
      * PENDING 상태의 문서 검증 목록 조회
+     * 
      * @return PENDING 상태의 문서 검증 목록
      */
     public List<DocumentVerification> loadPendingList() {
@@ -57,6 +71,7 @@ public class DocumentManagement {
     /**
      * 문서 검증 승인 처리
      * 비즈니스 규칙: PENDING 상태인 경우에만 승인 가능
+     * 
      * @param verification 검증 엔티티
      * @throws RuntimeException 이미 처리된 문서인 경우
      */
@@ -68,8 +83,9 @@ public class DocumentManagement {
     /**
      * 문서 검증 거절 처리
      * 비즈니스 규칙: PENDING 상태인 경우에만 거절 가능
+     * 
      * @param verification 검증 엔티티
-     * @param reason 거절 사유
+     * @param reason       거절 사유
      * @throws RuntimeException 이미 처리된 문서인 경우
      */
     public void reject(DocumentVerification verification, String reason) {
@@ -79,6 +95,7 @@ public class DocumentManagement {
 
     /**
      * PENDING 상태 검증
+     * 
      * @param verification 검증 엔티티
      * @throws RuntimeException PENDING 상태가 아닌 경우
      */
@@ -86,5 +103,18 @@ public class DocumentManagement {
         if (verification.getStatus() != DocumentStatus.PENDING) {
             throw DocumentErrors.ALREADY_PROCESSED.toException();
         }
+    }
+
+    /**
+     * OCR 데이터 추출 (업로드 전 미리보기용)
+     * 
+     * @param file 분석할 파일
+     * @param role 사용자 역할
+     * @return OCR 분석 결과
+     */
+    public com.lgcns.bebee.member.application.client.OcrClient.OcrResult extractOcrData(
+            org.springframework.web.multipart.MultipartFile file,
+            String role) {
+        return documentVerificationService.extractRawOcr(file, role);
     }
 }

@@ -47,13 +47,25 @@ public class AuthController implements AuthSwagger {
                 reqDTO.getAddressRoad(),
                 reqDTO.getLatitude(),
                 reqDTO.getLongitude(),
-                reqDTO.getDistrictCode()
-        );
+                reqDTO.getDistrictCode(),
+                reqDTO.getHelpTypes(),
+                reqDTO.getDisabilityType(),
+                reqDTO.getDisabilityDescription());
 
         SignUpUseCase.Result result = signUpUseCase.execute(param);
         SignUpResDTO resDTO = SignUpResDTO.create(result);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(resDTO);
+    }
+
+    @GetMapping("/check-email")
+    public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
+        return ResponseEntity.ok(signUpUseCase.checkEmailDuplicated(email));
+    }
+
+    @GetMapping("/check-nickname")
+    public ResponseEntity<Boolean> checkNickname(@RequestParam String nickname) {
+        return ResponseEntity.ok(signUpUseCase.checkNicknameDuplicated(nickname));
     }
 
     @PostMapping("/login")
@@ -73,8 +85,7 @@ public class AuthController implements AuthSwagger {
     @PostMapping("/reissue")
     public ResponseEntity<ReissueResDTO> reissue(
             @CurrentMember Long memberId,
-            @CookieValue(name = "refresh_token", required = false) String refreshToken
-            ) {
+            @CookieValue(name = "refresh_token", required = false) String refreshToken) {
         if (refreshToken == null) {
             throw REFRESH_TOKEN_EXPIRED.toException();
         }
@@ -96,15 +107,13 @@ public class AuthController implements AuthSwagger {
             HttpServletRequest request,
             HttpServletResponse response,
             @CurrentMember Long memberId,
-            @CookieValue(name = "refresh_token", required = false) String refreshToken
-            ) {
+            @CookieValue(name = "refresh_token", required = false) String refreshToken) {
         String accessToken = resolveToken(request);
 
-        LogoutUseCase.Param param = new  LogoutUseCase.Param(
+        LogoutUseCase.Param param = new LogoutUseCase.Param(
                 memberId,
                 accessToken,
-                refreshToken
-        );
+                refreshToken);
 
         logoutUseCase.execute(param);
 
@@ -124,4 +133,3 @@ public class AuthController implements AuthSwagger {
                 .build();
     }
 }
-

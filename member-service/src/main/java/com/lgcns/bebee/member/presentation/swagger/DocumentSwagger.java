@@ -20,8 +20,7 @@ public interface DocumentSwagger {
     ResponseEntity<DocumentUploadResDTO> uploadDocument(
             Long memberId,
             Long documentId,
-            MultipartFile file
-    );
+            MultipartFile file);
 
     /**
      * 문서 검증 정보 조회

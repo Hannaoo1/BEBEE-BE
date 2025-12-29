@@ -10,6 +10,14 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.regex.Pattern;
 
+import com.lgcns.bebee.member.domain.entity.DisabilityCategory;
+import com.lgcns.bebee.member.domain.entity.HelpCategory;
+import com.lgcns.bebee.member.domain.entity.MemberDisabilityCategory;
+import com.lgcns.bebee.member.domain.entity.MemberHelpCategory;
+import com.lgcns.bebee.member.domain.repository.DisabilityCategoryRepository;
+import com.lgcns.bebee.member.domain.repository.HelpCategoryRepository;
+import com.lgcns.bebee.member.domain.repository.MemberDisabilityCategoryRepository;
+import com.lgcns.bebee.member.domain.repository.MemberHelpCategoryRepository;
 import com.lgcns.bebee.member.domain.service.MemberManagement;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +29,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class SignUpUseCase implements UseCase<SignUpUseCase.Param, SignUpUseCase.Result> {
     private final MemberRepository memberRepository;
     private final MemberManagement memberManagement;
+    private final HelpCategoryRepository helpCategoryRepository;
+    private final DisabilityCategoryRepository disabilityCategoryRepository;
+    private final MemberHelpCategoryRepository memberHelpCategoryRepository;
+    private final MemberDisabilityCategoryRepository memberDisabilityCategoryRepository;
 
     @Override
     @Transactional
@@ -46,6 +58,31 @@ public class SignUpUseCase implements UseCase<SignUpUseCase.Param, SignUpUseCase
 
         Member savedMember = memberRepository.save(newMember);
 
+        // HELPER: 도움 유형 저장
+        if ("HELPER".equals(params.getRole()) && params.getHelpTypes() != null && !params.getHelpTypes().isEmpty()) {
+            for (String helpTypeName : params.getHelpTypes()) {
+                HelpCategory helpCategory = helpCategoryRepository
+                        .findByName(helpTypeName)
+                        .orElseThrow(() -> new IllegalArgumentException("도움 유형을 찾을 수 없습니다: " + helpTypeName));
+                MemberHelpCategory memberHelpCategory = MemberHelpCategory.create(savedMember, helpCategory);
+                memberHelpCategoryRepository.save(memberHelpCategory);
+            }
+        }
+
+        // DISABLED: 장애 유형 저장
+        if ("DISABLED".equals(params.getRole()) && params.getDisabilityType() != null
+                && !params.getDisabilityType().isBlank()) {
+            DisabilityCategory disabilityCategory = disabilityCategoryRepository
+                    .findByType(params.getDisabilityType())
+                    .orElseThrow(() -> new IllegalArgumentException("장애 유형을 찾을 수 없습니다: " + params.getDisabilityType()));
+            MemberDisabilityCategory memberDisabilityCategory = MemberDisabilityCategory.create(
+                    savedMember,
+                    disabilityCategory,
+                    "1", // 기본 등급 (TODO: 프론트에서 받아오도록 수정 필요)
+                    params.getDisabilityDescription() != null ? params.getDisabilityDescription() : "");
+            memberDisabilityCategoryRepository.save(memberDisabilityCategory);
+        }
+
         return new Result(savedMember.getId());
     }
 
@@ -64,6 +101,13 @@ public class SignUpUseCase implements UseCase<SignUpUseCase.Param, SignUpUseCase
         private final BigDecimal latitude;
         private final BigDecimal longitude;
         private final String districtCode;
+
+        // HELPER용: 도움 유형 목록
+        private final java.util.List<String> helpTypes;
+
+        // DISABLED용: 장애 유형 및 설명
+        private final String disabilityType;
+        private final String disabilityDescription;
 
         @Override
         public boolean validate() {

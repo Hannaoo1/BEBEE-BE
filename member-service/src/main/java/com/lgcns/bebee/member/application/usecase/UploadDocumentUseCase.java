@@ -29,6 +29,7 @@ public class UploadDocumentUseCase implements UseCase<UploadDocumentUseCase.Para
 
     /**
      * 문서 업로드 실행
+     * 
      * @param param 업로드 파라미터
      * @return 생성된 검증 ID
      */
@@ -42,7 +43,12 @@ public class UploadDocumentUseCase implements UseCase<UploadDocumentUseCase.Para
         String fileUrl = fileStorageClient.upload(param.getFile(), "documents");
 
         // 2. 위변조 분석 (Domain Service)
-        DocumentVerificationService.AnalysisResult analysis = verificationService.analyze(param.getFile());
+        DocumentVerificationService.AnalysisResult analysis = verificationService.analyze(
+                param.getFile(),
+                null, // role
+                null, // expectedName
+                null // expectedBirthDate
+        );
 
         // 3. Document 조회 (Domain Service)
         Document document = documentManagement.loadDocument(param.getDocumentId());
@@ -53,8 +59,7 @@ public class UploadDocumentUseCase implements UseCase<UploadDocumentUseCase.Para
                 analysis.exifScore(),
                 analysis.ocrScore(),
                 analysis.forgeryScore(),
-                analysis.systemFlag()
-        );
+                analysis.systemFlag());
 
         // 5. 저장
         verificationRepository.save(verification);

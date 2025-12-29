@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
@@ -30,16 +31,15 @@ class DocumentVerificationServiceTest {
     void setUp() {
         ocrClient = mock(OcrClient.class);
         verificationService = new DocumentVerificationService(ocrClient);
-        
+
         // 기본 OCR 응답 설정 (대부분의 테스트에서 사용)
-        when(ocrClient.analyze(any())).thenReturn(
-            new OcrClient.OcrResult(
-                "활동지원사 자격증 발급기관 확인",
-                0.85,
-                List.of("활동지원사", "자격증", "발급", "기관"),
-                List.of("임상준") // 이름 후보 기본값
-            )
-        );
+        when(ocrClient.analyze(any(), any())).thenReturn(
+                new OcrClient.OcrResult(
+                        "활동지원사 자격증 발급기관 확인",
+                        0.85,
+                        List.of("활동지원사", "자격증", "발급", "기관"),
+                        List.of("임상준"),
+                        java.util.Map.of()));
     }
 
     @Nested
@@ -58,7 +58,8 @@ class DocumentVerificationServiceTest {
             );
 
             // when
-            DocumentVerificationService.AnalysisResult result = verificationService.analyze(file);
+            DocumentVerificationService.AnalysisResult result = verificationService.analyze(file, "HELPER", "임상준",
+                    LocalDate.of(1990, 1, 1));
 
             // then
             assertThat(result).isNotNull();
@@ -87,8 +88,10 @@ class DocumentVerificationServiceTest {
             );
 
             // when
-            DocumentVerificationService.AnalysisResult smallResult = verificationService.analyze(smallFile);
-            DocumentVerificationService.AnalysisResult normalResult = verificationService.analyze(normalFile);
+            DocumentVerificationService.AnalysisResult smallResult = verificationService.analyze(smallFile, "HELPER",
+                    "임상준", LocalDate.of(1990, 1, 1));
+            DocumentVerificationService.AnalysisResult normalResult = verificationService.analyze(normalFile, "HELPER",
+                    "임상준", LocalDate.of(1990, 1, 1));
 
             // then
             assertThat(smallResult.forgeryScore()).isLessThanOrEqualTo(normalResult.forgeryScore());
@@ -111,8 +114,10 @@ class DocumentVerificationServiceTest {
                     new byte[50 * 1024]);
 
             // when
-            DocumentVerificationService.AnalysisResult unsupportedResult = verificationService.analyze(unsupportedFile);
-            DocumentVerificationService.AnalysisResult supportedResult = verificationService.analyze(supportedFile);
+            DocumentVerificationService.AnalysisResult unsupportedResult = verificationService.analyze(unsupportedFile,
+                    "HELPER", "임상준", LocalDate.of(1990, 1, 1));
+            DocumentVerificationService.AnalysisResult supportedResult = verificationService.analyze(supportedFile,
+                    "HELPER", "임상준", LocalDate.of(1990, 1, 1));
 
             // then
             assertThat(unsupportedResult.forgeryScore()).isLessThan(supportedResult.forgeryScore());
@@ -129,7 +134,8 @@ class DocumentVerificationServiceTest {
                     new byte[50 * 1024]);
 
             // when
-            DocumentVerificationService.AnalysisResult result = verificationService.analyze(file);
+            DocumentVerificationService.AnalysisResult result = verificationService.analyze(file, "HELPER", "임상준",
+                    LocalDate.of(1990, 1, 1));
 
             // then
             assertThat(result).isNotNull();
@@ -147,7 +153,8 @@ class DocumentVerificationServiceTest {
                     new byte[50 * 1024]);
 
             // when
-            DocumentVerificationService.AnalysisResult result = verificationService.analyze(file);
+            DocumentVerificationService.AnalysisResult result = verificationService.analyze(file, "HELPER", "임상준",
+                    LocalDate.of(1990, 1, 1));
 
             // then
             assertThat(result).isNotNull();
@@ -171,7 +178,7 @@ class DocumentVerificationServiceTest {
                     java.nio.file.Files.readAllBytes(realFile.toPath()));
 
             // when
-            DocumentVerificationService.AnalysisResult result = verificationService.analyze(multipartFile);
+            DocumentVerificationService.AnalysisResult result = verificationService.analyze(multipartFile, "HELPER");
 
             // then
             // PNG 스크린샷/디지털 이미지는 EXIF 데이터가 없으므로 낮은 exifScore
@@ -202,7 +209,8 @@ class DocumentVerificationServiceTest {
             );
 
             // when
-            DocumentVerificationService.AnalysisResult result = verificationService.analyze(file);
+            DocumentVerificationService.AnalysisResult result = verificationService.analyze(file, "HELPER", "임상준",
+                    LocalDate.of(1990, 1, 1));
 
             // then
             // OCR은 신뢰도 0.85, 키워드 있음, 텍스트 길이 충분하므로 높은 점수
