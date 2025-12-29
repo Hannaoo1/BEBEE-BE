@@ -6,6 +6,7 @@ import com.lgcns.bebee.match.presentation.dto.res.PostsGetResDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -29,7 +30,132 @@ public interface MatchSwagger {
                     description = "도움 활동 목록 조회 성공",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = PostsGetResDTO.class)
+                            schema = @Schema(implementation = MatchesByDateGetResDTO.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "하루도움 매칭 조회 응답 예시",
+                                            description = """
+                                                    engagementTime 내에 도움 활동 날짜, 시간 포함
+                                                    - date : 활동일
+                                                    - schedule (단일 객체) : 요일, 시간
+                                                    """,
+                                            value = """
+                                                    {
+                                                        "matches": [
+                                                            {
+                                                                "agreementId": "791168241386394999",
+                                                                "postId": "404",
+                                                                "title": "병원 동행 도우미 구해요",
+                                                                "thumbnailImageUrl": "https://example.com/posts/hospital-help.jpg",
+                                                                "helper": {
+                                                                    "id": "101",
+                                                                    "nickname": "친절한도우미",
+                                                                    "profileImageUrl": "https://example.com/profiles/helper1.jpg",
+                                                                    "gender": "MALE",
+                                                                    "ageGroup": 30
+                                                                },
+                                                                "disabled": {
+                                                                    "id": "202",
+                                                                    "nickname": "김장애",
+                                                                    "profileImageUrl": "https://example.com/profiles/disabled1.jpg",
+                                                                    "gender": "FEMALE",
+                                                                    "ageGroup": 60
+                                                                },
+                                                                "confirmationDate": "2025-12-01",
+                                                                "type": "DAY",
+                                                                "helpCategories": [
+                                                                    {
+                                                                        "helpCategoryId": 1,
+                                                                        "helpCategoryName": "외출동행"
+                                                                    }
+                                                                ],
+                                                                "isVolunteer": false,
+                                                                "unitHoney": 200,
+                                                                "totalHoney": 200,
+                                                                "region": "서울특별시 중구 장충동",
+                                                                "engagementTime": {
+                                                                    "date": "2025-12-28",
+                                                                    "schedule": {
+                                                                        "dayOfWeek": "SUNDAY",
+                                                                        "startTime": "10:00:00",
+                                                                        "endTime": "12:00:00"
+                                                                    }
+                                                                },
+                                                                "isDayComplete": false,
+                                                                "isTermComplete": false,
+                                                                "chatRoomId": "303"
+                                                            }
+                                                        ]
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "지속도움 매칭 조회 응답 예시",
+                                            description = """
+                                                    engagementTime 내에 도움 활동 기간, 시간 포함
+                                                    - startDate : 활동 시작일
+                                                    - endDate : 활동 종료일
+                                                    - schedules (배열 객체) : 요일별 홛동 시간
+                                                    """,
+                                            value = """
+                                                    {
+                                                        "matches": [
+                                                            {
+                                                                "agreementId": "791168241386395000",
+                                                                "postId": "505",
+                                                                "title": "가사 도우미 구합니다",
+                                                                "thumbnailImageUrl": "https://example.com/posts/housework.jpg",
+                                                                "helper": {
+                                                                    "id": "103",
+                                                                    "nickname": "베테랑도우미",
+                                                                    "profileImageUrl": "https://example.com/profiles/helper2.jpg",
+                                                                    "gender": "FEMALE",
+                                                                    "ageGroup": 40
+                                                                },
+                                                                "disabled": {
+                                                                    "id": "204",
+                                                                    "nickname": "박장애",
+                                                                    "profileImageUrl": "https://example.com/profiles/disabled2.jpg",
+                                                                    "gender": "MALE",
+                                                                    "ageGroup": 70
+                                                                },
+                                                                "confirmationDate": "2025-12-15",
+                                                                "type": "TERM",
+                                                                "helpCategories": [
+                                                                    {
+                                                                        "helpCategoryId": 7,
+                                                                        "helpCategoryName": "가사지원"
+                                                                    }
+                                                                ],
+                                                                "isVolunteer": false,
+                                                                "unitHoney": 200,
+                                                                "totalHoney": 1200,
+                                                                "region": "서울특별시 중구 장충동",
+                                                                "engagementTime": {
+                                                                    "startDate": "2026-01-01",
+                                                                    "endDate": "2026-01-31",
+                                                                    "schedules": [
+                                                                        {
+                                                                            "dayOfWeek": "MONDAY",
+                                                                            "startTime": "09:00:00",
+                                                                            "endTime": "11:00:00"
+                                                                        },
+                                                                        {
+                                                                            "dayOfWeek": "WEDNESDAY",
+                                                                            "startTime": "14:00:00",
+                                                                            "endTime": "16:00:00"
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                "isDayComplete": false,
+                                                                "isTermComplete": false,
+                                                                "chatRoomId": "305"
+                                                            }
+                                                        ]
+                                                    }
+                                                    """
+                                    )
+                            }
                     )
             ),
             @ApiResponse(
