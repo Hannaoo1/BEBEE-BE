@@ -5,14 +5,14 @@ import com.lgcns.bebee.common.application.UseCase;
 import com.lgcns.bebee.common.exception.InvalidParamException;
 import com.lgcns.bebee.match.common.exception.MatchErrors;
 import com.lgcns.bebee.match.common.exception.MatchInvalidParamErrors;
-import com.lgcns.bebee.match.domain.entity.MatchMemberSync;
-import com.lgcns.bebee.match.domain.entity.vo.MemberRole;
+import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
+import com.lgcns.bebee.match.domain.entity.sync.Role;
 import com.lgcns.bebee.match.common.util.ParamValidator;
 import com.lgcns.bebee.match.domain.entity.Agreement;
 import com.lgcns.bebee.match.domain.repository.AgreementRepository;
 import com.lgcns.bebee.match.domain.entity.vo.AgreementStatus;
 import com.lgcns.bebee.match.domain.entity.vo.EngagementType;
-import com.lgcns.bebee.match.domain.service.MemberReader;
+import com.lgcns.bebee.match.domain.service.MemberManager;
 import com.lgcns.bebee.match.presentation.dto.DayEngagementTimeDTO;
 import com.lgcns.bebee.match.presentation.dto.TermEngagementTimeDTO;
 import com.lgcns.bebee.match.presentation.dto.res.AgreementHelpCategoryDTO;
@@ -31,7 +31,7 @@ import java.util.List;
 public class CreateAgreementUseCase implements UseCase<CreateAgreementUseCase.Param, CreateAgreementUseCase.Result> {
 
     private final AgreementRepository agreementRepository;
-    private final MemberReader memberReader;
+    private final MemberManager memberManager;
 
     @Transactional
     @Override
@@ -40,8 +40,8 @@ public class CreateAgreementUseCase implements UseCase<CreateAgreementUseCase.Pa
         param.validate();
 
         // 생성하려는 사용자 검증, 장애인 유저인지 확인
-        MatchMemberSync member = memberReader.getById(param.getDisabledId());
-        if (member.getRole() != MemberRole.DISABLED) {
+        MemberSync member = memberManager.findExistingMember(param.getDisabledId());
+        if (member.getRole() != Role.DISABLED) {
             throw MatchErrors.ONLY_DISABLED_MEMBERS_ALLOWED.toException();
         }
 
