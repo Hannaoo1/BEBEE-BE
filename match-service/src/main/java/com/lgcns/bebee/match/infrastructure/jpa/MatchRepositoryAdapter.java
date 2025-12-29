@@ -33,7 +33,7 @@ public class MatchRepositoryAdapter implements MatchRepository {
     }
 
     @Override
-    public List<Match> findByMonthAndMember(Long memberId, LocalDate monthStart, LocalDate monthEnd, EngagementType type) {
-        return matchJpaRepository.findByMonthAndMember(memberId, monthStart, monthEnd, type);
+    public List<Match> findByMonthAndMember(Long memberId, LocalDate monthStart, LocalDate monthEnd) {
+        return matchJpaRepository.findByMonthAndMember(memberId, monthStart, monthEnd);
     }
 }

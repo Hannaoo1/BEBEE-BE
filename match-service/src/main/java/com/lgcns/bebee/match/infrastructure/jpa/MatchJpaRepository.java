@@ -58,13 +58,11 @@ public interface MatchJpaRepository extends JpaRepository<Match, Long> {
         JOIN FETCH m.agreement a
         JOIN FETCH a.period p
         WHERE (m.helperId = :memberId OR m.disabledId = :memberId)
-        AND (:type IS NULL OR a.type = :type)
         AND (p.startDate <= :monthEnd AND p.endDate >= :monthStart)
         """)
     List<Match> findByMonthAndMember(
             @Param("memberId") Long memberId,
             @Param("monthStart") LocalDate monthStart,
-            @Param("monthEnd") LocalDate monthEnd,
-            @Param("type") EngagementType type
+            @Param("monthEnd") LocalDate monthEnd
     );
 }

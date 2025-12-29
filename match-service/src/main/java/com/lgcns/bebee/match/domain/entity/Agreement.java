@@ -12,9 +12,13 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.lgcns.bebee.match.common.exception.MatchErrors.ALREADY_CONFIRMED_AGREEMENT;
 
@@ -165,5 +169,49 @@ public class Agreement extends BaseTimeEntity {
             throw ALREADY_CONFIRMED_AGREEMENT.toException();
         }
         this.status = AgreementStatus.CONFIRMED;
+    }
+
+    /**
+     * 주어진 기간 내에서 이 Agreement의 활동이 있는 날짜들을 반환
+     * <p>
+     * DAY 타입: 활동 날짜 하나만 반환 (범위 내에 있는 경우)
+     * TERM 타입: 기간 내 활동 요일에 해당하는 모든 날짜 반환
+     *
+     * @param rangeStart 조회 범위 시작일
+     * @param rangeEnd 조회 범위 종료일
+     * @return 활동이 있는 날짜들의 Set
+     */
+    public Set<LocalDate> getActiveDatesInRange(LocalDate rangeStart, LocalDate rangeEnd) {
+        Set<LocalDate> activeDates = new HashSet<>();
+
+        if (this.type == EngagementType.DAY) {
+            // DAY: 활동 날짜 하나만
+            LocalDate activeDate = this.period.getStartDate();
+
+            if (!activeDate.isBefore(rangeStart) && !activeDate.isAfter(rangeEnd)) {
+                activeDates.add(activeDate);
+            }
+        } else {
+            // TERM: 기간 내 활동 요일에 해당하는 모든 날짜
+            LocalDate periodStart = this.period.getStartDate();
+            LocalDate periodEnd = this.period.getEndDate();
+
+            LocalDate calcStart = periodStart.isBefore(rangeStart) ? rangeStart : periodStart;
+            LocalDate calcEnd = periodEnd.isAfter(rangeEnd) ? rangeEnd : periodEnd;
+
+            Set<DayOfWeek> activityDays = this.schedules.stream()
+                    .map(AgreementSchedule::getDayOfWeek)
+                    .collect(Collectors.toSet());
+
+            LocalDate current = calcStart;
+            while (!current.isAfter(calcEnd)) {
+                if (activityDays.contains(current.getDayOfWeek())) {
+                    activeDates.add(current);
+                }
+                current = current.plusDays(1);
+            }
+        }
+
+        return activeDates;
     }
 }
