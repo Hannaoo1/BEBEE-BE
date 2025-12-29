@@ -71,6 +71,14 @@ public class CreateAgreementUseCase implements UseCase<CreateAgreementUseCase.Pa
         // 매칭 확인서 저장
         Agreement savedAgreement = agreementRepository.save(agreement);
 
+        // Lazy Loading 초기화 (period와 schedules 명시적 접근)
+        if (savedAgreement.getPeriod() != null) {
+            savedAgreement.getPeriod().getStartDate(); // 초기화
+        }
+        if (!savedAgreement.getSchedules().isEmpty()) {
+            savedAgreement.getSchedules().size(); // 초기화
+        }
+
         return Result.from(savedAgreement);
     }
 

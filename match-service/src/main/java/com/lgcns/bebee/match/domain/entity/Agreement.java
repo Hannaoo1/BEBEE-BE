@@ -3,6 +3,7 @@ package com.lgcns.bebee.match.domain.entity;
 import com.lgcns.bebee.common.domain.BaseTimeEntity;
 import com.lgcns.bebee.match.domain.entity.vo.AgreementStatus;
 import com.lgcns.bebee.match.domain.entity.vo.EngagementType;
+import com.lgcns.bebee.match.presentation.dto.AgreementScheduleDTO;
 import com.lgcns.bebee.match.presentation.dto.DayEngagementTimeDTO;
 import com.lgcns.bebee.match.presentation.dto.TermEngagementTimeDTO;
 import io.hypersistence.utils.hibernate.id.Tsid;
@@ -109,22 +110,21 @@ public class Agreement extends BaseTimeEntity {
         if (type == EngagementType.DAY && dayTime != null) {
             // DAY 타입: period 생성 및 주입
             AgreementPeriod period = AgreementPeriod.create(
-                    dayTime.getEngagementDate(),
-                    dayTime.getEngagementDate()
+                    dayTime.getDate(),
+                    dayTime.getDate()
             );
             period.assignToAgreement(agreement);
             agreement.period = period;
-
-            // DAY 타입: schedule 생성 및 주입
+            
+            AgreementScheduleDTO scheduleDTO = dayTime.getSchedule();
             AgreementSchedule schedule = AgreementSchedule.create(
-                    dayTime.getEngagementDate().getDayOfWeek(),
-                    dayTime.getStartTime(),
-                    dayTime.getEndTime()
+                    scheduleDTO.getDayOfWeek(),
+                    scheduleDTO.getStartTime(),
+                    scheduleDTO.getEndTime()
             );
             schedule.assignToAgreement(agreement);
             agreement.schedules.add(schedule);
         } else if (type == EngagementType.TERM && termTime != null) {
-            // TERM 타입: period 생성 및 주입
             AgreementPeriod period = AgreementPeriod.create(
                     termTime.getStartDate(),
                     termTime.getEndDate()
