@@ -53,20 +53,38 @@ public interface AgreementSwagger {
                             examples = {
                                 @ExampleObject(
                                         name = "하루도움 매칭 확인서 생성 요청 예시",
+                                        description = """
+                                            나눔 활동인 경우 isVolunteer=true로 지정하여 요청
+                                            unitHoney, totalHoney는 0 또는 아무 값이나 보내도 됨 (서버에서 자동으로 0으로 처리)
+                                        """,
                                         value = """
                                                 {
-                                                  "memberId": 101,
-                                                  "type": "DAY",
-                                                  "isVolunteer": false,
-                                                  "unitHoney": 100,
-                                                  "totalHoney": 100,
-                                                  "region": "서울특별시 강남구 논현동",
-                                                  "helpCategoryIds": [1, 2],
+                                                    "postId": 404,
+                                                	"helperId": 101,
+                                                    "disabledId": 202,
+                                                    "type": "DAY",
+                                                    "isVolunteer": false,
+                                                    "helpCategoryIds": [1, 2],
+                                                    "unitHoney": 200,
+                                                    "totalHoney": 200,
+                                                    "region": "서울특별시 중구 장충동",
+                                                    "engagementTime": {
+                                                        "date": "2025-12-28",
+                                                        "schedule": {
+                                                            "dayOfWeek": "SUNDAY",
+                                                            "startTime": "10:00:00",
+                                                            "endTime": "12:00:00"
+                                                        }
+                                                    }
                                                 }
                                                 """
                                 ),
                                     @ExampleObject(
                                             name = "지속도움 매칭 확인서 생성 요청 예시",
+                                            description = """
+                                                나눔 활동인 경우 isVolunteer=true로 지정하여 요청
+                                                unitHoney, totalHoney는 0 또는 아무 값이나 보내도 됨 (서버에서 자동으로 0으로 처리)
+                                            """,
                                             value = """
                                                     {
                                                          "postId": 505,
