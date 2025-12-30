@@ -155,3 +155,4 @@ public class SignUpUseCase implements UseCase<SignUpUseCase.Param, SignUpUseCase
         return memberRepository.existsByNickname(nickname);
     }
 }
+// Force git tracking for conflict resolution
