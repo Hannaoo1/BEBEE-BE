@@ -4,9 +4,11 @@ import com.lgcns.bebee.common.data.domain.BaseTimeEntity;
 import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Application extends BaseTimeEntity {
     @Id
