@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -30,6 +31,9 @@ public class MemberSync {
     @Column(nullable = false)
     private Role role;
 
+    @Column(nullable = false)
+    private LocalDate birthDate;
+
     @Column(nullable = false, precision = 10, scale = 7)
     private BigDecimal latitude;
 
@@ -41,6 +45,9 @@ public class MemberSync {
 
     @Column(nullable = false, precision = 5, scale = 2)
     private BigDecimal sweetness;
+
+    @Column
+    private String addressRoad;
 
     @Column(nullable = false)
     private String legalDongCode;

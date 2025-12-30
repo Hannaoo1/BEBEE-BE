@@ -3,9 +3,11 @@ package com.lgcns.bebee.match.application.usecase;
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
 import com.lgcns.bebee.match.domain.entity.*;
+import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
 import com.lgcns.bebee.match.domain.entity.vo.EngagementType;
 import com.lgcns.bebee.match.domain.repository.MatchRepository;
-import com.lgcns.bebee.match.domain.service.MemberReader;
+
+import com.lgcns.bebee.match.domain.service.MemberManager;
 import com.lgcns.bebee.match.domain.service.PostManager;
 import com.lgcns.bebee.match.presentation.dto.DayEngagementTimeDTO;
 import com.lgcns.bebee.match.presentation.dto.MemberInfoDTO;
@@ -27,7 +29,7 @@ import java.util.List;
 public class GetMatchesByDateUseCase implements UseCase<GetMatchesByDateUseCase.Param, GetMatchesByDateUseCase.Result> {
 
     private final MatchRepository matchRepository;
-    private final MemberReader memberReader;
+    private final MemberManager memberManager;
     private final PostManager postManager;
 
     @Transactional(readOnly = true)
@@ -43,7 +45,7 @@ public class GetMatchesByDateUseCase implements UseCase<GetMatchesByDateUseCase.
                 param.getEngagementType()
         );
 
-        return Result.from(matches, memberReader, postManager);
+        return Result.from(matches, memberManager, postManager);
     }
 
     @Getter
@@ -61,7 +63,7 @@ public class GetMatchesByDateUseCase implements UseCase<GetMatchesByDateUseCase.
 
         public static Result from(
                 List<Match> matches,
-                MemberReader memberReader,
+                MemberManager memberManager,
                 PostManager postManager
         ) {
             List<MatchInfo> matchInfos = matches.stream()
@@ -69,8 +71,8 @@ public class GetMatchesByDateUseCase implements UseCase<GetMatchesByDateUseCase.
                         // Match에서 Agreement 가져오기 (이미 JOIN FETCH로 로드됨!)
                         Agreement agreement = match.getAgreement();
 
-                        MatchMemberSync helper = memberReader.getById(agreement.getHelperId());
-                        MatchMemberSync disabled = memberReader.getById(agreement.getDisabledId());
+                        MemberSync helper = memberManager.findExistingMember(agreement.getHelperId());
+                        MemberSync disabled = memberManager.findExistingMember(agreement.getDisabledId());
 
                         String title = match.getTitle();
                         Long chatRoomId = match.getChatRoomId();
