@@ -5,8 +5,10 @@ import com.lgcns.bebee.match.domain.entity.vo.EngagementType;
 import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Engagement extends BaseTimeEntity {
