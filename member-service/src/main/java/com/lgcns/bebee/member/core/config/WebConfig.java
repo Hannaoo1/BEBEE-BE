@@ -23,14 +23,15 @@ public class WebConfig extends BaseWebConfig {
     private final CurrentMemberArgumentResolver currentMemberArgumentResolver;
 
     @Autowired
-    public WebConfig(CorsProperties corsProperties, JwtProperties jwtProperties, CurrentMemberArgumentResolver currentMemberArgumentResolver) {
+    public WebConfig(CorsProperties corsProperties, JwtProperties jwtProperties,
+            CurrentMemberArgumentResolver currentMemberArgumentResolver) {
         super(corsProperties);
         this.jwtProperties = jwtProperties;
         this.currentMemberArgumentResolver = currentMemberArgumentResolver;
     }
 
     @Bean
-    public JwtAuthenticationInterceptor jwtAuthenticationInterceptor(){
+    public JwtAuthenticationInterceptor jwtAuthenticationInterceptor() {
         return new JwtAuthenticationInterceptor(jwtProperties);
     }
 
@@ -39,15 +40,19 @@ public class WebConfig extends BaseWebConfig {
         registry.addInterceptor(jwtAuthenticationInterceptor())
                 .addPathPatterns("/**")
                 .excludePathPatterns(
-                        "/auth/**",
+                        "/auth/login",
+                        "/auth/signup",
+                        "/auth/check-email",
+                        "/auth/check-nickname",
+                        "/documents/**",
                         "/error",
                         "/swagger-ui/**",
-                        "/v3/api-docs/**"
-                );
+                        "/v3/api-docs/**");
     }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
+        super.addCorsMappings(registry);
     }
 
     @Override

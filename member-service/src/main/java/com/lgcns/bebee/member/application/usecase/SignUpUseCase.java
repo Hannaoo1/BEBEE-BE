@@ -10,10 +10,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.regex.Pattern;
 
-import com.lgcns.bebee.member.domain.service.PasswordPolicyValidator;
+import com.lgcns.bebee.member.domain.service.MemberManagement;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,31 +20,29 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class SignUpUseCase implements UseCase<SignUpUseCase.Param, SignUpUseCase.Result> {
     private final MemberRepository memberRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final PasswordPolicyValidator passwordPolicyValidator;
+    private final MemberManagement memberManagement;
 
     @Override
     @Transactional
     public SignUpUseCase.Result execute(Param params) {
         params.validate();
 
-        passwordPolicyValidator.validate(params.password);
-        String encodedPassword = passwordEncoder.encode(params.password);
+        memberManagement.checkEmailDuplicated(params.getEmail());
+        memberManagement.checkNicknameDuplicated(params.getNickname());
 
-        Member newMember = Member.create(
-                params.email,
-                encodedPassword,
-                params.name,
-                params.nickname,
-                params.birthDate,
-                params.gender,
-                params.phoneNumber,
-                params.role,
-                params.addressRoad,
-                params.latitude,
-                params.longitude,
-                params.districtCode
-        );
+        Member newMember = memberManagement.createMember(
+                params.getEmail(),
+                params.getPassword(),
+                params.getName(),
+                params.getNickname(),
+                params.getBirthDate(),
+                params.getGender(),
+                params.getPhoneNumber(),
+                params.getRole(),
+                params.getAddressRoad(),
+                params.getLatitude(),
+                params.getLongitude(),
+                params.getDistrictCode());
 
         Member savedMember = memberRepository.save(newMember);
 
@@ -102,7 +99,15 @@ public class SignUpUseCase implements UseCase<SignUpUseCase.Param, SignUpUseCase
 
     @Getter
     @RequiredArgsConstructor
-    public static class Result{
+    public static class Result {
         private final Long memberId;
+    }
+
+    public boolean checkEmailDuplicated(String email) {
+        return memberRepository.existsByEmail(email);
+    }
+
+    public boolean checkNicknameDuplicated(String nickname) {
+        return memberRepository.existsByNickname(nickname);
     }
 }

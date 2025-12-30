@@ -41,6 +41,7 @@ public class JwtAuthenticationInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        log.info("인증 인터셉터 진입: URI={}, Method={}", request.getRequestURI(), request.getMethod());
         if (handler instanceof HandlerMethod) {
             String token = resolveToken(request);
 

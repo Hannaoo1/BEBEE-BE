@@ -21,7 +21,8 @@ import java.time.LocalDate;
 public class Member extends BaseTimeEntity {
 
     @Id
-    @Tsid @Column(name = "member_id")
+    @Tsid
+    @Column(name = "member_id")
     private Long id;
 
     @Column(nullable = false, length = 30, unique = true)
@@ -76,17 +77,17 @@ public class Member extends BaseTimeEntity {
     private BigDecimal sweetness = BigDecimal.valueOf(40.00);
 
     public static Member create(String email,
-                                String encodedPassword,
-                                String name,
-                                String nickname,
-                                LocalDate birthDate,
-                                String gender,
-                                String phoneNumber,
-                                String role,
-                                String addressRoad,
-                                BigDecimal latitude,
-                                BigDecimal longitude,
-                                String districtCode) {
+            String encodedPassword,
+            String name,
+            String nickname,
+            LocalDate birthDate,
+            String gender,
+            String phoneNumber,
+            String role,
+            String addressRoad,
+            BigDecimal latitude,
+            BigDecimal longitude,
+            String districtCode) {
         Member member = new Member();
         member.email = email;
         member.password = encodedPassword;
@@ -105,30 +106,26 @@ public class Member extends BaseTimeEntity {
         return member;
     }
 
-    /**
-     * 입력된 비밀번호가 회원의 비밀번호와 일치하는지 검증합니다.
-     *
-     * @param encodedPassword 암호화된 입력 비밀번호
-     * @throws com.lgcns.bebee.member.core.exception.MemberException 비밀번호가 일치하지 않는 경우
-     */
-    public void validatePassword(String encodedPassword) {
-        if (!encodedPassword.equals(this.password)) {
-            throw MemberErrors.INVALID_PASSWORD.toException();
-        }
-    }
-
-    /**
-     * 회원이 로그인 가능한 상태인지 검증합니다.
-     * ACTIVE 상태만 로그인이 가능합니다.
-     *
-     * @throws com.lgcns.bebee.member.core.exception.MemberException 로그인 불가능한 상태인 경우
-     */
     public void validateLoginAvailable() {
         switch (this.status) {
             case REJECTED -> throw MemberErrors.MEMBER_STATUS_REJECTED.toException();
             case WITHDRAWN, WITHDRAW_APPROVAL -> throw MemberErrors.MEMBER_STATUS_WITHDRAWN.toException();
-            case ACTIVE, PENDING_APPROVAL -> { /* 정상 */ }
+            case ACTIVE, PENDING_APPROVAL -> {
+                /* 정상 */ }
         }
     }
-}
 
+    /**
+     * 회원을 활성화 상태로 변경합니다.
+     */
+    public void activate() {
+        this.status = MemberStatus.ACTIVE;
+    }
+
+    /**
+     * 회원을 거절 상태로 변경합니다.
+     */
+    public void reject() {
+        this.status = MemberStatus.REJECTED;
+    }
+}
