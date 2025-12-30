@@ -45,6 +45,7 @@ public class WebConfig extends BaseWebConfig {
                         "/auth/check-email",
                         "/auth/check-nickname",
                         "/documents/**",
+                        "/api/documents/**",
                         "/error",
                         "/swagger-ui/**",
                         "/v3/api-docs/**");

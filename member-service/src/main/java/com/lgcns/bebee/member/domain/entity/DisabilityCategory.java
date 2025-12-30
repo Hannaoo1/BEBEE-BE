@@ -20,4 +20,3 @@ public class DisabilityCategory extends BaseTimeEntity {
     @Column(nullable = false, length = 10, unique = true)
     private String type;
 }
-

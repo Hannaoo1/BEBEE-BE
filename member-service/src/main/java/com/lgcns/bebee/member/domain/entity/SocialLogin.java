@@ -10,8 +10,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "social_login",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"provider", "provider_user_id"}))
+@Table(name = "social_login", uniqueConstraints = @UniqueConstraint(columnNames = { "provider", "provider_user_id" }))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SocialLogin extends BaseTimeEntity {
 
@@ -30,4 +29,3 @@ public class SocialLogin extends BaseTimeEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 }
-

@@ -62,7 +62,7 @@ public class SignUpUseCase implements UseCase<SignUpUseCase.Param, SignUpUseCase
         if ("HELPER".equals(params.getRole()) && params.getHelpTypes() != null && !params.getHelpTypes().isEmpty()) {
             for (String helpTypeName : params.getHelpTypes()) {
                 HelpCategory helpCategory = helpCategoryRepository
-                        .findByName(helpTypeName)
+                        .findByHelpType(helpTypeName)
                         .orElseThrow(() -> new IllegalArgumentException("도움 유형을 찾을 수 없습니다: " + helpTypeName));
                 MemberHelpCategory memberHelpCategory = MemberHelpCategory.create(savedMember, helpCategory);
                 memberHelpCategoryRepository.save(memberHelpCategory);

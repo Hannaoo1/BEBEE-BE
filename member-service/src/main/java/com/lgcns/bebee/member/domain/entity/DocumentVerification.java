@@ -18,7 +18,8 @@ import lombok.NoArgsConstructor;
 public class DocumentVerification extends BaseTimeEntity {
 
     @Id
-    @Tsid @Column(name = "document_verification_id")
+    @Tsid
+    @Column(name = "document_verification_id")
     private Long id;
 
     @Column(nullable = false, length = 255)
@@ -46,7 +47,8 @@ public class DocumentVerification extends BaseTimeEntity {
 
     /**
      * 문서 검증 생성 (정적 팩토리 메서드)
-     * @param fileUrl 파일 URL
+     * 
+     * @param fileUrl  파일 URL
      * @param document 문서 엔티티
      * @return 생성된 DocumentVerification
      */
@@ -60,10 +62,11 @@ public class DocumentVerification extends BaseTimeEntity {
 
     /**
      * 분석 결과 적용
-     * @param exifScore EXIF 점수
-     * @param ocrScore OCR 점수
+     * 
+     * @param exifScore    EXIF 점수
+     * @param ocrScore     OCR 점수
      * @param forgeryScore 종합 위변조 점수
-     * @param systemFlag 시스템 플래그 (LOW/MID/HIGH)
+     * @param systemFlag   시스템 플래그 (LOW/MID/HIGH)
      */
     public void applyAnalysisResult(Integer exifScore, Integer ocrScore, Integer forgeryScore, String systemFlag) {
         this.exifScore = exifScore;
@@ -81,6 +84,7 @@ public class DocumentVerification extends BaseTimeEntity {
 
     /**
      * 거절 처리
+     * 
      * @param reason 거절 사유
      */
     public void reject(String reason) {
@@ -88,4 +92,3 @@ public class DocumentVerification extends BaseTimeEntity {
         this.reason = reason;
     }
 }
-

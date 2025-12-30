@@ -6,6 +6,7 @@ import com.lgcns.bebee.member.presentation.dto.res.DocumentVerificationResDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.lgcns.bebee.member.application.client.OcrClient;
 import java.util.List;
 
 /**
@@ -36,6 +37,11 @@ public interface DocumentSwagger {
      * 문서 승인 (관리자용)
      */
     ResponseEntity<Void> approveDocument(Long verificationId);
+
+    /**
+     * OCR 분석 (단순 텍스트 추출)
+     */
+    ResponseEntity<OcrClient.OcrResult> extractOcr(MultipartFile file, String role);
 
     /**
      * 문서 거절 (관리자용)

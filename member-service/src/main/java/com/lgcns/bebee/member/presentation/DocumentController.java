@@ -28,6 +28,7 @@ public class DocumentController implements DocumentSwagger {
         private final ApproveDocumentUseCase approveDocumentUseCase;
         private final RejectDocumentUseCase rejectDocumentUseCase;
         private final DocumentManagement documentManagement;
+        private final com.lgcns.bebee.member.application.client.OcrClient ocrClient;
 
         /**
          * 문서 업로드
@@ -115,5 +116,19 @@ public class DocumentController implements DocumentSwagger {
                                 request.getReason());
                 rejectDocumentUseCase.execute(param);
                 return ResponseEntity.ok().build();
+        }
+
+        /**
+         * OCR 분석 (단순 텍스트 추출)
+         * 
+         * @param file 분석할 이미지 파일
+         * @param role 사용자 역할
+         * @return OCR 분석 결과
+         */
+        @PostMapping("/ocr-extract")
+        public ResponseEntity<com.lgcns.bebee.member.application.client.OcrClient.OcrResult> extractOcr(
+                        @RequestPart MultipartFile file,
+                        @RequestParam(required = false) String role) {
+                return ResponseEntity.ok(ocrClient.analyze(file, role));
         }
 }

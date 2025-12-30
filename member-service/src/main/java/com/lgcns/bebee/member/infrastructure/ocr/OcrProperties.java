@@ -22,5 +22,5 @@ public class OcrProperties {
     /**
      * 타임아웃 (밀리초)
      */
-    private int timeout = 30000;
+    private int timeout = 60000;
 }
