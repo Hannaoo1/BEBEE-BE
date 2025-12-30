@@ -2,11 +2,12 @@ package com.lgcns.bebee.match.application;
 
 import com.lgcns.bebee.match.application.usecase.GetMatchesByDateUseCase;
 import com.lgcns.bebee.match.domain.entity.*;
+import com.lgcns.bebee.match.domain.entity.sync.Gender;
+import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
+import com.lgcns.bebee.match.domain.entity.sync.Role;
 import com.lgcns.bebee.match.domain.entity.vo.EngagementType;
-import com.lgcns.bebee.match.domain.entity.vo.Gender;
-import com.lgcns.bebee.match.domain.entity.vo.MemberRole;
 import com.lgcns.bebee.match.domain.repository.MatchRepository;
-import com.lgcns.bebee.match.domain.service.MemberReader;
+import com.lgcns.bebee.match.domain.service.MemberManager;
 import com.lgcns.bebee.match.domain.service.PostManager;
 import com.lgcns.bebee.match.presentation.dto.DayEngagementTimeDTO;
 import com.lgcns.bebee.match.presentation.dto.TermEngagementTimeDTO;
@@ -44,7 +45,7 @@ class GetMatchesByDateUseCaseTest {
     private MatchRepository matchRepository;
 
     @Mock
-    private MemberReader memberReader;
+    private MemberManager memberManager;
 
     @Mock
     private PostManager postManager;
@@ -54,8 +55,8 @@ class GetMatchesByDateUseCaseTest {
 
     private Long memberId;
     private LocalDate targetDate;
-    private MatchMemberSync helperMember;
-    private MatchMemberSync disabledMember;
+    private MemberSync helperMember;
+    private MemberSync disabledMember;
     private Post mockPost;
 
     @BeforeEach
@@ -65,18 +66,18 @@ class GetMatchesByDateUseCaseTest {
 
         // Helper Member Mock
         helperMember = createMockMember(101L, "친절한도우미", "https://example.com/helper.jpg",
-                Gender.MALE, LocalDate.of(1990, 5, 15), MemberRole.HELPER);
+                Gender.MALE, LocalDate.of(1990, 5, 15), Role.HELPER);
 
         // Disabled Member Mock
         disabledMember = createMockMember(202L, "김장애", "https://example.com/disabled.jpg",
-                Gender.FEMALE, LocalDate.of(1960, 3, 20), MemberRole.DISABLED);
+                Gender.FEMALE, LocalDate.of(1960, 3, 20), Role.DISABLED);
 
         // Post Mock
         mockPost = createMockPost(404L, "병원 동행 도우미 구해요",
                 "https://example.com/posts/hospital-help.jpg");
 
-        when(memberReader.getById(101L)).thenReturn(helperMember);
-        when(memberReader.getById(202L)).thenReturn(disabledMember);
+        when(memberManager.findExistingMember(101L)).thenReturn(helperMember);
+        when(memberManager.findExistingMember(202L)).thenReturn(disabledMember);
         when(postManager.findSinglePost(404L)).thenReturn(mockPost);
     }
 
@@ -158,17 +159,17 @@ class GetMatchesByDateUseCaseTest {
             Match termMatch = createMatch(3002L, 103L, 204L, 505L,
                     "가사 도우미 구합니다", 4002L, termAgreement);
 
-            MatchMemberSync helper2 = createMockMember(103L, "베테랑도우미",
+            MemberSync helper2 = createMockMember(103L, "베테랑도우미",
                     "https://example.com/helper2.jpg", Gender.FEMALE,
-                    LocalDate.of(1980, 7, 10), MemberRole.HELPER);
-            MatchMemberSync disabled2 = createMockMember(204L, "박장애",
+                    LocalDate.of(1980, 7, 10), Role.HELPER);
+            MemberSync disabled2 = createMockMember(204L, "박장애",
                     "https://example.com/disabled2.jpg", Gender.MALE,
-                    LocalDate.of(1950, 8, 25), MemberRole.DISABLED);
+                    LocalDate.of(1950, 8, 25), Role.DISABLED);
             Post post2 = createMockPost(505L, "가사 도우미 구합니다",
                     "https://example.com/posts/housework.jpg");
 
-            when(memberReader.getById(103L)).thenReturn(helper2);
-            when(memberReader.getById(204L)).thenReturn(disabled2);
+            when(memberManager.findExistingMember(103L)).thenReturn(helper2);
+            when(memberManager.findExistingMember(204L)).thenReturn(disabled2);
             when(postManager.findSinglePost(505L)).thenReturn(post2);
 
             when(matchRepository.findByDateAndMember(
@@ -300,9 +301,9 @@ class GetMatchesByDateUseCaseTest {
 
     // ========== 헬퍼 메서드 ==========
 
-    private MatchMemberSync createMockMember(Long id, String nickname, String profileImageUrl,
-                                              Gender gender, LocalDate birthDate, MemberRole role) throws Exception {
-        MatchMemberSync member = mock(MatchMemberSync.class);
+    private MemberSync createMockMember(Long id, String nickname, String profileImageUrl,
+                                              Gender gender, LocalDate birthDate, Role role) throws Exception {
+        MemberSync member = mock(MemberSync.class);
 
         when(member.getId()).thenReturn(id);
         when(member.getNickname()).thenReturn(nickname);
