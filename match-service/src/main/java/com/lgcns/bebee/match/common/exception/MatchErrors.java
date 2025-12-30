@@ -15,7 +15,8 @@ public enum MatchErrors implements ErrorInfo {
     CANNOT_REFUSE_CONFIRMED_AGREEMENT("이미 수락된 매칭 확인서는 거절할 수 없습니다.", HttpStatus.CONFLICT),
     ALREADY_MATCHED("이미 매칭이 성사된 요청입니다.", HttpStatus.CONFLICT),
     HELPER_ONLY_CAN_APPLY("도우미만 지원할 수 있습니다.", HttpStatus.FORBIDDEN),
-    ALREADY_APPLIED("이미 지원한 게시글입니다.", HttpStatus.CONFLICT);
+    ALREADY_APPLIED("이미 지원한 게시글입니다.", HttpStatus.CONFLICT),
+    UNAUTHORIZED_ACCESS("권한이 없습니다.", HttpStatus.FORBIDDEN);
 
     private final String desc;
     private final HttpStatus httpStatus;
