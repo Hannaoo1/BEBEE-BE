@@ -1,12 +1,15 @@
 package com.lgcns.bebee.match.domain.entity;
 
 import com.lgcns.bebee.common.domain.BaseTimeEntity;
+import com.lgcns.bebee.match.domain.entity.vo.EngagementStatus;
 import com.lgcns.bebee.match.domain.entity.vo.EngagementType;
 import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
 
 @Getter
 @Entity
@@ -21,6 +24,12 @@ public class Engagement extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     private EngagementType type;
+
+    @Column
+    private EngagementStatus status;
+
+    @Column
+    private LocalDate endDate;
 
     @Column
     private Boolean isDisabledCheck = false;
