@@ -46,6 +46,9 @@ dependencies {
     // Redis - 리프레시 토큰 블랙리스트 관리용
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+    // Spring Actuator - 어플리케이션 모니터링 및 관리 엔드포인트를 제공
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
     // Spring Boot Test - 테스트용 종속성
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
