@@ -30,5 +30,15 @@ public class MemberDisabilityCategory extends BaseTimeEntity {
 
     @Column(nullable = false, length = 300)
     private String disabilityDescription;
-}
 
+    public static MemberDisabilityCategory create(Member member, DisabilityCategory disabilityCategory, String level,
+            String description) {
+        MemberDisabilityCategory entity = new MemberDisabilityCategory();
+        entity.id = new MemberDisabilityCategoryId(member.getId(), disabilityCategory.getDisabilityCategoryId());
+        entity.member = member;
+        entity.disabilityCategory = disabilityCategory;
+        entity.level = level;
+        entity.disabilityDescription = description;
+        return entity;
+    }
+}

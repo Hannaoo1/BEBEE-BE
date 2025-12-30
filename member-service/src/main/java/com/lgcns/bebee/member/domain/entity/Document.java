@@ -30,5 +30,18 @@ public class Document extends BaseTimeEntity {
     private String description;
 
     private Long memberId;
-}
 
+    /**
+     * Document 생성 (정적 팩토리 메서드)
+     */
+    public static Document create(Long memberId, String targetRole, String docCode, String docNameKo,
+            String description) {
+        Document document = new Document();
+        document.memberId = memberId;
+        document.targetRole = targetRole;
+        document.docCode = docCode;
+        document.docNameKo = docNameKo;
+        document.description = description;
+        return document;
+    }
+}
