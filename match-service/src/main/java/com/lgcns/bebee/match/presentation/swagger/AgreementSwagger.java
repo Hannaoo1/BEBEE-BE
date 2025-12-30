@@ -53,6 +53,10 @@ public interface AgreementSwagger {
                             examples = {
                                 @ExampleObject(
                                         name = "하루도움 매칭 확인서 생성 요청 예시",
+                                        description = """
+                                            나눔 활동인 경우 isVolunteer=true로 지정하여 요청
+                                            unitHoney, totalHoney는 0 또는 아무 값이나 보내도 됨 (서버에서 자동으로 0으로 처리)
+                                        """,
                                         value = """
                                                 {
                                                     "postId": 404,
@@ -65,15 +69,22 @@ public interface AgreementSwagger {
                                                     "totalHoney": 200,
                                                     "region": "서울특별시 중구 장충동",
                                                     "engagementTime": {
-                                                        "engagementDate": "2025-12-28",
-                                                        "startTime": "10:00:00",
-                                                        "endTime": "12:00:00"
+                                                        "date": "2025-12-28",
+                                                        "schedule": {
+                                                            "dayOfWeek": "SUNDAY",
+                                                            "startTime": "10:00:00",
+                                                            "endTime": "12:00:00"
+                                                        }
                                                     }
                                                 }
                                                 """
                                 ),
                                     @ExampleObject(
                                             name = "지속도움 매칭 확인서 생성 요청 예시",
+                                            description = """
+                                                나눔 활동인 경우 isVolunteer=true로 지정하여 요청
+                                                unitHoney, totalHoney는 0 또는 아무 값이나 보내도 됨 (서버에서 자동으로 0으로 처리)
+                                            """,
                                             value = """
                                                     {
                                                          "postId": 505,

@@ -15,6 +15,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * HTTP 기반 OCR 클라이언트 구현체
@@ -29,7 +30,7 @@ public class HttpOcrClientImpl implements OcrClient {
 
     /**
      * 이미지 파일에서 텍스트를 추출하고 분석
-     * 
+     *
      * @param file 분석할 이미지 파일
      * @param role 사용자 역할
      * @return OCR 분석 결과
@@ -89,6 +90,6 @@ public class HttpOcrClientImpl implements OcrClient {
         private Integer ocrScore;
         private List<String> keywords;
         private List<String> names;
-        private java.util.Map<String, String> fields;
+        private Map<String, String> fields;
     }
 }

@@ -46,7 +46,7 @@ public class JwtAuthenticationInterceptor implements HandlerInterceptor {
             String token = resolveToken(request);
 
             Claims claims = parseClaims(token);
-            Long memberId = Long.parseLong(claims.getSubject());
+            String memberId = claims.getSubject();
             request.setAttribute(MEMBER_KEY, memberId);
         }
         return true;

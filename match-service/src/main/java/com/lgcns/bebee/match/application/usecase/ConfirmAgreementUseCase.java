@@ -38,7 +38,7 @@ public class ConfirmAgreementUseCase implements UseCase<ConfirmAgreementUseCase.
                 param.getPostId(),
                 param.getTitle(),
                 param.getChatRoomId(),
-                param.getAgreementId()
+                agreement
         );
         Match savedMatch = matchRepository.save(match);
 
