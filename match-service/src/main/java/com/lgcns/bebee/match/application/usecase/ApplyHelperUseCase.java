@@ -37,7 +37,7 @@ public class ApplyHelperUseCase implements UseCase<ApplyHelperUseCase.Param, Voi
             throw MatchErrors.HELPER_ONLY_CAN_APPLY.toException();
         }
 
-        if (applicationRepository.existsByApplicantIdAndPost_PostId(param.getMemberId(), param.getPostId())) {
+        if (applicationRepository.existsByApplicantIdAndPost_Id(param.getMemberId(), param.getPostId())) {
             throw MatchErrors.ALREADY_APPLIED.toException();
         }
 
