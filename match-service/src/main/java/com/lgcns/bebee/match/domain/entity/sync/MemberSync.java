@@ -11,7 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "match_member_sync")
+@Table(name = "member_sync")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberSync {
