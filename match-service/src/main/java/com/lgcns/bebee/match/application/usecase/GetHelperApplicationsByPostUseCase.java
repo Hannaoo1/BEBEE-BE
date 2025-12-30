@@ -11,6 +11,7 @@ import com.lgcns.bebee.match.domain.entity.Application;
 import com.lgcns.bebee.match.domain.entity.Post;
 import com.lgcns.bebee.match.domain.entity.sync.Gender;
 import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
+import com.lgcns.bebee.match.domain.entity.sync.Role;
 import com.lgcns.bebee.match.domain.repository.HelperApplicationRepository;
 import com.lgcns.bebee.match.domain.service.MemberManager;
 import com.lgcns.bebee.match.domain.service.PostManager;
@@ -42,20 +43,20 @@ public class GetHelperApplicationsByPostUseCase implements UseCase<GetHelperAppl
         if (!post.getMemberId().equals(param.getMemberId())) {
             throw MatchErrors.UNAUTHORIZED_ACCESS.toException();
         }
-        
+
         List<Application> applications = applicationRepository.findAllByPost_Id(param.getPostId());
         
         List<ApplicantInfo> applicants = applications.stream()
                 .map(application -> {
-                    MemberSync member = memberManager.findExistingMember(application.getApplicantId());
+                    MemberSync applicant = memberManager.findExistingMember(application.getApplicantId());
 
-                    Integer ageGroup = AgeGroupCalculator.calculateAgeGroup(member.getBirthDate());
+                    Integer ageGroup = AgeGroupCalculator.calculateAgeGroup(applicant.getBirthDate());
 
                     return new ApplicantInfo(
-                            member.getId(),
-                            member.getNickname(),
+                            applicant.getId(),
+                            applicant.getNickname(),
                             ageGroup,
-                            member.getGender(),
+                            applicant.getGender(),
                             application.getIsVolunteer()
                     );
                 })

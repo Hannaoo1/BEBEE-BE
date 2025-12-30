@@ -3,16 +3,20 @@ package com.lgcns.bebee.match.application.usecase;
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
 import com.lgcns.bebee.common.exception.InvalidParamException;
+import com.lgcns.bebee.match.common.exception.MatchErrors;
 import com.lgcns.bebee.match.common.exception.MatchInvalidParamErrors;
 import com.lgcns.bebee.match.common.util.ParamValidator;
 import com.lgcns.bebee.match.domain.entity.Application;
 import com.lgcns.bebee.match.domain.entity.Post;
 import com.lgcns.bebee.match.domain.entity.PostPeriod;
 import com.lgcns.bebee.match.domain.entity.PostSchedule;
+import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
+import com.lgcns.bebee.match.domain.entity.sync.Role;
 import com.lgcns.bebee.match.domain.entity.vo.EngagementType;
 import com.lgcns.bebee.match.domain.entity.vo.PostStatus;
 import com.lgcns.bebee.match.domain.repository.HelperApplicationRepository;
 import com.lgcns.bebee.match.domain.repository.PostRepository;
+import com.lgcns.bebee.match.domain.service.MemberManager;
 import com.lgcns.bebee.match.presentation.dto.DayEngagementTimeDTO;
 import com.lgcns.bebee.match.presentation.dto.PostScheduleDTO;
 import com.lgcns.bebee.match.presentation.dto.TermEngagementTimeDTO;
@@ -34,11 +38,17 @@ public class GetHelperApplicationPostsUseCase implements UseCase<GetHelperApplic
 
     private final PostRepository postRepository;
     private final HelperApplicationRepository applicationRepository;
+    private final MemberManager memberManager;
 
     @Transactional(readOnly = true)
     @Override
     public Result execute(Param param) {
         param.validate();
+
+        MemberSync member = memberManager.findExistingMember(param.getMemberId());
+        if (member.getRole() != Role.DISABLED) {
+            throw MatchErrors.ONLY_DISABLED_MEMBERS_ALLOWED.toException();
+        }
         
         List<Post> posts = postRepository.findAllByMemberId(param.getMemberId());
         
