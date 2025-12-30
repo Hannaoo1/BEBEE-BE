@@ -2,13 +2,10 @@ package com.lgcns.bebee.match.application.usecase;
 
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
-import com.lgcns.bebee.match.common.exception.MatchErrors;
-import com.lgcns.bebee.match.domain.entity.Engagement;
 import com.lgcns.bebee.match.domain.entity.Match;
 import com.lgcns.bebee.match.domain.entity.vo.Keyword;
 import com.lgcns.bebee.match.domain.entity.vo.ReviewDirection;
-import com.lgcns.bebee.match.domain.service.EngagementReader;
-import com.lgcns.bebee.match.domain.service.MatchReader;
+import com.lgcns.bebee.match.domain.service.ReviewValidator;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,29 +26,19 @@ public class GetReviewKeywordsUseCase implements UseCase<GetReviewKeywordsUseCas
      * - 도우미 → 장애인 평가: 키워드 13-24
      */
 
-    private final EngagementReader engagementReader;
-    private final MatchReader matchReader;
+    private final ReviewValidator reviewValidator;
 
     @Transactional(readOnly = true)
     @Override
     public Result execute(Param param) {
 
-        // 활동 조회
-        Engagement engagement = engagementReader.getById(param.getEngagementId());
+        // 검증
+        ReviewValidator.ValidationResult validation = reviewValidator.validateReviewEligibility(
+                param.getEngagementId(),
+                param.getMemberId()
+        );
 
-        // 매칭 조회
-        Match match = matchReader.getByAgreementId(engagement.getAgreementId());
-
-        // 참여자 확인
-        if (!match.isParticipant(param.getMemberId())) {
-            throw MatchErrors.NOT_ENGAGEMENT_MEMBER.toException();
-        }
-
-        // 활동 완료 확인
-        // Engagement 완료 API 구현 후 상태 및 종료일 검증 추가 예정
-        if (!engagement.getIsDisabledCheck() || !engagement.getIsHelperCheck()) {
-            throw MatchErrors.ENGAGEMENT_NOT_COMPLETED.toException();
-        }
+        Match match = validation.getMatch();
 
         // 리뷰 방향 결정
         ReviewDirection direction;
