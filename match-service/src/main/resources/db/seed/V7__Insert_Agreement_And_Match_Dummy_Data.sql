@@ -12,8 +12,8 @@ INSERT INTO agreement (agreement_id, post_id, helper_id, disabled_id, unit_honey
 VALUES (
     10001,
     1001,
-    101,  -- HELPER 회원
-    100,  -- DISABLED 회원
+    700,  -- HELPER 회원 (강지훈)
+    100,  -- DISABLED 회원 (김철수)
     5000,
     5000,
     '서울시 강남구 역삼동',
@@ -34,7 +34,7 @@ INSERT INTO agreement (agreement_id, post_id, helper_id, disabled_id, unit_honey
 VALUES (
     10002,
     1003,
-    102,
+    800,  -- HELPER 회원 (윤서연)
     100,
     4000,
     40000,
@@ -56,7 +56,7 @@ INSERT INTO agreement (agreement_id, post_id, helper_id, disabled_id, unit_honey
 VALUES (
     10003,
     1008,
-    103,
+    900,  -- HELPER 회원 (임동현)
     200,
     0,      -- 나눔이므로 0
     0,
@@ -78,7 +78,7 @@ INSERT INTO agreement (agreement_id, post_id, helper_id, disabled_id, unit_honey
 VALUES (
     10004,
     1011,
-    104,
+    1000,  -- HELPER 회원 (한미래)
     200,
     8000,
     80000,
@@ -100,7 +100,7 @@ INSERT INTO agreement (agreement_id, post_id, helper_id, disabled_id, unit_honey
 VALUES (
     10005,
     1021,
-    101,
+    700,  -- HELPER 회원 (강지훈)
     100,
     7000,
     70000,
@@ -195,12 +195,12 @@ VALUES (
 -- AgreementSchedule (스케줄 정보)
 -- ========================================
 
--- Agreement 10001 스케줄 (DAY - 오늘만)
+-- Agreement 10001 스케줄 (DAY - 화요일, 2025-12-30)
 INSERT INTO agreement_schedule (agreement_schedule_id, agreement_id, day_of_week, start_time, end_time, created_at, updated_at)
 VALUES (
     30001,
     10001,
-    'MONDAY',
+    'TUESDAY',
     '09:00:00',
     '12:00:00',
     NOW(),
@@ -240,7 +240,7 @@ ON DUPLICATE KEY UPDATE
     end_time = VALUES(end_time),
     updated_at = NOW();
 
--- Agreement 10005 스케줄 (TERM - 매일)
+-- Agreement 10005 스케줄 (TERM - 월~금)
 INSERT INTO agreement_schedule (agreement_schedule_id, agreement_id, day_of_week, start_time, end_time, created_at, updated_at)
 VALUES
 (30008, 10005, 'MONDAY', '08:00:00', '08:30:00', NOW(), NOW()),
@@ -305,11 +305,11 @@ ON DUPLICATE KEY UPDATE
 INSERT INTO `match` (match_id, helper_id, disabled_id, post_id, title, chat_room_id, agreement_id, created_at, updated_at)
 VALUES (
     40001,
-    101,
+    700,
     100,
     1001,
     '병원 동행 도와주실 분',
-    50001,  -- 채팅방 ID
+    50001,
     10001,
     NOW(),
     NOW()
@@ -322,7 +322,7 @@ VALUES (
 INSERT INTO `match` (match_id, helper_id, disabled_id, post_id, title, chat_room_id, agreement_id, created_at, updated_at)
 VALUES (
     40002,
-    102,
+    800,
     100,
     1003,
     '문화센터 수업 동행',
@@ -339,7 +339,7 @@ VALUES (
 INSERT INTO `match` (match_id, helper_id, disabled_id, post_id, title, chat_room_id, agreement_id, created_at, updated_at)
 VALUES (
     40003,
-    103,
+    900,
     200,
     1008,
     '정기 통원 치료 동행',
@@ -356,7 +356,7 @@ VALUES (
 INSERT INTO `match` (match_id, helper_id, disabled_id, post_id, title, chat_room_id, agreement_id, created_at, updated_at)
 VALUES (
     40004,
-    104,
+    1000,
     200,
     1011,
     '주 2회 방문 목욕 서비스',
@@ -373,7 +373,7 @@ VALUES (
 INSERT INTO `match` (match_id, helper_id, disabled_id, post_id, title, chat_room_id, agreement_id, created_at, updated_at)
 VALUES (
     40005,
-    101,
+    700,
     100,
     1021,
     '당뇨 환자 혈당 체크',
