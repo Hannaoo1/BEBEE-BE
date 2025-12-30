@@ -31,6 +31,7 @@ public class PostController implements PostSwagger {
             @RequestParam(defaultValue = "20") Integer count,
             @ModelAttribute PostsGetReqDTO reqDTO
             ){
+
         GetPostsUseCase.Param param = reqDTO.toParam(Long.parseLong(currentMemberId), type, isMatched, lastPostId, count);
         GetPostsUseCase.Result result = getPostsUseCase.execute(param);
         PostsGetResDTO resDTO = PostsGetResDTO.from(result);

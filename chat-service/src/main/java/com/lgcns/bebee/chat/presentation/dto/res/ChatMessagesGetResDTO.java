@@ -30,7 +30,7 @@ public record ChatMessagesGetResDTO(
         return ChatMessagesGetResDTO.builder()
                 .messages(messageDTOs)
                 .hasNext(hasNext)
-                .nextChatId(String.valueOf(nextChatId))
+                .nextChatId(nextChatId != null ? String.valueOf(nextChatId) : null)
                 .build();
     }
 

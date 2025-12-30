@@ -26,7 +26,10 @@ public class ChatroomController implements ChatroomSwagger {
             @RequestParam(required = false) String lastChatId,
             @RequestParam(defaultValue = "20") Integer count
     ) {
-        GetChatMessagesUseCase.Param param = new GetChatMessagesUseCase.Param(Long.parseLong(chatroomId), Long.parseLong(lastChatId), count);
+        Long parsedChatroomId = chatroomId != null ? Long.parseLong(chatroomId) : null;
+        Long parsedLastChatId = lastChatId != null ? Long.parseLong(lastChatId): null;
+
+        GetChatMessagesUseCase.Param param = new GetChatMessagesUseCase.Param(parsedChatroomId, parsedLastChatId, count);
         GetChatMessagesUseCase.Result result = getChatMessagesUseCase.execute(param);
 
         ChatMessagesGetResDTO response = ChatMessagesGetResDTO.from(
@@ -44,10 +47,13 @@ public class ChatroomController implements ChatroomSwagger {
             @RequestParam(required = false) String lastChatroomId,
             @RequestParam(defaultValue = "20") Integer count
     ) {
-        GetChatroomsUseCase.Param param = new GetChatroomsUseCase.Param(Long.parseLong(currentMemberId), Long.parseLong(lastChatroomId), count);
+        Long parsedCurrentMemberId = currentMemberId != null ? Long.parseLong(currentMemberId) : null;
+        Long parsedLastChatroomId = lastChatroomId != null ? Long.parseLong(lastChatroomId) : null;
+
+        GetChatroomsUseCase.Param param = new GetChatroomsUseCase.Param(parsedCurrentMemberId, parsedLastChatroomId, count);
         GetChatroomsUseCase.Result result = getChatroomsUseCase.execute(param);
 
-        ChatroomsGetResDTO response = ChatroomsGetResDTO.from(result, Long.parseLong(currentMemberId));
+        ChatroomsGetResDTO response = ChatroomsGetResDTO.from(result, parsedCurrentMemberId);
 
         return ResponseEntity.ok(response);
     }
@@ -59,9 +65,13 @@ public class ChatroomController implements ChatroomSwagger {
             @RequestParam(required = false) String otherMemberId,
             @RequestBody ChatroomOpenReqDTO reqDTO
     ){
+        Long parsedChatroomId = chatroomId != null ? Long.parseLong(chatroomId) : null;
+        Long parsedCurrentMemberId = currentMemberId != null ? Long.parseLong(currentMemberId) : null;
+        Long parsedOtherMemberId = otherMemberId != null ? Long.parseLong(otherMemberId) : null;
+
         OpenChatroomUseCase.Param param = new OpenChatroomUseCase.Param(
-                Long.parseLong(chatroomId),
-                Long.parseLong(currentMemberId), Long.parseLong(otherMemberId),
+                parsedChatroomId,
+                parsedCurrentMemberId, parsedOtherMemberId,
                 reqDTO.postId(), reqDTO.postTitle(), reqDTO.helpCategoryIds()
         );
 
