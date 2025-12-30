@@ -43,9 +43,6 @@ public class MemberSync {
     @Column(length = 512)
     private String profileImageUrl;
 
-    @Column(nullable = false, precision = 5, scale = 2)
-    private BigDecimal sweetness;
-
     @Column
     private String addressRoad;
 
