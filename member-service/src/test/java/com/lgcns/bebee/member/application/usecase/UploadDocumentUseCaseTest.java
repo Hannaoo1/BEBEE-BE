@@ -84,7 +84,9 @@ class UploadDocumentUseCaseTest {
                         Long memberId = 1L;
                         String uploadedFileUrl = "http://storage.test.com/documents/test-document.jpg";
 
-                        UploadDocumentUseCase.Param param = new UploadDocumentUseCase.Param(memberId, testFile);
+                        Long documentId = 1L;
+                        UploadDocumentUseCase.Param param = new UploadDocumentUseCase.Param(memberId, documentId,
+                                        testFile);
 
                         DocumentVerificationService.AnalysisResult analysisResult = new DocumentVerificationService.AnalysisResult(
                                         80, 75, 77, "LOW");
@@ -121,7 +123,9 @@ class UploadDocumentUseCaseTest {
                         Long memberId = 1L;
                         String uploadedFileUrl = "http://storage.test.com/documents/test-document.jpg";
 
-                        UploadDocumentUseCase.Param param = new UploadDocumentUseCase.Param(memberId, testFile);
+                        Long documentId = 1L;
+                        UploadDocumentUseCase.Param param = new UploadDocumentUseCase.Param(memberId, documentId,
+                                        testFile);
 
                         DocumentVerificationService.AnalysisResult analysisResult = new DocumentVerificationService.AnalysisResult(
                                         85, 70, 76, "MID");
