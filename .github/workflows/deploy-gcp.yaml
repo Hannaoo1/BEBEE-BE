@@ -81,7 +81,7 @@ jobs:
       - name: Build and Push to Docker Hub
         if: steps.changes.outputs.src == 'true'
         run: |
-          IMAGE_TAG="${{ env.DOCKER_USERNAME }}/bebee-${{ matrix.service }}:latest"
+          IMAGE_TAG="${{ env.DOCKER_USERNAME }}/bebee-${{ matrix.service }}:${{ github.sha }}"
           
           docker build --no-cache -t $IMAGE_TAG -f ${{ matrix.service }}-service/Dockerfile .
           docker push $IMAGE_TAG
