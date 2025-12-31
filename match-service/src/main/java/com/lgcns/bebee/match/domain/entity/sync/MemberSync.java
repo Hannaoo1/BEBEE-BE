@@ -5,10 +5,13 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "member_sync")
@@ -54,4 +57,8 @@ public class MemberSync {
 
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    @BatchSize(size = 100)
+    @OneToMany(mappedBy = "memberSync", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberDisabilityCategorySync> disabilityCategories = new ArrayList<>();
 }
