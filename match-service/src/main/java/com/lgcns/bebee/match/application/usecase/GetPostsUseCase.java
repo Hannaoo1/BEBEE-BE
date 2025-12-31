@@ -112,6 +112,7 @@ public class GetPostsUseCase implements UseCase<GetPostsUseCase.Param, GetPostsU
         public static class PostDTO {
             private final Long postId;
             private final String title;
+            private final Boolean isCompleted;
             private final Integer unitHoney;
             private final Integer totalHoney;
             private final String legalDongName;
@@ -122,6 +123,8 @@ public class GetPostsUseCase implements UseCase<GetPostsUseCase.Param, GetPostsU
             private final List<String> dayOfWeeks;
 
             public static PostDTO from(Post post) {
+                Boolean isCompleted = post.getStatus() == PostStatus.MATCHED;
+
                 List<String> helpCategoryNames = post.getHelpCategories().stream()
                         .map(postHelpCategory -> postHelpCategory.getId().getHelpCategoryId())
                         .map(HelpCategoryType::getNameById)
@@ -146,6 +149,7 @@ public class GetPostsUseCase implements UseCase<GetPostsUseCase.Param, GetPostsU
                 return new PostDTO(
                         post.getId(),
                         post.getTitle(),
+                        isCompleted,
                         post.getUnitHoney(),
                         post.getTotalHoney(),
                         post.getRegion(),
