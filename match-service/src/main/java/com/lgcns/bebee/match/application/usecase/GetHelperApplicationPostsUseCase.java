@@ -17,7 +17,6 @@ import com.lgcns.bebee.match.domain.entity.vo.PostStatus;
 import com.lgcns.bebee.match.domain.repository.HelperApplicationRepository;
 import com.lgcns.bebee.match.domain.repository.PostRepository;
 import com.lgcns.bebee.match.domain.service.MemberManager;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -48,73 +47,17 @@ public class GetHelperApplicationPostsUseCase implements UseCase<GetHelperApplic
         if (member.getRole() != Role.DISABLED) {
             throw MatchErrors.ONLY_DISABLED_MEMBERS_ALLOWED.toException();
         }
-        
+
         List<Post> posts = postRepository.findAllByMemberId(param.getMemberId());
-        
+
         List<PostSummary> postSummaries = posts.stream()
                 .map(post -> {
                     List<Application> applications = applicationRepository.findAllByPost_Id(post.getId());
-
-                    int commonCount = (int) applications.stream()
-                            .filter(app -> !app.getIsVolunteer())
-                            .count();
-
-                    int volunteerCount = (int) applications.stream()
-                            .filter(Application::getIsVolunteer)
-                            .count();
-
-                    Integer daysRemaining = calculateDaysRemaining(post.getPeriod());
-
-                    Object engagementTime = createEngagementTime(post);
-
-                    List<Integer> helpCategories = post.getHelpCategories().stream()
-                            .map(helpCategory -> helpCategory.getId().getHelpCategoryId().intValue())
-                            .collect(Collectors.toList());
-
-                    return new PostSummary(
-                            post.getId(),
-                            post.getTitle(),
-                            post.getRegion(),
-                            commonCount,
-                            volunteerCount,
-                            post.getStatus() == PostStatus.MATCHED,
-                            daysRemaining,
-                            engagementTime,
-                            helpCategories
-                    );
+                    return PostSummary.from(post, applications);
                 })
                 .collect(Collectors.toList());
 
         return new Result(postSummaries);
-    }
-
-    private Integer calculateDaysRemaining(PostPeriod period) {
-        if (period == null || period.getEndDate() == null) {
-            return null;
-        }
-
-        LocalDate now = LocalDate.now();
-        LocalDate endDate = period.getEndDate();
-
-        if (endDate.isBefore(now)) {
-            return 0;
-        }
-
-        return (int) ChronoUnit.DAYS.between(now, endDate);
-    }
-
-    private Object createEngagementTime(Post post) {
-        if (post.getPeriod() == null) {
-            return null;
-        }
-
-        if (post.getType() == EngagementType.DAY) {
-            return DayEngagementTime.from(post);
-        } else if (post.getType() == EngagementType.TERM) {
-            return TermEngagementTime.from(post);
-        }
-
-        return null;
     }
 
     @Getter
@@ -132,9 +75,9 @@ public class GetHelperApplicationPostsUseCase implements UseCase<GetHelperApplic
     }
 
     @Getter
-    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @AllArgsConstructor
     public static class Result {
-        private List<PostSummary> posts;
+        private final List<PostSummary> posts;
     }
 
     @Getter
@@ -149,6 +92,65 @@ public class GetHelperApplicationPostsUseCase implements UseCase<GetHelperApplic
         private Integer daysRemaining;
         private Object engagementTime;
         private List<Integer> helpCategories;
+
+        public static PostSummary from(Post post, List<Application> applications) {
+            int commonCount = (int) applications.stream()
+                    .filter(app -> !app.getIsVolunteer())
+                    .count();
+
+            int volunteerCount = (int) applications.stream()
+                    .filter(Application::getIsVolunteer)
+                    .count();
+
+            Integer daysRemaining = calculateDaysRemaining(post.getPeriod());
+
+            Object engagementTime = createEngagementTime(post);
+
+            List<Integer> helpCategories = post.getHelpCategories().stream()
+                    .map(helpCategory -> helpCategory.getId().getHelpCategoryId().intValue())
+                    .collect(Collectors.toList());
+
+            return new PostSummary(
+                    post.getId(),
+                    post.getTitle(),
+                    post.getRegion(),
+                    commonCount,
+                    volunteerCount,
+                    post.getStatus() == PostStatus.MATCHED,
+                    daysRemaining,
+                    engagementTime,
+                    helpCategories
+            );
+        }
+
+        private static Integer calculateDaysRemaining(PostPeriod period) {
+            if (period == null || period.getEndDate() == null) {
+                return null;
+            }
+
+            LocalDate now = LocalDate.now();
+            LocalDate endDate = period.getEndDate();
+
+            if (endDate.isBefore(now)) {
+                return 0;
+            }
+
+            return (int) ChronoUnit.DAYS.between(now, endDate);
+        }
+
+        private static Object createEngagementTime(Post post) {
+            if (post.getPeriod() == null) {
+                return null;
+            }
+
+            if (post.getType() == EngagementType.DAY) {
+                return DayEngagementTime.from(post);
+            } else if (post.getType() == EngagementType.TERM) {
+                return TermEngagementTime.from(post);
+            }
+
+            return null;
+        }
     }
 
     @Getter
