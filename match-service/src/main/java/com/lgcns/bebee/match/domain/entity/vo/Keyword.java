@@ -86,4 +86,10 @@ public enum Keyword {
                 .filter(keyword -> keyword.direction == direction)
                 .collect(Collectors.toList());
     }
+
+    // 키워드가 해당 방향에 속하는지 확인
+    public boolean belongsToDirection(ReviewDirection direction) {
+        return this.direction == direction;
+    }
+    
 }

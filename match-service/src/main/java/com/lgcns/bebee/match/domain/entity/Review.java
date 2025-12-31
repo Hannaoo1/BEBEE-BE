@@ -30,7 +30,7 @@ public class Review extends BaseTimeEntity {
     @Column(nullable = false)
     private Long revieweeId;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewKeyword> keywords = new ArrayList<>();
 
     public static Review create(
@@ -46,7 +46,7 @@ public class Review extends BaseTimeEntity {
         review.addKeywords(keywords);
         return review;
     }
-    
+
     // 키워드 추가
     private void addKeywords(List<Keyword> keywords) {
         this.keywords = keywords.stream()
