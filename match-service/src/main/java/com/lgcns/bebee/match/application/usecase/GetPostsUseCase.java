@@ -55,7 +55,7 @@ public class GetPostsUseCase implements UseCase<GetPostsUseCase.Param, GetPostsU
                 gender,
                 params.minHoney,
                 params.maxHoney,
-                params.disabilityCategoryId,
+                params.disabilityCategoryIds,
                 daysOfWeek,
                 postStatus,
                 cursorId,
@@ -86,7 +86,7 @@ public class GetPostsUseCase implements UseCase<GetPostsUseCase.Param, GetPostsU
         private final String gender;
         private final Integer minHoney;
         private final Integer maxHoney;
-        private final Long disabilityCategoryId;
+        private final List<Long> disabilityCategoryIds;
         private final List<String> days;
         private final Long lastPostId;
         private final Integer count;
@@ -112,6 +112,7 @@ public class GetPostsUseCase implements UseCase<GetPostsUseCase.Param, GetPostsU
         public static class PostDTO {
             private final Long postId;
             private final String title;
+            private final Boolean isCompleted;
             private final Integer unitHoney;
             private final Integer totalHoney;
             private final String legalDongName;
@@ -122,6 +123,8 @@ public class GetPostsUseCase implements UseCase<GetPostsUseCase.Param, GetPostsU
             private final List<String> dayOfWeeks;
 
             public static PostDTO from(Post post) {
+                Boolean isCompleted = post.getStatus() == PostStatus.MATCHED;
+
                 List<String> helpCategoryNames = post.getHelpCategories().stream()
                         .map(postHelpCategory -> postHelpCategory.getId().getHelpCategoryId())
                         .map(HelpCategoryType::getNameById)
@@ -146,6 +149,7 @@ public class GetPostsUseCase implements UseCase<GetPostsUseCase.Param, GetPostsU
                 return new PostDTO(
                         post.getId(),
                         post.getTitle(),
+                        isCompleted,
                         post.getUnitHoney(),
                         post.getTotalHoney(),
                         post.getRegion(),

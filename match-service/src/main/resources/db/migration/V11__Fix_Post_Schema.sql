@@ -1,0 +1,9 @@
+-- 외래키 체크 비활성화 (TRUNCATE를 위해 필요)
+SET FOREIGN_KEY_CHECKS = 0;
+
+ALTER TABLE post
+    MODIFY COLUMN latitude DOUBLE NOT NULL,
+    MODIFY COLUMN longitude DOUBLE NOT NULL,
+    MODIFY COLUMN legal_dong_code VARCHAR(10) NULL;
+-- 외래키 체크 재활성화
+SET FOREIGN_KEY_CHECKS = 1;

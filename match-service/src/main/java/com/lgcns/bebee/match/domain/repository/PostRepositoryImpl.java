@@ -18,6 +18,7 @@ import static com.lgcns.bebee.match.domain.entity.QPostHelpCategory.postHelpCate
 import static com.lgcns.bebee.match.domain.entity.QPostPeriod.postPeriod;
 import static com.lgcns.bebee.match.domain.entity.QPostSchedule.postSchedule;
 import static com.lgcns.bebee.match.domain.entity.sync.QMemberSync.memberSync;
+import static com.lgcns.bebee.match.domain.entity.sync.QMemberDisabilityCategorySync.memberDisabilityCategorySync;
 
 @Component
 @RequiredArgsConstructor
@@ -32,6 +33,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .leftJoin(post.period, postPeriod).fetchJoin()
                 .leftJoin(post.helpCategories, postHelpCategory)
                 .leftJoin(memberSync).on(memberSync.id.eq(post.memberId))
+                .leftJoin(memberSync.disabilityCategories, memberDisabilityCategorySync)
                 .leftJoin(postSchedule).on(postSchedule.post.id.eq(post.id))
                 .where(
                         eqEngagementType(cond.engagementType()),
@@ -39,6 +41,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                         inHelpCategoryIds(cond.helpCategoryIds()),
                         eqGender(cond.gender()),
                         betweenHoney(cond.minHoney(), cond.maxHoney()),
+                        inDisabilityCategoryIds(cond.disabilityCategoryId()),
                         inDayOfWeeks(cond.dayOfWeeks()),
                         eqStatus(cond.postStatus()),
                         ltPostId(cond.lastPostId())
@@ -66,6 +69,12 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 
     private BooleanExpression eqGender(Gender gender) {
         return gender != null ? memberSync.gender.eq(gender) : null;
+    }
+
+    private BooleanExpression inDisabilityCategoryIds(List<Long> disabilityCategoryIds) {
+        return disabilityCategoryIds != null && !disabilityCategoryIds.isEmpty()
+                ? memberDisabilityCategorySync.id.disabilityCategoryId.in(disabilityCategoryIds)
+                : null;
     }
 
     private BooleanExpression betweenHoney(Integer minHoney, Integer maxHoney) {

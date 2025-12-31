@@ -2,8 +2,10 @@ package com.lgcns.bebee.match.application.usecase;
 
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
+import com.lgcns.bebee.match.application.usecase.client.EventPublisher;
 import com.lgcns.bebee.match.domain.entity.Post;
 import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
+import com.lgcns.bebee.match.domain.event.PostCreatedEvent;
 import com.lgcns.bebee.match.domain.service.MemberManager;
 import com.lgcns.bebee.match.domain.service.PostManager;
 import lombok.AccessLevel;
@@ -25,6 +27,8 @@ import java.util.List;
 public class CreatePostUseCase implements UseCase<CreatePostUseCase.Param, CreatePostUseCase.Result> {
     private final MemberManager memberManager;
     private final PostManager postManager;
+
+    private final EventPublisher eventPublisher;
 
     @Transactional
     @Override
@@ -57,10 +61,11 @@ public class CreatePostUseCase implements UseCase<CreatePostUseCase.Param, Creat
                 param.unitHoney,
                 param.totalHoney,
                 param.region,
-                param.legalDongCode,
                 param.latitude,
                 param.longitude
         );
+
+        eventPublisher.publish(new PostCreatedEvent(post.getId(), post.getLatitude(), post.getLongitude()));
 
         return new Result(post.getId());
     }
@@ -86,10 +91,9 @@ public class CreatePostUseCase implements UseCase<CreatePostUseCase.Param, Creat
         private final Integer totalHoney;
         
         private final String region;
-        private final String legalDongCode;
 
-        private final BigDecimal latitude;
-        private final BigDecimal longitude;
+        private final Double latitude;
+        private final Double longitude;
     }
 
     @Getter

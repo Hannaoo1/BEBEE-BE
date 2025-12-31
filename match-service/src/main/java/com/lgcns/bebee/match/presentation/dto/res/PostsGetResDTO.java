@@ -42,6 +42,7 @@ public record PostsGetResDTO(
                 .map(postDTO -> new PostResDTO(
                         String.valueOf(postDTO.getPostId()),
                         postDTO.getTitle(),
+                        postDTO.getIsCompleted(),
                         postDTO.getUnitHoney(),
                         postDTO.getTotalHoney(),
                         postDTO.getLegalDongName(),
@@ -69,6 +70,12 @@ public record PostsGetResDTO(
                     example = "병원 동행 도와주실 분"
             )
             String title,
+
+            @Schema(
+                    description = "매칭 완료 여부",
+                    example = "true"
+            )
+            Boolean isCompleted,
 
             @Schema(
                     description = "단위 꿀 금액 (회당 보상) - 단위: 원",

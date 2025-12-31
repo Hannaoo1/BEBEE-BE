@@ -10,7 +10,10 @@ import java.util.Arrays;
 public enum DisabilityCategory {
     PHYSICAL(1L, "지체장애"),
     VISUAL(2L, "시각장애"),
-    HEARING(3L, "청각장애")
+    HEARING(3L, "청각장애"),
+    DEVELOPMENTAL(4L, "발달장애"),
+    INTERNAL_ORGAN(5L, "내부기관장애"),
+    ETC(6L, "기타장애")
     ;
 
     private final Long id;

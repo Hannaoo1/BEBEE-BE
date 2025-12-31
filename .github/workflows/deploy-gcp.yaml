@@ -130,6 +130,7 @@ jobs:
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             REDIS_HOST=${{ secrets.REDIS_HOST }}
             REDIS_PORT=6379
+            KAKAO_API_KEY=${{ secrets.KAKAO_API_KEY }}
             SPRINGDOC_API_DESC="임시 GCP 개발 서버"
 
       - name: Deploy to Cloud Run (File Service)
