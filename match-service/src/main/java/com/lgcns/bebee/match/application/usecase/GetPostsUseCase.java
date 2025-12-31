@@ -116,7 +116,7 @@ public class GetPostsUseCase implements UseCase<GetPostsUseCase.Param, GetPostsU
             private final Integer unitHoney;
             private final Integer totalHoney;
             private final String legalDongName;
-            private final List<String> helpCategories;
+            private final List<Long> helpCategories;
             private final String helpType;
             private final String imageUrl;
             private final LocalDate date;  // DAY 타입일 때만 값 있음
@@ -125,9 +125,8 @@ public class GetPostsUseCase implements UseCase<GetPostsUseCase.Param, GetPostsU
             public static PostDTO from(Post post) {
                 Boolean isCompleted = post.getStatus() == PostStatus.MATCHED;
 
-                List<String> helpCategoryNames = post.getHelpCategories().stream()
+                List<Long> helpCategoryNames = post.getHelpCategories().stream()
                         .map(postHelpCategory -> postHelpCategory.getId().getHelpCategoryId())
-                        .map(HelpCategoryType::getNameById)
                         .collect(Collectors.toList());
 
                 String imageUrl = post.getImages().isEmpty()

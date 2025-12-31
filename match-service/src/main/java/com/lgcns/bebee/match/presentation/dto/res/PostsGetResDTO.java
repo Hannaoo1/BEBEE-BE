@@ -96,10 +96,10 @@ public record PostsGetResDTO(
             String legalDongName,
 
             @Schema(
-                    description = "도움 카테고리 이름 리스트",
-                    example = "[\"외출동행\", \"방문간호\"]"
+                    description = "도움 카테고리 id 리스트",
+                    example = "[1,3,5]"
             )
-            List<String> helpCategories,
+            List<Long> helpCategories,
 
             @Schema(
                     description = "도움 타입 - DAY(일회성) 또는 TERM(정기적)",
