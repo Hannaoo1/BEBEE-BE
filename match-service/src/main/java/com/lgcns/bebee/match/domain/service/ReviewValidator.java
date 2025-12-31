@@ -57,5 +57,8 @@ public class ReviewValidator {
     public static class ValidationResult {
         private Engagement engagement;
         private Match match;
+
+        public ValidationResult(Match mockMatch) {
+        }
     }
 }
