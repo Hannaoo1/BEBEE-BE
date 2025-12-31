@@ -75,7 +75,7 @@ public record PostsGetResDTO(
                     description = "매칭 완료 여부",
                     example = "true"
             )
-            Boolean isCompleted,
+            Boolean isMatched,
 
             @Schema(
                     description = "단위 꿀 금액 (회당 보상) - 단위: 원",
