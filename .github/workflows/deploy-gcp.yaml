@@ -112,6 +112,7 @@ jobs:
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             REDIS_HOST=${{ secrets.REDIS_HOST }}
             REDIS_PORT=6379
+            MONGODB_HOST=${{ secrets.MONGODB_HOST }}
             SPRINGDOC_API_DESC="임시 GCP 개발 서버"
 
       - name: Deploy to Cloud Run (Match Service)
