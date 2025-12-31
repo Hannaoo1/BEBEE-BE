@@ -17,9 +17,6 @@ import com.lgcns.bebee.match.domain.entity.vo.PostStatus;
 import com.lgcns.bebee.match.domain.repository.HelperApplicationRepository;
 import com.lgcns.bebee.match.domain.repository.PostRepository;
 import com.lgcns.bebee.match.domain.service.MemberManager;
-import com.lgcns.bebee.match.presentation.dto.DayEngagementTimeDTO;
-import com.lgcns.bebee.match.presentation.dto.PostScheduleDTO;
-import com.lgcns.bebee.match.presentation.dto.TermEngagementTimeDTO;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,7 +24,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -109,22 +108,10 @@ public class GetHelperApplicationPostsUseCase implements UseCase<GetHelperApplic
             return null;
         }
 
-        if (post.getType() == EngagementType.DAY && !post.getSchedules().isEmpty()) {
-            PostSchedule schedule = post.getSchedules().get(0);
-            return new DayEngagementTime(
-                    post.getPeriod().getStartDate(),
-                    PostScheduleDTO.from(schedule)
-            );
+        if (post.getType() == EngagementType.DAY) {
+            return DayEngagementTime.from(post);
         } else if (post.getType() == EngagementType.TERM) {
-            List<PostScheduleDTO> scheduleDTOs = post.getSchedules().stream()
-                    .map(PostScheduleDTO::from)
-                    .collect(Collectors.toList());
-
-            return new TermEngagementTime(
-                    post.getPeriod().getStartDate(),
-                    post.getPeriod().getEndDate(),
-                    scheduleDTOs
-            );
+            return TermEngagementTime.from(post);
         }
 
         return null;
@@ -168,7 +155,18 @@ public class GetHelperApplicationPostsUseCase implements UseCase<GetHelperApplic
     @AllArgsConstructor
     public static class DayEngagementTime {
         private LocalDate date;
-        private PostScheduleDTO schedule;
+        private ScheduleInfo schedule;
+
+        public static DayEngagementTime from(Post post) {
+            if (post.getPeriod() == null || post.getSchedules().isEmpty()) {
+                return null;
+            }
+            
+            return new DayEngagementTime(
+                    post.getPeriod().getStartDate(),
+                    ScheduleInfo.from(post.getSchedules().get(0))
+            );
+        }
     }
 
     @Getter
@@ -176,6 +174,38 @@ public class GetHelperApplicationPostsUseCase implements UseCase<GetHelperApplic
     public static class TermEngagementTime {
         private LocalDate startDate;
         private LocalDate endDate;
-        private List<PostScheduleDTO> schedules;
+        private List<ScheduleInfo> schedules;
+
+        public static TermEngagementTime from(Post post) {
+            if (post.getPeriod() == null) {
+                return null;
+            }
+            
+            List<ScheduleInfo> scheduleInfos = post.getSchedules().stream()
+                    .map(ScheduleInfo::from)
+                    .collect(Collectors.toList());
+
+            return new TermEngagementTime(
+                    post.getPeriod().getStartDate(),
+                    post.getPeriod().getEndDate(),
+                    scheduleInfos
+            );
+        }
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class ScheduleInfo {
+        private DayOfWeek dayOfWeek;
+        private LocalTime startTime;
+        private LocalTime endTime;
+
+        static ScheduleInfo from(PostSchedule schedule) {
+            return new ScheduleInfo(
+                    schedule.getDayOfWeek(),
+                    schedule.getStartTime(),
+                    schedule.getEndTime()
+            );
+        }
     }
 }
