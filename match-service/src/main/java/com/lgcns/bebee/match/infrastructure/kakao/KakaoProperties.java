@@ -7,7 +7,6 @@ public record KakaoProperties(
     String key,
     String baseUrl,
     String coord2RegionCodePath,
-    String origin,
     Integer timeout
 ) {
     public KakaoProperties {

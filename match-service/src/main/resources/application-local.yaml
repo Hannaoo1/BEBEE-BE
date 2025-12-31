@@ -115,7 +115,6 @@ event:
 kakao:
   api:
     key: "${KAKAO_API_KEY}"
-    origin: "${KAKAO_ORIGIN_URL:http://localhost:8082}"
 
 # 로깅 설정
 logging:
