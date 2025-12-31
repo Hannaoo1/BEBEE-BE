@@ -2,6 +2,8 @@ package com.lgcns.bebee.member.presentation;
 
 import com.lgcns.bebee.member.domain.entity.Member;
 import com.lgcns.bebee.common.annotation.CurrentMember;
+import com.lgcns.bebee.member.domain.repository.MemberRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,27 +15,33 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/test")
+@RequiredArgsConstructor
 public class TestAuthController {
+    private final MemberRepository memberRepository;
 
     /**
      * 현재 로그인한 회원 정보 조회 (인증 필요)
-     * @param member 현재 로그인한 회원
+     * 
+     * @param memberId 현재 로그인한 회원 ID
      * @return 회원 정보
      */
     @GetMapping("/me")
-    public ResponseEntity<MemberInfoResponse> getCurrentMember(@CurrentMember Member member) {
+    public ResponseEntity<MemberInfoResponse> getCurrentMember(@CurrentMember Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다. memberId=" + memberId));
+
         MemberInfoResponse response = new MemberInfoResponse(
                 member.getId(),
                 member.getEmail(),
                 member.getName(),
                 member.getNickname(),
-                member.getRole().name()
-        );
+                member.getRole().name());
         return ResponseEntity.ok(response);
     }
 
     /**
      * 인증 없이 접근 가능한 엔드포인트
+     * 
      * @return 공개 메시지
      */
     @GetMapping("/public")
@@ -46,9 +54,9 @@ public class TestAuthController {
             String email,
             String name,
             String nickname,
-            String role
-    ) { }
+            String role) {
+    }
 
-    private record PublicResponse(String message) { }
+    private record PublicResponse(String message) {
+    }
 }
-

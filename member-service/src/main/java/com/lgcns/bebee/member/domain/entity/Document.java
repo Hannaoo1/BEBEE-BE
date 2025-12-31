@@ -32,4 +32,15 @@ public class Document extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
+
+    public static Document create(String targetRole, String docCode, String docNameKo, String description,
+            Member member) {
+        Document document = new Document();
+        document.targetRole = targetRole;
+        document.docCode = docCode;
+        document.docNameKo = docNameKo;
+        document.description = description;
+        document.member = member;
+        return document;
+    }
 }

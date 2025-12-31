@@ -10,6 +10,7 @@ import com.lgcns.bebee.member.presentation.dto.res.DocumentUploadResDTO;
 import com.lgcns.bebee.member.presentation.dto.res.DocumentVerificationResDTO;
 import com.lgcns.bebee.member.presentation.swagger.DocumentSwagger;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +20,7 @@ import java.util.List;
 /**
  * 문서 검증 API 컨트롤러
  */
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/documents")
@@ -43,20 +45,27 @@ public class DocumentController implements DocumentSwagger {
                         @RequestParam Long memberId,
                         @RequestParam Long documentId,
                         @RequestPart MultipartFile file) {
-                UploadDocumentUseCase.Param param = new UploadDocumentUseCase.Param(memberId, documentId, file);
-                Long verificationId = uploadDocumentUseCase.execute(param);
+                log.info("문서 업로드 처리 시작: memberId={}, documentId={}", memberId, documentId);
+                try {
+                        UploadDocumentUseCase.Param param = new UploadDocumentUseCase.Param(memberId, documentId, file);
+                        Long verificationId = uploadDocumentUseCase.execute(param);
 
-                // 저장된 검증 정보 조회
-                DocumentVerification verification = documentManagement.load(verificationId);
+                        // 저장된 검증 정보 조회
+                        DocumentVerification verification = documentManagement.load(verificationId);
 
-                DocumentUploadResDTO response = DocumentUploadResDTO.of(
-                                verification.getId(),
-                                verification.getFileUrl(),
-                                verification.getForgeryScore(),
-                                verification.getSystemFlag(),
-                                verification.getStatus().name());
+                        DocumentUploadResDTO response = DocumentUploadResDTO.of(
+                                        verification.getId(),
+                                        verification.getFileUrl(),
+                                        verification.getForgeryScore(),
+                                        verification.getSystemFlag(),
+                                        verification.getStatus().name());
 
-                return ResponseEntity.ok(response);
+                        log.info("문서 업로드 처리 성공: verificationId={}", verificationId);
+                        return ResponseEntity.ok(response);
+                } catch (Exception e) {
+                        log.error("문서 업로드 중 치명적 오류 발생!", e);
+                        throw e;
+                }
         }
 
         /**

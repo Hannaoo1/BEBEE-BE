@@ -3,6 +3,7 @@ package com.lgcns.bebee.member.application.usecase;
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
 import com.lgcns.bebee.member.core.exception.MemberInvalidParamErrors;
+import lombok.extern.slf4j.Slf4j;
 import com.lgcns.bebee.member.domain.entity.Member;
 import com.lgcns.bebee.member.domain.repository.MemberRepository;
 
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SignUpUseCase implements UseCase<SignUpUseCase.Param, SignUpUseCase.Result> {
@@ -61,6 +63,12 @@ public class SignUpUseCase implements UseCase<SignUpUseCase.Param, SignUpUseCase
         // HELPER: 도움 유형 저장
         if ("HELPER".equals(params.getRole()) && params.getHelpTypes() != null && !params.getHelpTypes().isEmpty()) {
             for (String helpTypeName : params.getHelpTypes()) {
+                StringBuilder hexBuilder = new StringBuilder();
+                for (byte b : helpTypeName.getBytes()) {
+                    hexBuilder.append(String.format("%02X", b));
+                }
+                log.info("도움 유형 조회 요청: [{}], Hex: {}", helpTypeName, hexBuilder.toString());
+
                 HelpCategory helpCategory = helpCategoryRepository
                         .findByHelpType(helpTypeName)
                         .orElseThrow(() -> new IllegalArgumentException("도움 유형을 찾을 수 없습니다: " + helpTypeName));
