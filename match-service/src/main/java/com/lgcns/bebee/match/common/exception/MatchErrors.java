@@ -9,13 +9,14 @@ public enum MatchErrors implements ErrorInfo {
     MATCH_NOT_FOUND("매칭 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     MEMBER_NOT_FOUND("회원 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 
-    ONLY_DISABLED_MEMBERS_ALLOWED("장애인 회원만 확인서를 생성할 수 있습니다.", HttpStatus.FORBIDDEN),
+    ONLY_DISABLED_MEMBERS_ALLOWED("장애인 회원에게 주어진 권한입니다.", HttpStatus.FORBIDDEN),
     AGREEMENT_NOT_FOUND("매칭 확인서를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     ALREADY_CONFIRMED_AGREEMENT("이미 수락된 매칭 확인서입니다.", HttpStatus.CONFLICT),
     CANNOT_REFUSE_CONFIRMED_AGREEMENT("이미 수락된 매칭 확인서는 거절할 수 없습니다.", HttpStatus.CONFLICT),
     ALREADY_MATCHED("이미 매칭이 성사된 요청입니다.", HttpStatus.CONFLICT),
     HELPER_ONLY_CAN_APPLY("도우미만 지원할 수 있습니다.", HttpStatus.FORBIDDEN),
-    ALREADY_APPLIED("이미 지원한 게시글입니다.", HttpStatus.CONFLICT);
+    ALREADY_APPLIED("이미 지원한 게시글입니다.", HttpStatus.CONFLICT),
+    UNAUTHORIZED_ACCESS("접근 권한이 없습니다.", HttpStatus.FORBIDDEN);
 
     private final String desc;
     private final HttpStatus httpStatus;
