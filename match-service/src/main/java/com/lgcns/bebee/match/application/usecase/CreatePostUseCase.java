@@ -86,10 +86,9 @@ public class CreatePostUseCase implements UseCase<CreatePostUseCase.Param, Creat
         private final Integer totalHoney;
         
         private final String region;
-        private final String legalDongCode;
 
-        private final BigDecimal latitude;
-        private final BigDecimal longitude;
+        private final Double latitude;
+        private final Double longitude;
     }
 
     @Getter

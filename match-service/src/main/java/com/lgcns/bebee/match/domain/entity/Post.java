@@ -45,14 +45,14 @@ public class Post extends BaseTimeEntity {
     @Column(nullable = false)
     private PostStatus status;
 
-    @Column(nullable = false, length = 10)
+    @Column(length = 10)
     private String legalDongCode;
 
-    @Column(nullable = false, precision = 10, scale = 7)
-    private BigDecimal latitude;
+    @Column(nullable = false)
+    private Double latitude;
 
-    @Column(nullable = false, precision = 10, scale = 7)
-    private BigDecimal longitude;
+    @Column(nullable = false)
+    private Double longitude;
 
     @Column(nullable = true)
     private int applicantCount;
@@ -87,9 +87,8 @@ public class Post extends BaseTimeEntity {
             Integer unitHoney,
             Integer totalHoney,
             String region,
-            String legalDongCode,
-            BigDecimal latitude,
-            BigDecimal longitude
+            Double latitude,
+            Double longitude
     ) {
         Post post = new Post();
         post.memberId = memberId;
@@ -101,7 +100,6 @@ public class Post extends BaseTimeEntity {
         post.unitHoney = unitHoney;
         post.totalHoney = totalHoney;
         post.region = region;
-        post.legalDongCode = legalDongCode;
         post.latitude = latitude;
         post.longitude = longitude;
 
@@ -117,5 +115,9 @@ public class Post extends BaseTimeEntity {
         schedules.forEach(schedule -> schedule.assignToPost(post));
 
         return post;
+    }
+
+    public void updateLegalDongCode(String legalDongCode){
+        this.legalDongCode = legalDongCode;
     }
 }
