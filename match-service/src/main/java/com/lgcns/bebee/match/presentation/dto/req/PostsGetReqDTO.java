@@ -68,7 +68,7 @@ public record PostsGetReqDTO(
                         """,
                 example = "1"
         )
-        Long disabilityCategoryId,
+        List<Long> disabilityCategoryIds,
 
         @Schema(
                 description = """
@@ -95,7 +95,7 @@ public record PostsGetReqDTO(
                 this.gender,
                 this.minHoney,
                 this.maxHoney,
-                this.disabilityCategoryId,
+                this.disabilityCategoryIds,
                 this.days,
                 parsedLastPostId,
                 count

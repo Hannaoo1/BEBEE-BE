@@ -55,7 +55,7 @@ public class GetPostsUseCase implements UseCase<GetPostsUseCase.Param, GetPostsU
                 gender,
                 params.minHoney,
                 params.maxHoney,
-                params.disabilityCategoryId,
+                params.disabilityCategoryIds,
                 daysOfWeek,
                 postStatus,
                 cursorId,
@@ -86,7 +86,7 @@ public class GetPostsUseCase implements UseCase<GetPostsUseCase.Param, GetPostsU
         private final String gender;
         private final Integer minHoney;
         private final Integer maxHoney;
-        private final Long disabilityCategoryId;
+        private final List<Long> disabilityCategoryIds;
         private final List<String> days;
         private final Long lastPostId;
         private final Integer count;
