@@ -48,7 +48,10 @@ public class GetHelperApplicationPostsUseCase implements UseCase<GetHelperApplic
             throw MatchErrors.ONLY_DISABLED_MEMBERS_ALLOWED.toException();
         }
 
-        List<Post> posts = postRepository.findAllByMemberId(param.getMemberId());
+        List<Post> posts = postRepository.findAllByMemberIdAndPeriodStartDateGreaterThanEqual(
+                param.getMemberId(),
+                LocalDate.now()
+        );
 
         List<PostSummary> postSummaries = posts.stream()
                 .map(post -> {
