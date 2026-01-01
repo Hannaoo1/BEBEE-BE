@@ -3,13 +3,14 @@ package com.lgcns.bebee.match.application.usecase;
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
 import com.lgcns.bebee.match.common.exception.MatchErrors;
-import com.lgcns.bebee.match.domain.entity.Match;
+import com.lgcns.bebee.match.domain.entity.Engagement;
 import com.lgcns.bebee.match.domain.entity.Review;
+import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
 import com.lgcns.bebee.match.domain.entity.vo.Keyword;
 import com.lgcns.bebee.match.domain.entity.vo.ReviewDirection;
-import com.lgcns.bebee.match.domain.repository.ReviewRepository;
+import com.lgcns.bebee.match.domain.repository.EngagementRepository;
+import com.lgcns.bebee.match.domain.service.MemberManager;
 import com.lgcns.bebee.match.domain.service.ReviewManager;
-import com.lgcns.bebee.match.domain.service.ReviewValidator;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,71 +23,56 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CreateReviewUseCase implements UseCase<CreateReviewUseCase.Param, CreateReviewUseCase.Result> {
 
-    private final ReviewRepository reviewRepository;
     private final ReviewManager reviewManager;
-    private final ReviewValidator reviewValidator;
+    private final EngagementRepository engagementRepository;
+    private final MemberManager memberManager;
 
     @Transactional
     @Override
     public Result execute(Param param) {
 
-        // 검증
-        ReviewValidator.ValidationResult validation = reviewValidator.validateReviewEligibility(
+        // Engagement 조회
+        Engagement engagement = engagementRepository.findById(param.getEngagementId())
+                .orElseThrow(MatchErrors.ENGAGEMENT_NOT_FOUND::toException);
+
+        // 활동 완료 검증
+        reviewManager.validateEngagementCompleted(engagement);
+
+        // 중복 리뷰 검증
+        reviewManager.validateNoDuplicateReview(
                 param.getEngagementId(),
                 param.getReviewerId()
         );
 
-        Match match = validation.getMatch();
+        // 작성자 조회
+        MemberSync reviewer = memberManager.findExistingMember(param.getReviewerId());
 
-        // 중복 확인
-        if (reviewRepository.existsByEngagementIdAndReviewerId(
-                param.getEngagementId(),
-                param.getReviewerId()
-        )) {
-            throw MatchErrors.ALREADY_REVIEWED.toException();
-        }
-
-        // revieweeId 자동 결정 및 리뷰 방향 판단
-        Long revieweeId;
-        ReviewDirection direction;
-        if (match.getDisabledId().equals(param.getReviewerId())) {
-            revieweeId = match.getHelperId();
-            direction = ReviewDirection.DISABLED_TO_HELPER;
-        } else {
-            revieweeId = match.getDisabledId();
-            direction = ReviewDirection.HELPER_TO_DISABLED;
-        }
+        // ReviewDirection 결정
+        ReviewDirection direction = reviewManager.determineReviewDirection(reviewer);
 
         // 키워드 검증
-        validateKeywords(param.getKeywordIds(), direction);
+        validateKeywords(param.getKeywordIds());
 
         // 리뷰 생성
         Review review = reviewManager.createReview(
                 param.getEngagementId(),
                 param.getReviewerId(),
-                revieweeId,
+                param.getRevieweeId(),
+                direction,
                 param.getKeywordIds()
         );
 
         return new Result(review.getId());
     }
-
-    private void validateKeywords(List<Integer> keywordIds, ReviewDirection direction) {
-        List<Keyword> allowedKeywords = Keyword.getByDirection(direction);
-        List<Integer> allowedIds = allowedKeywords.stream()
-                .map(Keyword::getId)
-                .toList();
+    
+    // 키워드 유효성 검증
+    private void validateKeywords(List<Integer> keywordIds) {
+        if (keywordIds == null || keywordIds.isEmpty()) {
+            throw MatchErrors.INVALID_KEYWORD.toException();
+        }
 
         for (Integer keywordId : keywordIds) {
-            try {
-                Keyword.fromId(keywordId);
-            } catch (IllegalArgumentException e) {
-                throw MatchErrors.INVALID_KEYWORD.toException();
-            }
-
-            if (!allowedIds.contains(keywordId)) {
-                throw MatchErrors.KEYWORD_DIRECTION_MISMATCH.toException();
-            }
+            Keyword.fromId(keywordId);
         }
     }
 
@@ -95,6 +81,7 @@ public class CreateReviewUseCase implements UseCase<CreateReviewUseCase.Param, C
     public static class Param implements Params {
         private final Long engagementId;
         private final Long reviewerId;
+        private final Long revieweeId;
         private final List<Integer> keywordIds;
     }
 
