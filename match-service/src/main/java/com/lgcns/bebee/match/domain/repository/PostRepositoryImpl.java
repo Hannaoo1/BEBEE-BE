@@ -43,7 +43,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                         betweenHoney(cond.minHoney(), cond.maxHoney()),
                         inDisabilityCategoryIds(cond.disabilityCategoryId()),
                         inDayOfWeeks(cond.dayOfWeeks()),
-                        eqStatus(cond.postStatus()),
+                        inPostStatuses(cond.postStatuses()),
                         ltPostId(cond.lastPostId())
                 )
                 .orderBy(post.id.desc())
@@ -94,8 +94,10 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 : null;
     }
 
-    private BooleanExpression eqStatus(PostStatus status) {
-        return status != null ? post.status.eq(status) : null;
+    private BooleanExpression inPostStatuses(List<PostStatus> postStatuses) {
+        return postStatuses != null && !postStatuses.isEmpty()
+                ? post.status.in(postStatuses)
+                : null;
     }
 
     private BooleanExpression ltPostId(Long lastPostId) {
