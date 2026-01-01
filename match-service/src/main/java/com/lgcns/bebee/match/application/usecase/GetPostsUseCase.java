@@ -39,10 +39,10 @@ public class GetPostsUseCase implements UseCase<GetPostsUseCase.Param, GetPostsU
                 .map(DayOfWeek::valueOf)
                 .toList();
 
-        // isMatched를 PostStatus로 변환
-        PostStatus postStatus = null;
+        // isMatched를 PostStatus 리스트로 변환
+        List<PostStatus> postStatuses = null;
         if (params.isMatched != null) {
-            postStatus = PostStatus.NON_MATCHED;
+            postStatuses = List.of(PostStatus.NON_MATCHED, PostStatus.PROCEEDING);
         }
 
         // lastPostId가 null이면 Long.MAX_VALUE로 설정 (최초 요청)
@@ -57,7 +57,7 @@ public class GetPostsUseCase implements UseCase<GetPostsUseCase.Param, GetPostsU
                 params.maxHoney,
                 params.disabilityCategoryIds,
                 daysOfWeek,
-                postStatus,
+                postStatuses,
                 cursorId,
                 params.count + 1  // 다음 페이지 존재 여부 확인을 위해 +1
         );
