@@ -16,7 +16,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class GetReviewKeywordsUseCase implements UseCase<GetReviewKeywordsUseCase.Param, GetReviewKeywordsUseCase.Result> {
+public class GetReviewKeywordsListUseCase implements UseCase<GetReviewKeywordsListUseCase.Param, GetReviewKeywordsListUseCase.Result> {
 
     /*
      * 작성 가능한 키워드 목록 조회
