@@ -119,7 +119,7 @@ jobs:
 
           echo "Target file: $TARGET_PATH"
           
-          if [ -f "$TARGET_PATH"]; then
+          if [ -f "$TARGET_PATH" ]; then
             echo "Updating image tag to: ${{ steps.build-image.outputs.image_tag }}"
             sed -i "s|newTag:.*|newTag: ${{ steps.build-image.outputs.image_tag }}|g" "$TARGET_PATH"
           
