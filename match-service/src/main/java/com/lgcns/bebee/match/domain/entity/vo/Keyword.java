@@ -1,5 +1,6 @@
 package com.lgcns.bebee.match.domain.entity.vo;
 
+import com.lgcns.bebee.match.common.exception.MatchErrors;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import java.util.Arrays;
@@ -76,8 +77,7 @@ public enum Keyword {
         return Arrays.stream(values())
                 .filter(keyword -> keyword.id == id)
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Invalid keyword ID: " + id));
+                .orElseThrow(() -> MatchErrors.INVALID_KEYWORD.toException());
     }
 
     // 방향에 따른 키워드 목록 조회
@@ -86,10 +86,4 @@ public enum Keyword {
                 .filter(keyword -> keyword.direction == direction)
                 .collect(Collectors.toList());
     }
-
-    // 키워드가 해당 방향에 속하는지 확인
-    public boolean belongsToDirection(ReviewDirection direction) {
-        return this.direction == direction;
-    }
-    
 }
