@@ -32,10 +32,11 @@ CREATE TABLE Review (
 
 -- Review_Keyword 테이블 (리뷰-키워드 매핑)
 CREATE TABLE Review_Keyword (
+    review_keyword_id BIGINT NOT NULL PRIMARY KEY,
     review_id BIGINT NOT NULL COMMENT '리뷰 ID',
     keyword_id INT NOT NULL COMMENT '키워드 ID (1~24)',
 
-    PRIMARY KEY (review_id, keyword_id),
+    UNIQUE KEY unique_review_keyword (review_id, keyword_id),
     CONSTRAINT fk_review_keyword_review FOREIGN KEY (review_id)
             REFERENCES Review(review_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='리뷰-키워드 매핑 테이블';
