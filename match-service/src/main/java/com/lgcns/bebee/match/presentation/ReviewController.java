@@ -1,10 +1,12 @@
 package com.lgcns.bebee.match.presentation;
 
 import com.lgcns.bebee.match.application.usecase.CreateReviewUseCase;
-import com.lgcns.bebee.match.application.usecase.GetReviewKeywordsUseCase;
+import com.lgcns.bebee.match.application.usecase.GetReceivedReviewsUseCase;
+import com.lgcns.bebee.match.application.usecase.GetReviewKeywordsListUseCase;
 import com.lgcns.bebee.match.presentation.dto.req.ReviewCreateReqDTO;
 import com.lgcns.bebee.match.presentation.dto.res.ReviewCreateResDTO;
 import com.lgcns.bebee.match.presentation.dto.res.ReviewKeywordResDTO;
+import com.lgcns.bebee.match.presentation.dto.res.ReviewStatsResDTO;
 import com.lgcns.bebee.match.presentation.swagger.ReviewSwagger;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,40 +19,55 @@ import java.util.List;
 @RequestMapping("/reviews")
 public class ReviewController implements ReviewSwagger {
 
-    private final GetReviewKeywordsUseCase getReviewKeywordsUseCase;
+    private final GetReviewKeywordsListUseCase getReviewKeywordsUseCase;
     private final CreateReviewUseCase createReviewUseCase;
+    private final GetReceivedReviewsUseCase getReceivedReviewsUseCase;  // ← 추가!
 
-    @GetMapping("/keywords")
+    // 리뷰 키워드 목록 조회
     @Override
+    @GetMapping("/keywords")
     public ResponseEntity<List<ReviewKeywordResDTO>> getKeywords(
-            @RequestParam Long engagementId,
-            @RequestParam Long memberId
+            @RequestParam String currentMemberId
     ) {
-
-        GetReviewKeywordsUseCase.Param param = new GetReviewKeywordsUseCase.Param(
-                engagementId,
-                memberId
+        GetReviewKeywordsListUseCase.Param param = new GetReviewKeywordsListUseCase.Param(
+                Long.parseLong(currentMemberId)
         );
 
-        GetReviewKeywordsUseCase.Result result = getReviewKeywordsUseCase.execute(param);
+        GetReviewKeywordsListUseCase.Result result = getReviewKeywordsUseCase.execute(param);
+        List<ReviewKeywordResDTO> resDTO = ReviewKeywordResDTO.fromList(result.getKeywords());
 
-        List<ReviewKeywordResDTO> response = ReviewKeywordResDTO.fromList(result.getKeywords());
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok().body(resDTO);
     }
 
-    @PostMapping
+    // 리뷰 작성(키워드 선택)
     @Override
+    @PostMapping
     public ResponseEntity<ReviewCreateResDTO> createReview(
-            @RequestParam  Long memberId,
-            @Valid @RequestBody ReviewCreateReqDTO request
+            @RequestParam String currentMemberId,
+            @Valid @RequestBody ReviewCreateReqDTO reqDTO
     ) {
-        CreateReviewUseCase.Param param = request.toParam(memberId);
-
+        CreateReviewUseCase.Param param = reqDTO.toParam(Long.parseLong(currentMemberId));
         CreateReviewUseCase.Result result = createReviewUseCase.execute(param);
+        ReviewCreateResDTO resDTO = ReviewCreateResDTO.from(result);
 
-        ReviewCreateResDTO response = ReviewCreateResDTO.from(result);
+        return ResponseEntity.ok().body(resDTO);
+    }
 
-        return ResponseEntity.ok(response);
+    // 받은 리뷰 통계 조회
+    @Override
+    @GetMapping("/received/{memberId}")
+    public ResponseEntity<ReviewStatsResDTO> getReceivedReviews(
+            @PathVariable String memberId,
+            @RequestParam(defaultValue = "false") boolean isMyPage
+    ) {
+        GetReceivedReviewsUseCase.Param param = new GetReceivedReviewsUseCase.Param(
+                Long.parseLong(memberId),
+                isMyPage
+        );
+
+        GetReceivedReviewsUseCase.Result result = getReceivedReviewsUseCase.execute(param);
+        ReviewStatsResDTO resDTO = ReviewStatsResDTO.from(result);
+
+        return ResponseEntity.ok().body(resDTO);
     }
 }

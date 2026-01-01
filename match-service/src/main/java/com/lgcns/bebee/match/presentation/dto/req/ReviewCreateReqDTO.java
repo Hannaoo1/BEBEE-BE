@@ -3,15 +3,12 @@ package com.lgcns.bebee.match.presentation.dto.req;
 import com.lgcns.bebee.match.application.usecase.CreateReviewUseCase;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Schema(description = "리뷰 작성 요청")
 public class ReviewCreateReqDTO {
 
@@ -23,10 +20,10 @@ public class ReviewCreateReqDTO {
     @Schema(description = "선택한 키워드 ID 목록", example = "[1, 3, 5, 7, 9]", required = true)
     private List<Integer> keywordIds;
 
-    public CreateReviewUseCase.Param toParam(Long memberId) {
+    public CreateReviewUseCase.Param toParam(Long reviewerId) {
         return new CreateReviewUseCase.Param(
                 this.engagementId,
-                memberId,
+                reviewerId,
                 this.keywordIds
         );
     }
