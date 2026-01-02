@@ -127,18 +127,18 @@ public class GetHelperApplicationPostsUseCase implements UseCase<GetHelperApplic
         }
 
         private static Integer calculateDaysRemaining(PostPeriod period) {
-            if (period == null || period.getEndDate() == null) {
+            if (period == null || period.getStartDate() == null) {
                 return null;
             }
 
             LocalDate now = LocalDate.now();
-            LocalDate endDate = period.getEndDate();
+            LocalDate startDate = period.getStartDate();
 
-            if (endDate.isBefore(now)) {
+            if (startDate.isBefore(now)) {
                 return 0;
             }
 
-            return (int) ChronoUnit.DAYS.between(now, endDate);
+            return (int) ChronoUnit.DAYS.between(now, startDate);
         }
 
         private static Object createEngagementTime(Post post) {
