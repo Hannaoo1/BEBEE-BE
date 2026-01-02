@@ -29,9 +29,6 @@ public class Engagement extends BaseTimeEntity {
     private EngagementStatus status;
 
     @Column
-    private LocalDate endDate;
-
-    @Column
     private Boolean isDisabledCheck = false;
 
     @Column
