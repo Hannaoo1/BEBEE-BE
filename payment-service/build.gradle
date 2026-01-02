@@ -15,6 +15,9 @@ dependencies {
 	implementation project(":common")
 	implementation project(":common-data")
 
+    // Spring WebFlux (WebClient, Reactor Netty 사용)
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
 	// MySQL Connector - MySQL 데이터베이스 연결
 	runtimeOnly 'com.mysql:mysql-connector-j:9.5.0'
 
