@@ -20,7 +20,7 @@ public record PostGetResDTO(
         String memberProfileImageUrl,
 
         @Schema(description = "도움 카테고리 목록", example = "[\"외출동행\", \"방문목욕\"]")
-        List<String> helpCategories,
+        List<Long> helpCategoryIds,
 
         @Schema(description = "도움 타입 (DAY: 일회성, TERM: 정기적)", example = "DAY")
         String engagementType,
@@ -66,7 +66,7 @@ public record PostGetResDTO(
                 result.getMemberNickname(),
                 result.getMemberLegalDongCode(),
                 result.getMemberProfileImageUrl(),
-                result.getHelpCategories(),
+                result.getHelpCategoryIds(),
                 result.getEngagementType(),
                 result.getTitle(),
                 result.getUnitHoney(),

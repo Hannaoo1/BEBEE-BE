@@ -46,7 +46,7 @@ public class GetSinglePostUseCase implements UseCase<GetSinglePostUseCase.Param,
         private final String memberLegalDongCode;
         private final String memberProfileImageUrl;
 
-        private final List<String> helpCategories;
+        private final List<Long> helpCategoryIds;
 
         private final String engagementType;
         private final String title;
@@ -65,9 +65,8 @@ public class GetSinglePostUseCase implements UseCase<GetSinglePostUseCase.Param,
         private final List<String> postImageUrls;
 
         public static Result from(Post post, MemberSync member) {
-            List<String> helpCategoryNames = post.getHelpCategories().stream()
+            List<Long> helpCategoryIds = post.getHelpCategories().stream()
                     .map(postHelpCategory -> postHelpCategory.getId().getHelpCategoryId())
-                    .map(HelpCategoryType::getNameById)
                     .toList();
 
             List<ScheduleDTO> scheduleDTOs = post.getSchedules().stream()
@@ -104,7 +103,7 @@ public class GetSinglePostUseCase implements UseCase<GetSinglePostUseCase.Param,
                     member.getNickname(),
                     member.getLegalDongCode(),
                     member.getProfileImageUrl(),
-                    helpCategoryNames,
+                    helpCategoryIds,
                     post.getType().name(),
                     post.getTitle(),
                     post.getUnitHoney(),
