@@ -1,4 +1,4 @@
-package com.lgcns.bebee.file.core;
+package com.lgcns.bebee.member.core.config;
 
 import com.lgcns.bebee.common.config.BaseOpenApiConfig;
 import com.lgcns.bebee.common.properties.SpringdocApiProperties;
@@ -19,8 +19,8 @@ public class OpenApiConfig extends BaseOpenApiConfig {
     public OpenAPI openAPI(){
         return new OpenAPI()
                 .info(createApiInfo(
-                        "Bebee File Service API",
-                        "파일 서비스 REST API 문서",
+                        "Bebee Member Service API",
+                        "회원 서비스 REST API 문서",
                         "v1.0.0"
                 ))
                 .components(openApiComponents())

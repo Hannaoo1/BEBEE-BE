@@ -21,7 +21,7 @@ import java.util.List;
  */
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/documents")
+@RequestMapping("/documents")
 public class DocumentController implements DocumentSwagger {
 
         private final UploadDocumentUseCase uploadDocumentUseCase;
