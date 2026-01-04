@@ -69,4 +69,12 @@ public class Engagement extends BaseTimeEntity {
     public void incompleted() {
         this.status = EngagementStatus.INCOMPLETED;
     }
+
+    public Boolean isHelperCheck() {
+        return isHelperCheck;
+    }
+
+    public Boolean isDisabledCheck() {
+        return isDisabledCheck;
+    }
 }
