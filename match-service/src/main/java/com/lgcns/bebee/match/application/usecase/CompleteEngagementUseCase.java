@@ -8,8 +8,7 @@ import com.lgcns.bebee.match.domain.event.HoneySettlementEvent;
 import com.lgcns.bebee.match.domain.event.ReviewRequestEvent;
 import com.lgcns.bebee.match.domain.service.AgreementReader;
 import com.lgcns.bebee.match.domain.service.EngagementReader;
-import com.lgcns.bebee.match.presentation.dto.req.EngagementCompleteReqDTO;
-import com.lgcns.bebee.match.presentation.dto.res.EngagementCompleteResDTO;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,20 +22,30 @@ public class CompleteEngagementUseCase {
     private final AgreementReader agreementReader;
     private final EventPublisher eventPublisher;
 
+    @Getter
+    @RequiredArgsConstructor
+    public static class Param {
+        private final Long engagementId;
+        private final String memberId;
+        private final String userType;
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static class Result {
+        private final String status;
+        private final Boolean isLastActivity;
+    }
+
     @Transactional
-    public EngagementCompleteResDTO execute(
-            Long engagementId,
-            String memberId,
-            EngagementCompleteReqDTO request
-    ) {
+    public Result execute(Param param) {
 
-        Engagement engagement = engagementReader.getById(engagementId);
+        Engagement engagement = engagementReader.getById(param.getEngagementId());
 
-        // Agreement 조회 (이벤트)
         Agreement agreement = agreementReader.getById(engagement.getAgreementId());
 
         // 완료 체크 처리
-        String userType = request.getUserType();
+        String userType = param.getUserType();
         if ("HELPER".equals(userType)) {
             engagement.setHelperCheck();
         } else if ("DISABLED".equals(userType)) {
@@ -57,20 +66,20 @@ public class CompleteEngagementUseCase {
             publishCompletionEvents(engagement, agreement, true, false);
         }
 
-            // 케이스 3: 도우미만 완료 (PENDING 유지, 3일 후 스케줄러 처리)
-            // 케이스 4: 둘 다 클릭 x (UseCase 실행 안됨, 3일 후 스케줄러 처리)
+        // 케이스 3: 도우미만 완료 (PENDING 유지, 3일 후 스케줄러 처리)
+        // 케이스 4: 둘 다 클릭 x (UseCase 실행 안됨, 3일 후 스케줄러 처리)
 
         String status = engagement.getStatus().name();
-        Boolean isLastActivity = true;  // DAY는 항상 true
+        Boolean isLastActivity = true;
 
-        return EngagementCompleteResDTO.of(status, isLastActivity);
+        return new Result(status, isLastActivity);
     }
 
     private void publishCompletionEvents(
             Engagement engagement,
             Agreement agreement,
-            boolean notifyHelper,   // 도우미 알림 여부
-            boolean notifyDisabled  // 장애인 알림 여부
+            boolean notifyHelper,
+            boolean notifyDisabled
     ) {
 
         // 정산 이벤트 (결제 서비스)

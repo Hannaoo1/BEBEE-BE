@@ -1,5 +1,6 @@
 package com.lgcns.bebee.match.presentation.dto.res;
 
+import com.lgcns.bebee.match.application.usecase.CompleteEngagementUseCase;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -20,5 +21,13 @@ public class EngagementCompleteResDTO {
 
     public static EngagementCompleteResDTO of(String status, Boolean isLastActivity) {
         return new EngagementCompleteResDTO(status, isLastActivity);
+    }
+
+    // Result → DTO 변환
+    public static EngagementCompleteResDTO from(CompleteEngagementUseCase.Result result) {
+        return new EngagementCompleteResDTO(
+                result.getStatus(),
+                result.getIsLastActivity()
+        );
     }
 }
