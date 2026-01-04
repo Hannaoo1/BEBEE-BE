@@ -8,9 +8,9 @@ import java.util.List;
 
 public interface EngagementRepository extends JpaRepository<Engagement, Long> {
 
-    // PENDING 상태이면서 activityDate가 기준일 이하(3일이 지난)인 활동 목록
-    List<Engagement> findByStatusAndActivityDateLessThanEqual(
-            EngagementStatus status,
-            LocalDate activityDate
+    // 특정 날짜의 특정 상태 활동 조회 (스케줄러)
+    List<Engagement> findByActivityDateAndStatus(
+            LocalDate activityDate,
+            EngagementStatus status
     );
 }
