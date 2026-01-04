@@ -6,9 +6,11 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class HoneyWallet extends BaseTimeEntity {
     @Id
@@ -20,4 +22,16 @@ public class HoneyWallet extends BaseTimeEntity {
 
     @Column(nullable = false)
     private Long balance = 0L;
+
+    public static HoneyWallet create(Long memberId, Long balance) {
+        HoneyWallet honeyWallet = new HoneyWallet();
+        honeyWallet.memberId = memberId;
+        honeyWallet.balance = balance;
+
+        return honeyWallet;
+    }
+
+//    public void charge(Integer amount) {}
+//
+//    public void withdraw(Integer amount) {}
 }

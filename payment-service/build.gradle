@@ -18,6 +18,9 @@ dependencies {
     // Spring WebFlux (WebClient, Reactor Netty 사용)
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
+	// Spring Data Redis - Redis 연동
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
 	// MySQL Connector - MySQL 데이터베이스 연결
 	runtimeOnly 'com.mysql:mysql-connector-j:9.5.0'
 

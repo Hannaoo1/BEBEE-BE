@@ -5,9 +5,11 @@ import com.lgcns.bebee.payment.domain.entity.vo.PaymentStatus;
 import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Payment extends BaseTimeEntity {
     @Id
@@ -29,4 +31,18 @@ public class Payment extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PaymentStatus status;
+
+    public static Payment create(Long memberId, String paymentKey, String orderId, Integer amount) {
+        Payment payment = new Payment();
+        payment.memberId = memberId;
+        payment.paymentKey = paymentKey;
+        payment.orderId = orderId;
+        payment.amount = amount;
+
+        return payment;
+    }
+
+//    public void markAsPaid() {}
+//
+//    public void validateOwner(Long memberId) {}
 }
