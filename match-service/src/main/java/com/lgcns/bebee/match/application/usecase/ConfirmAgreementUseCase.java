@@ -6,9 +6,12 @@ import com.lgcns.bebee.common.exception.InvalidParamException;
 import com.lgcns.bebee.match.common.exception.MatchInvalidParamErrors;
 import com.lgcns.bebee.match.common.util.ParamValidator;
 import com.lgcns.bebee.match.domain.entity.Agreement;
+import com.lgcns.bebee.match.domain.entity.Engagement;
 import com.lgcns.bebee.match.domain.entity.Match;
+import com.lgcns.bebee.match.domain.repository.EngagementRepository;
 import com.lgcns.bebee.match.domain.repository.MatchRepository;
 import com.lgcns.bebee.match.domain.service.AgreementReader;
+import com.lgcns.bebee.match.domain.service.EngagementManager;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,6 +25,8 @@ public class ConfirmAgreementUseCase implements UseCase<ConfirmAgreementUseCase.
 
     private final AgreementReader agreementReader;
     private final MatchRepository matchRepository;
+    private final EngagementManager engagementManager;
+    private final EngagementRepository engagementRepository;
 
     @Transactional
     @Override
@@ -41,6 +46,9 @@ public class ConfirmAgreementUseCase implements UseCase<ConfirmAgreementUseCase.
                 agreement
         );
         Match savedMatch = matchRepository.save(match);
+
+        Engagement engagement = engagementManager.createEngagement(agreement);
+        engagementRepository.save(engagement);
 
         return Result.from(savedMatch);
     }
