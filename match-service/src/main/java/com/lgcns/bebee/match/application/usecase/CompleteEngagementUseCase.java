@@ -26,7 +26,7 @@ public class CompleteEngagementUseCase {
     @RequiredArgsConstructor
     public static class Param {
         private final Long engagementId;
-        private final String memberId;
+        private final Long memberId;
         private final String userType;
     }
 

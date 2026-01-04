@@ -16,10 +16,11 @@ public class EngagementCompleteReqDTO {
     @NotNull(message = "사용자 유형은 필수입니다")
     private String userType;
 
+    // DTO → Param 변환
     public CompleteEngagementUseCase.Param toParam(String engagementId, String memberId) {
         return new CompleteEngagementUseCase.Param(
                 Long.parseLong(engagementId),
-                memberId,
+                Long.parseLong(memberId),
                 userType
         );
     }
