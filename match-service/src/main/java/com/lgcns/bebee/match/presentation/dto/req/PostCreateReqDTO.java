@@ -109,13 +109,13 @@ public record PostCreateReqDTO(
         )
         Double longitude
 ) {
-    public CreatePostUseCase.Param toParam(String memberId) {
+    public CreatePostUseCase.Param toParam(Long memberId) {
         List<CreatePostUseCase.ScheduleParam> scheduleParams = schedules.stream()
                 .map(s -> new CreatePostUseCase.ScheduleParam(s.dayOfWeek(), s.startTime(), s.endTime()))
                 .toList();
 
         return new CreatePostUseCase.Param(
-                Long.parseLong(memberId),
+                memberId,
                 postType,
                 postImages,
                 title,

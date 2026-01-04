@@ -23,7 +23,7 @@ import java.util.Map;
  * OCR 서비스 HTTP 클라이언트 구현체
  * 외부 OCR 서비스와 HTTP 통신하여 문서 분석 수행
  */
-@Component
+//@Component
 @RequiredArgsConstructor
 @Slf4j
 public class HttpOcrClient implements OcrClient {

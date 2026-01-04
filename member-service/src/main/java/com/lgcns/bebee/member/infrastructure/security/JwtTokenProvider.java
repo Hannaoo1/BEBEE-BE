@@ -43,6 +43,7 @@ public class JwtTokenProvider implements TokenProvider {
 
     public Claims parseClaims(String token) {
         return Jwts.parserBuilder()
+                .requireIssuer(jwtProperties.issuer())
                 .setSigningKey(secretKey)
                 .build()
                 .parseClaimsJws(token)
@@ -53,6 +54,7 @@ public class JwtTokenProvider implements TokenProvider {
         Instant expiry = issuedAt.plusSeconds(expiresTime);
         return Jwts.builder()
                 .setSubject(String.valueOf(member.getId()))
+                .setIssuer(jwtProperties.issuer())
                 .claim("role", member.getRole().name())
                 .setIssuedAt(Date.from(issuedAt))
                 .setExpiration(Date.from(expiry))

@@ -1,4 +1,4 @@
-package com.lgcns.bebee.chat.core.config;
+package com.lgcns.bebee.file.core;
 
 import com.lgcns.bebee.common.config.BaseWebConfig;
 import com.lgcns.bebee.common.properties.CorsProperties;
@@ -30,6 +30,7 @@ public class WebConfig extends BaseWebConfig {
         registry.addInterceptor(memberAuthenticationInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns(
+                        "/files/**",
                         "/swagger-ui/**",
                         "/swagger-ui.html",
                         "/api-docs/**");
