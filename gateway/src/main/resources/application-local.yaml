@@ -1,0 +1,103 @@
+# ========================================
+# Gateway 로컬 개발 환경 설정 파일
+# ========================================
+
+server:
+  port: ${GATEWAY_PORT:8080}
+
+spring:
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+          globalcors:
+            add-to-simple-url-handler-mapping: true
+            cors-configurations:
+              '[/**]':
+                allowedOriginPatterns:
+                  - "https://be-bee.link"
+                  - "http://localhost:[*]"
+                  - "https://localhost:[*]"
+                allowedMethods:
+                  - GET
+                  - POST
+                  - PUT
+                  - DELETE
+                  - OPTIONS
+                allowedHeaders: "*"
+                allowCredentials: true
+                maxAge: 3600
+          routes:
+            # Member Service 라우팅
+            - id: member-service
+              uri: http://localhost:8083
+              predicates:
+                - Path=/api/members/**
+              filters:
+              - RewritePath=/api/members/(?<segment>.*), /${segment}
+
+            # Match Service 라우팅
+            - id: match-service
+              uri: http://localhost:8082
+              predicates:
+                - Path=/api/match/**
+              filters:
+                - RewritePath=/api/match/(?<segment>.*), /${segment}
+
+            # Chat Service 라우팅
+            - id: chat-service
+              uri: http://localhost:8081
+              predicates:
+                - Path=/api/chat/**
+              filters:
+                - RewritePath=/api/chat/(?<segment>.*), /${segment}
+
+            # Payment Service 라우팅
+            - id: payment-service
+              uri: http://localhost:8084
+              predicates:
+                - Path=/api/payment/**
+              filters:
+                - RewritePath=/api/payment/(?<segment>.*), /${segment}
+
+            # Notification Service 라우팅
+            - id: notification-service
+              uri: http://localhost:8085
+              predicates:
+                - Path=/api/notification/**
+              filters:
+                - RewritePath=/api/notification/(?<segment>.*), /${segment}
+
+            # File Service 라우팅
+            - id: file-service
+              uri: http://localhost:8086
+              predicates:
+                - Path=/api/file/**
+              filters:
+                - RewritePath=/api/file/(?<segment>.*), /${segment}
+
+# Swagger/OpenAPI 설정 (로컬 개발 환경)
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    urls:
+      - name: Member Service
+        url: /members/api-docs
+      - name: Match Service
+        url: /match/api-docs
+      - name: Chat Service
+        url: /chat/api-docs
+      - name: Payment Service
+        url: /payment/api-docs
+      - name: Notification Service
+        url: /notification/api-docs
+      - name: File Service
+        url: /file/api-docs
