@@ -13,13 +13,13 @@ public record PostGetResDTO(
         @Schema(description = "게시글 작성자 닉네임", example = "김철수")
         String memberNickname,
 
-        @Schema(description = "게시글 작성자 법정동 코드", example = "1168010500")
-        String memberLegalDongCode,
+        @Schema(description = "게시글 작성자 지역명", example = "서울시 강남구 역삼동")
+        String memberAddress,
 
         @Schema(description = "게시글 작성자 프로필 이미지 URL", example = "https://example.com/profiles/member.jpg")
         String memberProfileImageUrl,
 
-        @Schema(description = "도움 카테고리 목록", example = "[\"외출동행\", \"방문목욕\"]")
+        @Schema(description = "도움 카테고리 목록", example = "[1,3,5]")
         List<Long> helpCategoryIds,
 
         @Schema(description = "도움 타입 (DAY: 일회성, TERM: 정기적)", example = "DAY")
@@ -49,8 +49,8 @@ public record PostGetResDTO(
         @Schema(description = "스케줄 목록 (요일별 시간)")
         List<ScheduleDTO> schedules,
 
-        @Schema(description = "게시글 작성 지역 법정동 코드", example = "1168010500")
-        String postLegalDongCode,
+        @Schema(description = "게시글 작성 지역명", example = "서울시 강남구 역삼동")
+        String postAddress,
 
         @Schema(description = "게시글 내용", example = "병원 진료 예약이 있어서 동행해주실 분을 찾습니다.")
         String content,
@@ -64,7 +64,7 @@ public record PostGetResDTO(
     public static PostGetResDTO from(GetSinglePostUseCase.Result result) {
         return new PostGetResDTO(
                 result.getMemberNickname(),
-                result.getMemberLegalDongCode(),
+                result.getMemberAddress(),
                 result.getMemberProfileImageUrl(),
                 result.getHelpCategoryIds(),
                 result.getEngagementType(),
@@ -77,7 +77,7 @@ public record PostGetResDTO(
                 result.getSchedules().stream()
                         .map(s -> new ScheduleDTO(s.getDayOfWeek(), s.getStartTime(), s.getEndTime()))
                         .toList(),
-                result.getPostLegalDongCode(),
+                result.getPostAddress(),
                 result.getContent(),
                 result.getApplicantCount(),
                 result.getPostImageUrls()

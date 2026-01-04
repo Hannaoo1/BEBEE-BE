@@ -169,7 +169,7 @@ public interface PostSwagger {
             @Parameter(
                     description = "조회할 게시글 ID",
                     required = true,
-                    example = "1234567890"
+                    example = "1001"
             )
             @PathVariable String postId
     );
