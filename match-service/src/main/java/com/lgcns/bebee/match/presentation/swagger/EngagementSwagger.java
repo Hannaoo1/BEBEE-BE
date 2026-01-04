@@ -1,5 +1,6 @@
 package com.lgcns.bebee.match.presentation.swagger;
 
+import com.lgcns.bebee.common.annotation.CurrentMember;
 import com.lgcns.bebee.match.presentation.dto.req.EngagementCompleteReqDTO;
 import com.lgcns.bebee.match.presentation.dto.res.EngagementCompleteResDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,7 +13,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "Engagement", description = "활동 관리 API")
 public interface EngagementSwagger {
@@ -64,19 +64,15 @@ public interface EngagementSwagger {
             )
     })
     ResponseEntity<EngagementCompleteResDTO> completeEngagement(
+            @Parameter(hidden = true)
+            @CurrentMember Long currentMemberId,
+
             @Parameter(
                     description = "활동 ID",
                     required = true,
                     example = "123"
             )
             @PathVariable String engagementId,
-
-            @Parameter(
-                    description = "클릭한 사용자 ID",
-                    required = true,
-                    example = "101"
-            )
-            @RequestParam String memberId,
 
             @RequestBody(
                     description = "활동 완료 요청 정보",
