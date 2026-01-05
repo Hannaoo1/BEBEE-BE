@@ -94,7 +94,7 @@ public interface PaymentSwagger {
             requestBody = @RequestBody(
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = PreparePaymentReqDTO.class),
+                            schema = @Schema(implementation = ConfirmPaymentReqDTO.class),
                             examples = {
                                     @ExampleObject(
                                             name = "결제 승인 요청 예시",
@@ -124,7 +124,7 @@ public interface PaymentSwagger {
                                                     {
                                                         "paymentKey": "tviva20240101000000ABCD1234",
                                                         "currentBalance": 500000,
-                                                        "paymentId": "5EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1",
+                                                        "paymentId": "5EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1"
                                                     }
                                                 """
                                 )
