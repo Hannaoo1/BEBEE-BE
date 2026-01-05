@@ -69,7 +69,7 @@ public class ConfirmPaymentUseCase implements UseCase<ConfirmPaymentUseCase.Para
         // HoneyWallet 충전 (비관적 락 적용)
         HoneyWallet wallet = honeyWalletRepository.findByMemberIdWithLock(temp.getMemberId())
                 .orElseGet(() -> HoneyWallet.create(temp.getMemberId(), 0L));
-        wallet.charge(response.totalAmount());
+        wallet.charge(response.totalAmount().longValue());
         honeyWalletRepository.save(wallet);
         log.info("허니 충전 완료: memberId={}, amount={}, balance={}",
                 temp.getMemberId(), response.totalAmount(), wallet.getBalance());
@@ -100,7 +100,7 @@ public class ConfirmPaymentUseCase implements UseCase<ConfirmPaymentUseCase.Para
     public static class Param implements Params {
         private final String orderId;
         private final String paymentKey;
-        private final Integer amount;
+        private final Long amount;
         private final Long memberId;
     }
 

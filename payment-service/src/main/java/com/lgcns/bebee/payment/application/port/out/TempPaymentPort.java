@@ -3,7 +3,7 @@ package com.lgcns.bebee.payment.application.port.out;
 import com.lgcns.bebee.payment.application.port.out.dto.TempPaymentInfo;
 
 public interface TempPaymentPort {
-    String save(Long memberId, Integer amount);
+    String save(Long memberId, Long amount);
 
     TempPaymentInfo get(String orderId);
 

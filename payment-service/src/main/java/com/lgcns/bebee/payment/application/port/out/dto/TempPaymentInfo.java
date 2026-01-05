@@ -7,6 +7,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TempPaymentInfo {
     private final String orderId;
-    private final Integer amount;
+    private final Long amount;
     private final Long memberId;
 }

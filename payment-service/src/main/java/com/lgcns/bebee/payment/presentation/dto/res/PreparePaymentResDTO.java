@@ -15,7 +15,7 @@ public record PreparePaymentResDTO(
                 description = "충전 금액",
                 example = "10000"
         )
-        Integer amount
+        Long amount
 ) {
     public static PreparePaymentResDTO from(PreparePaymentUseCase.Result result) {
         return new PreparePaymentResDTO(

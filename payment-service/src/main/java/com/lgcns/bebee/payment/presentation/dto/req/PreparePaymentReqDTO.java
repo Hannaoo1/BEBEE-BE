@@ -10,7 +10,7 @@ public record PreparePaymentReqDTO(
                 example = "10000",
                 requiredMode = Schema.RequiredMode.REQUIRED
         )
-        Integer amount
+        Long amount
 ) {
     public PreparePaymentUseCase.Param toParam(Long memberId) {
         return new PreparePaymentUseCase.Param(memberId, amount);

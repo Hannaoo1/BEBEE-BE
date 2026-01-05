@@ -34,7 +34,7 @@ public class HoneyWallet extends BaseTimeEntity {
     /**
      * 허니 충전 (결제 완료 시)
      */
-    public void charge(Integer amount) {
+    public void charge(Long amount) {
         if (amount <= 0) {
             throw new IllegalArgumentException("충전 금액은 0보다 커야 합니다.");
         }
@@ -44,7 +44,7 @@ public class HoneyWallet extends BaseTimeEntity {
     /**
      * 허니 차감 (결제 취소 또는 사용 시)
      */
-    public void withdraw(Integer amount) {
+    public void withdraw(Long amount) {
         if (amount <= 0) {
             throw new IllegalArgumentException("차감 금액은 0보다 커야 합니다.");
         }

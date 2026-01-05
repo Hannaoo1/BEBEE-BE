@@ -30,13 +30,13 @@ public class PreparePaymentUseCase implements UseCase<PreparePaymentUseCase.Para
     @RequiredArgsConstructor
     public static class Param implements Params {
         private final Long memberId;
-        private final Integer amount;
+        private final Long amount;
     }
 
     @Getter
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Result {
         private final String orderId;
-        private final Integer amount;
+        private final Long amount;
     }
 }

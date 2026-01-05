@@ -1,7 +1,7 @@
 package com.lgcns.bebee.payment.application.client;
 
 public interface TossPaymentsClient {
-    TossPaymentResponse confirmPayment(String paymentKey, String orderId, Integer amount);
+    TossPaymentResponse confirmPayment(String paymentKey, String orderId, Long amount);
 
 //    TossPaymentResponse getPayment(String paymentKey);
 //

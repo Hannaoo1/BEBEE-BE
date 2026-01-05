@@ -28,7 +28,7 @@ public class RedisTempPaymentService implements TempPaymentPort {
      * orderId 생성 및 결제 정보 임시 저장
      */
     @Override
-    public String save(Long memberId, Integer amount) {
+    public String save(Long memberId, Long amount) {
         String orderId = Tsid.FactorySupplier.INSTANCE.get().generate().toString();
 
         TempPaymentInfo dto = new TempPaymentInfo(orderId, amount, memberId);

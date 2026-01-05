@@ -21,7 +21,7 @@ public class HttpTossPaymentsClientImpl implements TossPaymentsClient {
     private final TossPaymentsProperties properties;
 
     @Override
-    public TossPaymentResponse confirmPayment(String paymentKey, String orderId, Integer amount) {
+    public TossPaymentResponse confirmPayment(String paymentKey, String orderId, Long amount) {
         log.info("토스 결제 승인 요청: paymentKey={}, orderId={}, amount={}", paymentKey, orderId, amount);
 
         try {
@@ -91,6 +91,6 @@ public class HttpTossPaymentsClientImpl implements TossPaymentsClient {
     private record TossConfirmRequest(
             String paymentKey,
             String orderId,
-            Integer amount
+            Long amount
     ) {}
 }

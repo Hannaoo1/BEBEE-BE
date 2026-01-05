@@ -24,7 +24,7 @@ public record ConfirmPaymentReqDTO(
                 example = "10000",
                 requiredMode = Schema.RequiredMode.REQUIRED
         )
-        Integer amount
+        Long amount
 ) {
     public ConfirmPaymentUseCase.Param toParam(Long memberId) {
         return new ConfirmPaymentUseCase.Param(orderId, paymentKey, amount, memberId);

@@ -15,7 +15,7 @@ public record ConfirmPaymentResDTO(
                 description = "현재 허니 잔액",
                 example = "50000"
         )
-        Integer currentBalance,
+        Long currentBalance,
 
         @Schema(
                 description = "토스 결제 키",
