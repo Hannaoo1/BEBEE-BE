@@ -32,7 +32,7 @@ public class HoneyWallet extends BaseTimeEntity {
     }
 
     /**
-     * 허니 충전 (결제 완료 시)
+     * 허니 충전 (장애인: 결제 완료 시 / 도우미: 꿀 지급 완료 시)
      */
     public void charge(Long amount) {
         if (amount <= 0) {
