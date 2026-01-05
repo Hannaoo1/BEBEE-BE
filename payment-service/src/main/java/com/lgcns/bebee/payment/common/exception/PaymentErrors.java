@@ -9,6 +9,7 @@ public enum PaymentErrors implements ErrorInfo {
     PAYMENT_ALREADY_CANCELED("이미 취소된 결제입니다."),
     PAYMENT_CANNOT_CANCEL("취소할 수 없는 결제 상태입니다."),
     PAYMENT_AMOUNT_MISMATCH("결제 금액이 일치하지 않습니다."),
+    PAYMENT_MEMBER_MISMATCH("결제 회원 정보가 일치하지 않습니다."),
     INVALID_PAYMENT_AMOUNT("잘못된 결제 금액입니다."),
 
     HONEY_WALLET_NOT_FOUND("허니 지갑을 찾을 수 없습니다."),
