@@ -100,3 +100,10 @@ logging:
 
     com.lgcns.bebee.payment: ${LOGGING_LEVEL_SERVICE:info}
 
+toss:
+  payments:
+    base-url: https://api.tosspayments.com
+    secret-key: ${TOSS_SECRET_KEY}
+    client-key: ${TOSS_CLIENT_KEY}
+    timeout: 10000
+    api-version: "2022-11-16"

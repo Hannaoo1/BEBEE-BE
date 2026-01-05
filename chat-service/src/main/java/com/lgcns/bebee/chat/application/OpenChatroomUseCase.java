@@ -1,9 +1,8 @@
 package com.lgcns.bebee.chat.application;
 
 import com.lgcns.bebee.chat.domain.entity.Chatroom;
-import com.lgcns.bebee.chat.domain.entity.ChatroomHelpCategory;
-import com.lgcns.bebee.chat.domain.entity.HelpCategorySync;
 import com.lgcns.bebee.chat.domain.entity.MemberSync;
+import com.lgcns.bebee.chat.domain.entity.sync.HelpCategorySync;
 import com.lgcns.bebee.chat.domain.service.ChatroomManagement;
 import com.lgcns.bebee.chat.domain.service.MemberManagement;
 import com.lgcns.bebee.common.application.Params;
@@ -13,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -32,34 +30,20 @@ public class OpenChatroomUseCase implements UseCase<OpenChatroomUseCase.Param, O
             Chatroom chatroom = chatroomManagement.findChatroomWithMembers(param.chatroomId);
             MemberSync otherMember = getOtherMember(chatroom, param.currentMemberId);
 
-            return new Result(
-                    chatroom.getId(), param.currentMemberId, otherMember.getId(),
-                    otherMember.getNickname(), otherMember.getProfileImageUrl(), otherMember.getSweetness(),
-                    null
-            );
+            return Result.from(chatroom, param.currentMemberId, otherMember);
         }
 
         // 상대방 조회
         MemberSync otherMember = memberManagement.getExistingMember(param.otherMemberId);
 
-        Chatroom chatroom = chatroomManagement.findChatroomWithMembers(currentMember, otherMember);
-        otherMember = getOtherMember(chatroom, param.currentMemberId);
-
-        chatroomManagement.linkPost(chatroom, param.postId, param.postTitle, param.helpCategoryIds);
-
-        List<HelpCategorySync> helpCategories = chatroom.getChatroomHelpCategories().stream()
-                .map(ChatroomHelpCategory::getHelpCategory)
+        List<HelpCategorySync> helpCategories = param.helpCategoryIds.stream()
+                .map(HelpCategorySync::from)
                 .toList();
 
-        return new Result(
-                chatroom.getId(),
-                param.currentMemberId,
-                otherMember.getId(),
-                otherMember.getNickname(),
-                otherMember.getProfileImageUrl(),
-                otherMember.getSweetness(),
-                helpCategories
-        );
+        Chatroom chatroom = chatroomManagement.findChatroomWithMembers(currentMember, otherMember, param.postId, param.postTitle, helpCategories);
+        otherMember = getOtherMember(chatroom, param.currentMemberId);
+
+        return Result.from(chatroom, param.currentMemberId, otherMember);
     }
 
     private MemberSync getOtherMember(Chatroom chatroom, Long currentMemberId) {
@@ -85,7 +69,23 @@ public class OpenChatroomUseCase implements UseCase<OpenChatroomUseCase.Param, O
         private final Long otherId;
         private final String otherNickname;
         private final String otherProfileImageUrl;
-        private final BigDecimal otherSweetness;
-        private final List<HelpCategorySync> helpCategories;
+        private final Long postId;
+        private final String title;
+        private final List<Long> helpCategoryIds;
+        private final String matchStatus;
+
+        public static Result from(Chatroom chatroom, Long currentMemberId, MemberSync otherMember) {
+            return new Result(
+                    chatroom.getId(),
+                    currentMemberId,
+                    otherMember.getId(),
+                    otherMember.getNickname(),
+                    otherMember.getProfileImageUrl(),
+                    chatroom.getPostId(),
+                    chatroom.getTitle(),
+                    chatroom.getChatroomHelpCategories().stream().map(chc -> chc.getId().getHelpCategoryId()).toList(),
+                    chatroom.getMatchStatus().name()
+            );
+        }
     }
 }

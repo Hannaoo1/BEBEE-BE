@@ -115,7 +115,7 @@ jobs:
         run: |
           cd infra
           
-          TARGET_PATH="k8s-temp/apps/${{ matrix.service }}-service/overlays/dev/kustomization.yaml"
+          TARGET_PATH="k8s/apps/${{ matrix.service }}-service/overlays/dev/kustomization.yaml"
 
           echo "Target file: $TARGET_PATH"
           
@@ -138,5 +138,5 @@ jobs:
 
           git add .
           
-          git commit -m "chore: update ${{ matrix.service }}-service image to ${{ steps.build-image.outputs.image_tag }}" || echo "No changes to commit"
+          git commit -m "feat: update ${{ matrix.service }}-service image to ${{ steps.build-image.outputs.image_tag }}" || echo "No changes to commit"
           git push

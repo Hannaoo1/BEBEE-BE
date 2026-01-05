@@ -4,6 +4,8 @@ import com.lgcns.bebee.chat.presentation.dto.req.ChatroomOpenReqDTO;
 import com.lgcns.bebee.chat.presentation.dto.res.ChatMessagesGetResDTO;
 import com.lgcns.bebee.chat.presentation.dto.res.ChatroomOpenResDTO;
 import com.lgcns.bebee.chat.presentation.dto.res.ChatroomsGetResDTO;
+import com.lgcns.bebee.common.annotation.CurrentMember;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -95,12 +97,8 @@ public interface ChatroomSwagger {
             )
     })
     ResponseEntity<ChatroomsGetResDTO> getChatrooms(
-            @Parameter(
-                    description = "현재 사용자(본인) ID (임시 용도, 나중에 토큰에서 처리)",
-                    required = true,
-                    example = "100"
-            )
-            @RequestParam String currentMemberId,
+            @Parameter(hidden = true)
+            @CurrentMember Long currentMemberId,
 
             @Parameter(
                     description = """
@@ -124,7 +122,6 @@ public interface ChatroomSwagger {
             description = """
                     기존 채팅방이 있으면 조회, 없으면 채팅방 생성
                     
-                    지도 페이지에서 채팅방 버튼 클릭: chatroomId = null, 게시글 정보 X
                     매칭 현황 페이지에서 채팅방 버튼 클릭: chatroomId 존재
                     도우미 지원 현황 페이지에서 채팅방 버튼 클릭: chatroomId = null, 게시글 정보 O(** 중요 ** 이때, 게시글 정보를 줘야 합니다.)
                     채팅방 리스트에서 채팅방 진입: chatroomId 존재
@@ -136,7 +133,6 @@ public interface ChatroomSwagger {
 
                     **요청 파라미터:**
                     - chatroomId: 기존 채팅방 ID (선택)
-                    - currentMemberId: 현재 사용자 ID (필수)
                     - otherMemberId: 상대방 ID (chatroomId가 없을 때 필수)
 
                     **요청 본문 (ChatroomOpenReqDTO):**
@@ -145,7 +141,7 @@ public interface ChatroomSwagger {
                     - helpCategoryIds: 도움 카테고리 ID 목록
 
                     **응답 정보:**
-                    - 채팅방 ID, 본인 ID, 상대방 정보 (ID, 닉네임, 프로필 이미지, 당도)
+                    - 채팅방 ID, 본인 ID, 상대방 정보 (ID, 닉네임, 프로필 이미지)
                     - 연결된 도움 카테고리 목록
                     """
     )
@@ -165,18 +161,14 @@ public interface ChatroomSwagger {
             )
     })
     ResponseEntity<ChatroomOpenResDTO> openChatroom(
+            @Parameter(hidden = true)
+            @CurrentMember Long currentMemberId,
+
             @Parameter(
                     description = "기존 채팅방 ID (선택)",
                     example = "1"
             )
             @RequestParam(required = false) String chatroomId,
-
-            @Parameter(
-                    description = "현재 사용자(본인) ID (필수, 임시 용도, 나중에 토큰에서 처리)",
-                    required = true,
-                    example = "100"
-            )
-            @RequestParam String currentMemberId,
 
             @Parameter(
                     description = "상대방 ID (chatroomId가 없을 때 필수)",
