@@ -1,8 +1,8 @@
 package com.lgcns.bebee.payment.application.usecase;
 
 import com.lgcns.bebee.payment.application.client.TossPaymentsClient;
-import com.lgcns.bebee.payment.core.exception.PaymentErrors;
-import com.lgcns.bebee.payment.core.exception.PaymentException;
+import com.lgcns.bebee.payment.common.exception.PaymentErrors;
+import com.lgcns.bebee.payment.common.exception.PaymentException;
 import com.lgcns.bebee.payment.domain.entity.HoneyHistory;
 import com.lgcns.bebee.payment.domain.entity.HoneyWallet;
 import com.lgcns.bebee.payment.domain.entity.Payment;
