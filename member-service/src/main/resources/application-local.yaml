@@ -100,7 +100,7 @@ cors:
 # OCR 서비스 설정
 ocr:
   base-url: ${OCR_SERVICE_URL:http://localhost:8086}
-  timeout: ${OCR_TIMEOUT:60000}
+  timeout: ${OCR_TIMEOUT:90000}
 
 # 로깅 설정
 logging:
