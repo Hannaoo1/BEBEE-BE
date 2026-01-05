@@ -1,6 +1,7 @@
 package com.lgcns.bebee.match.domain.service;
 
 import com.lgcns.bebee.match.common.exception.MatchErrors;
+import com.lgcns.bebee.match.domain.entity.Agreement;
 import com.lgcns.bebee.match.domain.entity.Engagement;
 import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
 import com.lgcns.bebee.match.domain.entity.sync.Role;
@@ -22,6 +23,14 @@ public class ReviewManager {
     public void validateEngagementCompleted(Engagement engagement) {
         if (engagement.getStatus() != EngagementStatus.COMPLETED) {
             throw MatchErrors.ENGAGEMENT_NOT_COMPLETED.toException();
+        }
+    }
+
+    // 마지막 활동 검증 
+    // DAY는 항상 마지막 활동
+    public void validateLastActivity(Engagement engagement, Agreement agreement) {
+        if (!engagement.isLastActivity(agreement)) {
+            throw MatchErrors.REVIEW_ONLY_FOR_LAST_ACTIVITY.toException();
         }
     }
 

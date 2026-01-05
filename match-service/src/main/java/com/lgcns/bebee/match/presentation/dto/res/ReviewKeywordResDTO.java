@@ -51,14 +51,14 @@ public class ReviewKeywordResDTO {
     public static class HelpCategoryDTO {
 
         @Schema(description = "카테고리 ID", example = "1")
-        private Long helpCategoryId;
+        private String helpCategoryId;
 
         @Schema(description = "카테고리 이름", example = "생활 지원")
         private String categoryName;
 
         public static HelpCategoryDTO from(GetReviewKeywordsListUseCase.HelpCategoryDTO dto) {
             return new HelpCategoryDTO(
-                    dto.getHelpCategoryId(),
+                    String.valueOf(dto.getHelpCategoryId()),
                     dto.getCategoryName()
             );
         }

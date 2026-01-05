@@ -13,10 +13,7 @@ import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
 import com.lgcns.bebee.match.domain.entity.sync.Role;
 import com.lgcns.bebee.match.domain.entity.vo.ReviewDirection;
 import com.lgcns.bebee.match.domain.repository.ReviewRepository;
-import com.lgcns.bebee.match.domain.service.EngagementReader;
-import com.lgcns.bebee.match.domain.service.MatchReader;
-import com.lgcns.bebee.match.domain.service.MemberManager;
-import com.lgcns.bebee.match.domain.service.ReviewManager;
+import com.lgcns.bebee.match.domain.service.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,9 +21,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import static com.lgcns.bebee.match.domain.entity.QAgreement.agreement;
 
 // 리뷰 작성 UseCase
-
 @Service
 @RequiredArgsConstructor
 public class CreateReviewUseCase implements UseCase<CreateReviewUseCase.Param, CreateReviewUseCase.Result> {
@@ -36,6 +33,7 @@ public class CreateReviewUseCase implements UseCase<CreateReviewUseCase.Param, C
     private final MemberManager memberManager;
     private final ReviewManager reviewManager;
     private final ReviewRepository reviewRepository;
+    private final AgreementReader agreementReader;
 
     @Transactional
     @Override
@@ -48,6 +46,7 @@ public class CreateReviewUseCase implements UseCase<CreateReviewUseCase.Param, C
 
         // 검증
         reviewManager.validateEngagementCompleted(engagement);
+        reviewManager.validateLastActivity(engagement, agreement);
         reviewManager.validateNoDuplicateReview(param.getEngagementId(), param.getReviewerId());
 
         // Match 조회

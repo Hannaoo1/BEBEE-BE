@@ -23,15 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * 리뷰 키워드 목록 조회 UseCase
- *
- * 리뷰 작성 화면에 필요한 정보:
- * 게시글 제목, 도움 카테고리,
- * 닉네임, 리뷰 방향에 맞는 키워드 목록
- *
- */
-
+// 리뷰 키워드 목록 조회 UseCase
 @Service
 @RequiredArgsConstructor
 public class GetReviewKeywordsListUseCase implements UseCase<GetReviewKeywordsListUseCase.Param, GetReviewKeywordsListUseCase.Result> {
@@ -55,6 +47,9 @@ public class GetReviewKeywordsListUseCase implements UseCase<GetReviewKeywordsLi
         if (engagement.getStatus() != EngagementStatus.COMPLETED) {
             throw MatchErrors.ENGAGEMENT_NOT_COMPLETED.toException();
         }
+        
+        // 중복 리뷰 확인
+        reviewManager.validateNoDuplicateReview(param.getEngagementId(), param.getReviewerId());
 
         // Agreement 조회 (도움 카테고리)
         Agreement agreement = agreementReader.getById(engagement.getAgreementId());

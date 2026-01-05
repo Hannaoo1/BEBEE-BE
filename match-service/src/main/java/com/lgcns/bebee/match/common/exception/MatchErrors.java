@@ -22,7 +22,7 @@ public enum MatchErrors implements ErrorInfo {
     INVALID_KEYWORD("유효하지 않은 키워드입니다", HttpStatus.BAD_REQUEST),
     KEYWORD_DIRECTION_MISMATCH("리뷰 방향과 키워드가 일치하지 않습니다", HttpStatus.BAD_REQUEST),
     NOT_ENGAGEMENT_MEMBER("활동 참여자만 리뷰를 작성할 수 있습니다", HttpStatus.FORBIDDEN),
-    ENGAGEMENT_NOT_ENDED("활동 종료 날짜가 일치하지 않습니다", HttpStatus.BAD_REQUEST);
+    REVIEW_ONLY_FOR_LAST_ACTIVITY("마지막 활동만 리뷰를 작성할 수 있습니다", HttpStatus.FORBIDDEN);
 
     private final String desc;
     private final HttpStatus httpStatus;
