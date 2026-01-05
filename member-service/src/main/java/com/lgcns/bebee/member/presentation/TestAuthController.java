@@ -56,7 +56,7 @@ public class TestAuthController {
     }
 
     /**
-     * 테스트용 임시 토큰 생성 (memberId: 100)
+     * 테스트용 임시 토큰 생성 - 장애인 (memberId: 100)
      * 
      * @return 액세스 토큰과 리프레시 토큰
      */
