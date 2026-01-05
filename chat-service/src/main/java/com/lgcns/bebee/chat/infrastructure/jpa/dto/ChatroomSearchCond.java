@@ -10,20 +10,21 @@ import com.lgcns.bebee.chat.domain.entity.MemberSync;
 public record ChatroomSearchCond(
         Long chatroomId,
         Long member1Id,
-        Long member2Id
+        Long member2Id,
+        Long postId
 ) {
     public static ChatroomSearchCond of(Long chatroomId){
         
         return new ChatroomSearchCond(
                 chatroomId,
-                null, null
+                null, null, null
         );
     }
 
-    public static ChatroomSearchCond of(MemberSync member1, MemberSync member2){
+    public static ChatroomSearchCond of(MemberSync member1, MemberSync member2, Long postId){
         return new ChatroomSearchCond(
                 null,
-                member1.getId(), member2.getId()
+                member1.getId(), member2.getId(), postId
         );
     }
 }
