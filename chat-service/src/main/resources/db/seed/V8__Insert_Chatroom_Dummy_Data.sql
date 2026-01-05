@@ -1,61 +1,91 @@
 -- ========================================
--- V7: Chatroom 더미 데이터
+-- V8: Chatroom 더미 데이터 (match-service Post 기반)
 -- ========================================
--- memberId = 100 (김철수)과 도우미들 간의 채팅방 데이터 (총 200개)
--- 도우미: 700(강지훈), 800(윤서연), 900(임동현), 1000(한미래)
+-- match-service의 실제 Post 데이터를 기반으로 한 채팅방
+-- 조건: Post 작성자(장애인) + 도우미, status가 PROCEEDING 또는 MATCHED인 Post만
+--
+-- Post 작성자 (모두 장애인):
+--   - 100 (김철수)
+--   - 200 (김민수)
+--   - 300 (이영희)
+--
+-- 도우미:
+--   - 700 (강지훈)
+--   - 800 (윤서연)
+--   - 900 (임동현)
+--   - 1000 (한미래)
 
--- 채팅방 1-50: 강지훈(700)과의 채팅
+-- ========================================
+-- PROCEEDING 상태 Post 기반 채팅방 (진행 중)
+-- ========================================
+
+-- Post 1006: 김철수(100) - 은행 업무 동행 (PROCEEDING)
 INSERT INTO chatroom (chatroom_id, member1_id, member2_id, title, post_id, last_message, match_status, created_at, updated_at) VALUES
-(1, 100, 700, '병원 동행 도와주실 분', 1001, '감사합니다', 'MATCHED', NOW(), NOW()),
-(2, 100, 700, '장보기 도움 요청', 1002, '네 알겠습니다', 'PROCEEDING', NOW(), NOW()),
-(3, 100, 700, '청소 도와주실 분', 1003, '안녕하세요', 'NON_MATCHED', NOW(), NOW()),
-(4, 100, 700, '산책 동행 구합니다', 1004, '좋아요', 'MATCHED', NOW(), NOW()),
-(5, 100, 700, '요리 도움', 1005, '언제 가능하신가요?', 'PROCEEDING', NOW(), NOW()),
-(6, 100, 700, '빨래 도와주세요', 1006, '네', 'NON_MATCHED', NOW(), NOW()),
-(7, 100, 700, '약국 동행', 1007, '도와드리겠습니다', 'MATCHED', NOW(), NOW()),
-(8, 100, 700, '은행 업무 도움', 1008, '준비물이 있나요?', 'PROCEEDING', NOW(), NOW()),
-(9, 100, 700, '집안 정리', 1009, '시간 맞춰드릴게요', 'NON_MATCHED', NOW(), NOW()),
-(10, 100, 700, '외출 동행', 1010, '감사합니다', 'MATCHED', NOW(), NOW()),
-(11, 100, 700, '목욕 도움', 1011, '네 가능합니다', 'PROCEEDING', NOW(), NOW()),
-(12, 100, 700, '식사 준비', 1012, '알겠습니다', 'NON_MATCHED', NOW(), NOW()),
-(13, 100, 700, '운동 도움', 1013, '좋아요', 'MATCHED', NOW(), NOW()),
-(14, 100, 700, '독서 동행', 1014, '같이 해요', 'PROCEEDING', NOW(), NOW()),
-(15, 100, 700, '영화 관람', 1015, '재밌을 것 같아요', 'NON_MATCHED', NOW(), NOW()),
-(16, 100, 700, '공원 산책', 1016, '날씨 좋네요', 'MATCHED', NOW(), NOW()),
-(17, 100, 700, '쇼핑 동행', 1017, '함께 가요', 'PROCEEDING', NOW(), NOW()),
-(18, 100, 700, '관공서 방문', 1018, '도와드릴게요', 'NON_MATCHED', NOW(), NOW()),
-(19, 100, 700, '문화센터 동행', 1019, '시간 괜찮아요', 'MATCHED', NOW(), NOW()),
-(20, 100, 700, '미용실 동행', 1020, '같이 가요', 'PROCEEDING', NOW(), NOW()),
-(21, 100, 700, '교회 동행', 1021, '네 알겠습니다', 'NON_MATCHED', NOW(), NOW()),
-(22, 100, 700, '도서관 방문', 1022, '조용히 갈게요', 'MATCHED', NOW(), NOW()),
-(23, 100, 700, '우체국 업무', 1023, '도와드릴게요', 'PROCEEDING', NOW(), NOW()),
-(24, 100, 700, '시장 보기', 1024, '함께 가요', 'NON_MATCHED', NOW(), NOW()),
-(25, 100, 700, '친구 만남', 1025, '좋아요', 'MATCHED', NOW(), NOW()),
-(26, 100, 700, '카페 동행', 1026, '커피 마셔요', 'PROCEEDING', NOW(), NOW()),
-(27, 100, 700, '식당 예약', 1027, '맛있겠네요', 'NON_MATCHED', NOW(), NOW()),
-(28, 100, 700, '옷 쇼핑', 1028, '같이 골라요', 'MATCHED', NOW(), NOW()),
-(29, 100, 700, '신발 구매', 1029, '편한 거로요', 'PROCEEDING', NOW(), NOW()),
-(30, 100, 700, '가전제품 구매', 1030, '알아봐요', 'NON_MATCHED', NOW(), NOW()),
-(31, 100, 700, '가구 쇼핑', 1031, '좋은 거 고르죠', 'MATCHED', NOW(), NOW()),
-(32, 100, 700, '인터넷 쇼핑', 1032, '주문해드릴게요', 'PROCEEDING', NOW(), NOW()),
-(33, 100, 700, '택배 받기', 1033, '확인했어요', 'NON_MATCHED', NOW(), NOW()),
-(34, 100, 700, '정리 정돈', 1034, '도와드릴게요', 'MATCHED', NOW(), NOW()),
-(35, 100, 700, '서류 작성', 1035, '같이 해요', 'PROCEEDING', NOW(), NOW()),
-(36, 100, 700, '전화 통화', 1036, '대신 드릴게요', 'NON_MATCHED', NOW(), NOW()),
-(37, 100, 700, '메일 확인', 1037, '확인했습니다', 'MATCHED', NOW(), NOW()),
-(38, 100, 700, '약 챙기기', 1038, '시간 맞춰요', 'PROCEEDING', NOW(), NOW()),
-(39, 100, 700, '건강검진 동행', 1039, '같이 가요', 'NON_MATCHED', NOW(), NOW()),
-(40, 100, 700, '물리치료 동행', 1040, '도와드릴게요', 'MATCHED', NOW(), NOW()),
-(41, 100, 700, '재활운동 도움', 1041, '함께 해요', 'PROCEEDING', NOW(), NOW()),
-(42, 100, 700, '스트레칭 도움', 1042, '천천히 해요', 'NON_MATCHED', NOW(), NOW()),
-(43, 100, 700, '요가 동행', 1043, '같이 배워요', 'MATCHED', NOW(), NOW()),
-(44, 100, 700, '명상 시간', 1044, '편안해요', 'PROCEEDING', NOW(), NOW()),
-(45, 100, 700, '음악 감상', 1045, '좋은 음악이에요', 'NON_MATCHED', NOW(), NOW()),
-(46, 100, 700, '그림 그리기', 1046, '같이 그려요', 'MATCHED', NOW(), NOW()),
-(47, 100, 700, '공예 활동', 1047, '재밌어요', 'PROCEEDING', NOW(), NOW()),
-(48, 100, 700, '원예 활동', 1048, '식물 키워요', 'NON_MATCHED', NOW(), NOW()),
-(49, 100, 700, '반려동물 산책', 1049, '강아지 귀여워요', 'MATCHED', NOW(), NOW()),
-(50, 100, 700, '취미 활동', 1050, '같이 해요', 'PROCEEDING', NOW(), NOW())
+(1, 100, 700, '은행 업무 동행', 1006, '내일 오전 10시에 만나요', 'PROCEEDING', NOW() - INTERVAL 1 DAY, NOW()),
+
+-- Post 1013: 이영희(300) - 어르신 목욕 보조 (PROCEEDING)
+(2, 300, 800, '어르신 목욕 보조', 1013, '목요일 오후 2시 가능하세요?', 'PROCEEDING', NOW() - INTERVAL 4 DAY, NOW()),
+
+-- Post 1019: 이영희(300) - 반신마비 환자 목욕 (PROCEEDING)
+(3, 300, 900, '반신마비 환자 목욕', 1019, '경험이 있으신가요?', 'PROCEEDING', NOW() - INTERVAL 6 DAY, NOW()),
+
+-- Post 1024: 김철수(100) - 투약 관리 도움 (PROCEEDING)
+(4, 100, 1000, '투약 관리 도움', 1024, '매일 아침 저녁 방문 가능하세요?', 'PROCEEDING', NOW() - INTERVAL 9 DAY, NOW()),
+
+-- Post 1029: 김민수(200) - 위루관 영양 주입 (PROCEEDING)
+(5, 200, 700, '위루관 영양 주입', 1029, '간호 경험 있으신 분 찾아요', 'PROCEEDING', NOW() - INTERVAL 10 DAY, NOW()),
+
+-- Post 1034: 이영희(300) - 정리정돈 서비스 (PROCEEDING)
+(6, 300, 800, '정리정돈 서비스', 1034, '주 2회 방문 부탁드려요', 'PROCEEDING', NOW() - INTERVAL 13 DAY, NOW()),
+
+-- Post 1040: 이영희(300) - 베란다 정리 (PROCEEDING)
+(7, 300, 900, '베란다 정리', 1040, '큰 짐 옮기는 것 도와주세요', 'PROCEEDING', NOW() - INTERVAL 14 DAY, NOW()),
+
+-- Post 1044: 김민수(200) - 반찬 만들기 (PROCEEDING)
+(8, 200, 1000, '반찬 만들기', 1044, '다음 주 월요일에 와주세요', 'PROCEEDING', NOW() - INTERVAL 16 DAY, NOW()),
+
+-- Post 1049: 이영희(300) - 간식 준비 (PROCEEDING)
+(9, 300, 700, '간식 준비', 1049, '당뇨 환자용 간식 만들어주세요', 'PROCEEDING', NOW() - INTERVAL 17 DAY, NOW()),
+
+-- Post 1053: 김민수(200) - 스마트폰 사용법 (PROCEEDING)
+(10, 200, 800, '스마트폰 사용법', 1053, '카카오톡 사용법 알려주세요', 'PROCEEDING', NOW() - INTERVAL 18 DAY, NOW()),
+
+-- Post 1058: 이영희(300) - 음악 감상 지도 (PROCEEDING)
+(11, 300, 900, '음악 감상 지도', 1058, '클래식 추천 부탁드려요', 'PROCEEDING', NOW() - INTERVAL 20 DAY, NOW()),
+
+-- Post 1062: 김민수(200) - 산책 동반자 (PROCEEDING)
+(12, 200, 1000, '산책 동반자', 1062, '매일 오후 4시에 같이 산책해요', 'PROCEEDING', NOW() - INTERVAL 21 DAY, NOW()),
+
+-- Post 1067: 이영희(300) - 종교 활동 동행 (PROCEEDING)
+(13, 300, 700, '종교 활동 동행', 1067, '주일 오전 11시 예배 함께 가요', 'PROCEEDING', NOW() - INTERVAL 22 DAY, NOW()),
+
+-- Post 1072: 김철수(100) - 택배 수령 대행 (PROCEEDING)
+(14, 100, 800, '택배 수령 대행', 1072, '낮 시간에 택배 받아주세요', 'PROCEEDING', NOW() - INTERVAL 24 DAY, NOW()),
+
+-- Post 1076: 이영희(300) - 가전제품 사용법 (PROCEEDING)
+(15, 300, 900, '가전제품 사용법', 1076, '새로 산 세탁기 사용법 알려주세요', 'PROCEEDING', NOW() - INTERVAL 25 DAY, NOW()),
+
+-- Post 1080: 김민수(200) - 의류 수선 맡기기 (PROCEEDING)
+(16, 200, 1000, '의류 수선 맡기기', 1080, '바지 기장 줄여야 해요', 'PROCEEDING', NOW() - INTERVAL 26 DAY, NOW()),
+
+-- Post 1083: 김민수(200) - 오후 돌봄 서비스 (PROCEEDING)
+(17, 200, 700, '오후 돌봄 서비스', 1083, '점심 식사 후 산책 도와주세요', 'PROCEEDING', NOW() - INTERVAL 27 DAY, NOW()),
+
+-- Post 1086: 김민수(200) - 병원 케어 서비스 (PROCEEDING)
+(18, 200, 800, '병원 케어 서비스', 1086, '병원 동행 및 간호 부탁드려요', 'PROCEEDING', NOW() - INTERVAL 28 DAY, NOW()),
+
+-- Post 1090: 김철수(100) - 맞춤형 돌봄 (PROCEEDING)
+(19, 100, 900, '맞춤형 돌봄', 1090, '개인별 맞춤 서비스 상담 원해요', 'PROCEEDING', NOW() - INTERVAL 29 DAY, NOW()),
+
+-- Post 1092: 김민수(200) - 야간 간호 서비스 (PROCEEDING)
+(20, 200, 1000, '야간 간호 서비스', 1092, '밤샘 간호 가능하신가요?', 'PROCEEDING', NOW() - INTERVAL 30 DAY, NOW()),
+
+-- Post 1096: 김철수(100) - 퇴원 후 케어 (PROCEEDING)
+(21, 100, 700, '퇴원 후 케어', 1096, '퇴원 후 2주간 집중 케어 필요해요', 'PROCEEDING', NOW() - INTERVAL 30 DAY, NOW()),
+
+-- Post 1100: 이영희(300) - 재활 운동 코치 (PROCEEDING)
+(22, 300, 800, '재활 운동 코치', 1100, '뇌졸중 환자 재활 경험 있나요?', 'PROCEEDING', NOW() - INTERVAL 30 DAY, NOW())
+
 ON DUPLICATE KEY UPDATE
     member1_id = VALUES(member1_id),
     member2_id = VALUES(member2_id),
@@ -65,180 +95,96 @@ ON DUPLICATE KEY UPDATE
     match_status = VALUES(match_status),
     updated_at = NOW();
 
--- 채팅방 51-100: 윤서연(800)과의 채팅
-INSERT INTO chatroom (chatroom_id, member1_id, member2_id, title, post_id, last_message, match_status, created_at, updated_at) VALUES
-(51, 100, 800, '병원 동행', 1051, '함께 가요', 'MATCHED', NOW(), NOW()),
-(52, 100, 800, '장보기', 1052, '목록 주세요', 'PROCEEDING', NOW(), NOW()),
-(53, 100, 800, '청소 도움', 1053, '깨끗하게 할게요', 'NON_MATCHED', NOW(), NOW()),
-(54, 100, 800, '산책', 1054, '날씨 좋아요', 'MATCHED', NOW(), NOW()),
-(55, 100, 800, '요리', 1055, '맛있게 만들어요', 'PROCEEDING', NOW(), NOW()),
-(56, 100, 800, '빨래', 1056, '도와드릴게요', 'NON_MATCHED', NOW(), NOW()),
-(57, 100, 800, '약국', 1057, '같이 가요', 'MATCHED', NOW(), NOW()),
-(58, 100, 800, '은행', 1058, '처리해드릴게요', 'PROCEEDING', NOW(), NOW()),
-(59, 100, 800, '정리', 1059, '정돈할게요', 'NON_MATCHED', NOW(), NOW()),
-(60, 100, 800, '외출', 1060, '준비됐어요', 'MATCHED', NOW(), NOW()),
-(61, 100, 800, '목욕', 1061, '도와드려요', 'PROCEEDING', NOW(), NOW()),
-(62, 100, 800, '식사', 1062, '맛있게 드세요', 'NON_MATCHED', NOW(), NOW()),
-(63, 100, 800, '운동', 1063, '같이 해요', 'MATCHED', NOW(), NOW()),
-(64, 100, 800, '독서', 1064, '재밌어요', 'PROCEEDING', NOW(), NOW()),
-(65, 100, 800, '영화', 1065, '보러 가요', 'NON_MATCHED', NOW(), NOW()),
-(66, 100, 800, '공원', 1066, '산책해요', 'MATCHED', NOW(), NOW()),
-(67, 100, 800, '쇼핑', 1067, '구경해요', 'PROCEEDING', NOW(), NOW()),
-(68, 100, 800, '관공서', 1068, '대신 갈게요', 'NON_MATCHED', NOW(), NOW()),
-(69, 100, 800, '문화센터', 1069, '같이 가요', 'MATCHED', NOW(), NOW()),
-(70, 100, 800, '미용실', 1070, '예약했어요', 'PROCEEDING', NOW(), NOW()),
-(71, 100, 800, '교회', 1071, '함께해요', 'NON_MATCHED', NOW(), NOW()),
-(72, 100, 800, '도서관', 1072, '책 빌려요', 'MATCHED', NOW(), NOW()),
-(73, 100, 800, '우체국', 1073, '등기 보내요', 'PROCEEDING', NOW(), NOW()),
-(74, 100, 800, '시장', 1074, '신선해요', 'NON_MATCHED', NOW(), NOW()),
-(75, 100, 800, '친구', 1075, '만나요', 'MATCHED', NOW(), NOW()),
-(76, 100, 800, '카페', 1076, '커피 한잔', 'PROCEEDING', NOW(), NOW()),
-(77, 100, 800, '식당', 1077, '맛집이에요', 'NON_MATCHED', NOW(), NOW()),
-(78, 100, 800, '옷', 1078, '잘 어울려요', 'MATCHED', NOW(), NOW()),
-(79, 100, 800, '신발', 1079, '편해요', 'PROCEEDING', NOW(), NOW()),
-(80, 100, 800, '가전', 1080, '좋은 제품', 'NON_MATCHED', NOW(), NOW()),
-(81, 100, 800, '가구', 1081, '튼튼해요', 'MATCHED', NOW(), NOW()),
-(82, 100, 800, '인터넷', 1082, '주문했어요', 'PROCEEDING', NOW(), NOW()),
-(83, 100, 800, '택배', 1083, '받았어요', 'NON_MATCHED', NOW(), NOW()),
-(84, 100, 800, '정리', 1084, '깔끔해요', 'MATCHED', NOW(), NOW()),
-(85, 100, 800, '서류', 1085, '작성했어요', 'PROCEEDING', NOW(), NOW()),
-(86, 100, 800, '전화', 1086, '연락드렸어요', 'NON_MATCHED', NOW(), NOW()),
-(87, 100, 800, '메일', 1087, '확인했어요', 'MATCHED', NOW(), NOW()),
-(88, 100, 800, '약', 1088, '드세요', 'PROCEEDING', NOW(), NOW()),
-(89, 100, 800, '건강검진', 1089, '예약했어요', 'NON_MATCHED', NOW(), NOW()),
-(90, 100, 800, '물리치료', 1090, '효과 있어요', 'MATCHED', NOW(), NOW()),
-(91, 100, 800, '재활', 1091, '열심히 해요', 'PROCEEDING', NOW(), NOW()),
-(92, 100, 800, '스트레칭', 1092, '천천히', 'NON_MATCHED', NOW(), NOW()),
-(93, 100, 800, '요가', 1093, '편안해요', 'MATCHED', NOW(), NOW()),
-(94, 100, 800, '명상', 1094, '마음이 좋아요', 'PROCEEDING', NOW(), NOW()),
-(95, 100, 800, '음악', 1095, '듣기 좋아요', 'NON_MATCHED', NOW(), NOW()),
-(96, 100, 800, '그림', 1096, '예뻐요', 'MATCHED', NOW(), NOW()),
-(97, 100, 800, '공예', 1097, '잘 만들었어요', 'PROCEEDING', NOW(), NOW()),
-(98, 100, 800, '원예', 1098, '꽃이 피었어요', 'NON_MATCHED', NOW(), NOW()),
-(99, 100, 800, '반려동물', 1099, '귀여워요', 'MATCHED', NOW(), NOW()),
-(100, 100, 800, '취미', 1100, '재밌어요', 'PROCEEDING', NOW(), NOW())
-ON DUPLICATE KEY UPDATE
-    member1_id = VALUES(member1_id),
-    member2_id = VALUES(member2_id),
-    title = VALUES(title),
-    post_id = VALUES(post_id),
-    last_message = VALUES(last_message),
-    match_status = VALUES(match_status),
-    updated_at = NOW();
 
--- 채팅방 101-150: 임동현(900)과의 채팅
-INSERT INTO chatroom (chatroom_id, member1_id, member2_id, title, post_id, last_message, match_status, created_at, updated_at) VALUES
-(101, 100, 900, '병원 예약', 1101, '다녀왔어요', 'MATCHED', NOW(), NOW()),
-(102, 100, 900, '마트 가기', 1102, '사왔어요', 'PROCEEDING', NOW(), NOW()),
-(103, 100, 900, '집 청소', 1103, '깨끗해요', 'NON_MATCHED', NOW(), NOW()),
-(104, 100, 900, '공원 가기', 1104, '좋았어요', 'MATCHED', NOW(), NOW()),
-(105, 100, 900, '식사 준비', 1105, '맛있어요', 'PROCEEDING', NOW(), NOW()),
-(106, 100, 900, '세탁', 1106, '말랐어요', 'NON_MATCHED', NOW(), NOW()),
-(107, 100, 900, '약 타기', 1107, '받았어요', 'MATCHED', NOW(), NOW()),
-(108, 100, 900, '은행 업무', 1108, '완료했어요', 'PROCEEDING', NOW(), NOW()),
-(109, 100, 900, '방 정리', 1109, '정돈했어요', 'NON_MATCHED', NOW(), NOW()),
-(110, 100, 900, '외출 준비', 1110, '출발해요', 'MATCHED', NOW(), NOW()),
-(111, 100, 900, '샤워 도움', 1111, '상쾌해요', 'PROCEEDING', NOW(), NOW()),
-(112, 100, 900, '아침 식사', 1112, '잘 먹었어요', 'NON_MATCHED', NOW(), NOW()),
-(113, 100, 900, '체조', 1113, '건강해요', 'MATCHED', NOW(), NOW()),
-(114, 100, 900, '책 읽기', 1114, '흥미로워요', 'PROCEEDING', NOW(), NOW()),
-(115, 100, 900, '영화 보기', 1115, '재밌었어요', 'NON_MATCHED', NOW(), NOW()),
-(116, 100, 900, '산책로', 1116, '걸었어요', 'MATCHED', NOW(), NOW()),
-(117, 100, 900, '백화점', 1117, '구경했어요', 'PROCEEDING', NOW(), NOW()),
-(118, 100, 900, '구청', 1118, '처리했어요', 'NON_MATCHED', NOW(), NOW()),
-(119, 100, 900, '복지관', 1119, '다녀왔어요', 'MATCHED', NOW(), NOW()),
-(120, 100, 900, '이발', 1120, '깔끔해요', 'PROCEEDING', NOW(), NOW()),
-(121, 100, 900, '성당', 1121, '다녀왔어요', 'NON_MATCHED', NOW(), NOW()),
-(122, 100, 900, '서점', 1122, '샀어요', 'MATCHED', NOW(), NOW()),
-(123, 100, 900, '편의점', 1123, '편리해요', 'PROCEEDING', NOW(), NOW()),
-(124, 100, 900, '전통시장', 1124, '활기차요', 'NON_MATCHED', NOW(), NOW()),
-(125, 100, 900, '모임', 1125, '즐거웠어요', 'MATCHED', NOW(), NOW()),
-(126, 100, 900, '찻집', 1126, '차 마셨어요', 'PROCEEDING', NOW(), NOW()),
-(127, 100, 900, '뷔페', 1127, '배불러요', 'NON_MATCHED', NOW(), NOW()),
-(128, 100, 900, '의류', 1128, '예뻐요', 'MATCHED', NOW(), NOW()),
-(129, 100, 900, '운동화', 1129, '좋아요', 'PROCEEDING', NOW(), NOW()),
-(130, 100, 900, '전자제품', 1130, '신기해요', 'NON_MATCHED', NOW(), NOW()),
-(131, 100, 900, '침대', 1131, '편해요', 'MATCHED', NOW(), NOW()),
-(132, 100, 900, '온라인', 1132, '편리해요', 'PROCEEDING', NOW(), NOW()),
-(133, 100, 900, '소포', 1133, '도착했어요', 'NON_MATCHED', NOW(), NOW()),
-(134, 100, 900, '청소', 1134, '완료했어요', 'MATCHED', NOW(), NOW()),
-(135, 100, 900, '문서', 1135, '썼어요', 'PROCEEDING', NOW(), NOW()),
-(136, 100, 900, '통화', 1136, '했어요', 'NON_MATCHED', NOW(), NOW()),
-(137, 100, 900, '이메일', 1137, '보냈어요', 'MATCHED', NOW(), NOW()),
-(138, 100, 900, '투약', 1138, '챙겼어요', 'PROCEEDING', NOW(), NOW()),
-(139, 100, 900, '검진', 1139, '받았어요', 'NON_MATCHED', NOW(), NOW()),
-(140, 100, 900, '치료', 1140, '좋아졌어요', 'MATCHED', NOW(), NOW()),
-(141, 100, 900, '운동치료', 1141, '효과있어요', 'PROCEEDING', NOW(), NOW()),
-(142, 100, 900, '몸풀기', 1142, '가벼워요', 'NON_MATCHED', NOW(), NOW()),
-(143, 100, 900, '필라테스', 1143, '좋아요', 'MATCHED', NOW(), NOW()),
-(144, 100, 900, '휴식', 1144, '편안해요', 'PROCEEDING', NOW(), NOW()),
-(145, 100, 900, '클래식', 1145, '듣기좋아요', 'NON_MATCHED', NOW(), NOW()),
-(146, 100, 900, '미술', 1146, '그렸어요', 'MATCHED', NOW(), NOW()),
-(147, 100, 900, '수공예', 1147, '만들었어요', 'PROCEEDING', NOW(), NOW()),
-(148, 100, 900, '화분', 1148, '심었어요', 'NON_MATCHED', NOW(), NOW()),
-(149, 100, 900, '고양이', 1149, '예뻐요', 'MATCHED', NOW(), NOW()),
-(150, 100, 900, '여가', 1150, '즐거워요', 'PROCEEDING', NOW(), NOW())
-ON DUPLICATE KEY UPDATE
-    member1_id = VALUES(member1_id),
-    member2_id = VALUES(member2_id),
-    title = VALUES(title),
-    post_id = VALUES(post_id),
-    last_message = VALUES(last_message),
-    match_status = VALUES(match_status),
-    updated_at = NOW();
+-- ========================================
+-- MATCHED 상태 Post 기반 추가 채팅방 (매칭 완료)
+-- ========================================
+-- 매칭이 완료된 게시글은 이미 도우미가 선정되어 활동 중인 상태
 
--- 채팅방 151-200: 한미래(1000)과의 채팅
 INSERT INTO chatroom (chatroom_id, member1_id, member2_id, title, post_id, last_message, match_status, created_at, updated_at) VALUES
-(151, 100, 1000, '진료 동행', 1151, '다녀올게요', 'MATCHED', NOW(), NOW()),
-(152, 100, 1000, '장 보기', 1152, '살게요', 'PROCEEDING', NOW(), NOW()),
-(153, 100, 1000, '청소하기', 1153, '할게요', 'NON_MATCHED', NOW(), NOW()),
-(154, 100, 1000, '걷기', 1154, '갈게요', 'MATCHED', NOW(), NOW()),
-(155, 100, 1000, '밥하기', 1155, '만들게요', 'PROCEEDING', NOW(), NOW()),
-(156, 100, 1000, '빨래하기', 1156, '할게요', 'NON_MATCHED', NOW(), NOW()),
-(157, 100, 1000, '처방전', 1157, '받을게요', 'MATCHED', NOW(), NOW()),
-(158, 100, 1000, '입금', 1158, '할게요', 'PROCEEDING', NOW(), NOW()),
-(159, 100, 1000, '정돈', 1159, '할게요', 'NON_MATCHED', NOW(), NOW()),
-(160, 100, 1000, '나들이', 1160, '갈게요', 'MATCHED', NOW(), NOW()),
-(161, 100, 1000, '씻기', 1161, '도와드릴게요', 'PROCEEDING', NOW(), NOW()),
-(162, 100, 1000, '점심', 1162, '먹어요', 'NON_MATCHED', NOW(), NOW()),
-(163, 100, 1000, '걷기운동', 1163, '해요', 'MATCHED', NOW(), NOW()),
-(164, 100, 1000, '신문', 1164, '읽어요', 'PROCEEDING', NOW(), NOW()),
-(165, 100, 1000, '드라마', 1165, '봐요', 'NON_MATCHED', NOW(), NOW()),
-(166, 100, 1000, '한강', 1166, '가요', 'MATCHED', NOW(), NOW()),
-(167, 100, 1000, '아울렛', 1167, '가요', 'PROCEEDING', NOW(), NOW()),
-(168, 100, 1000, '주민센터', 1168, '가요', 'NON_MATCHED', NOW(), NOW()),
-(169, 100, 1000, '노인정', 1169, '가요', 'MATCHED', NOW(), NOW()),
-(170, 100, 1000, '파마', 1170, '해요', 'PROCEEDING', NOW(), NOW()),
-(171, 100, 1000, '절', 1171, '가요', 'NON_MATCHED', NOW(), NOW()),
-(172, 100, 1000, '서점가기', 1172, '가요', 'MATCHED', NOW(), NOW()),
-(173, 100, 1000, '슈퍼', 1173, '가요', 'PROCEEDING', NOW(), NOW()),
-(174, 100, 1000, '재래시장', 1174, '가요', 'NON_MATCHED', NOW(), NOW()),
-(175, 100, 1000, '동창회', 1175, '가요', 'MATCHED', NOW(), NOW()),
-(176, 100, 1000, '다방', 1176, '가요', 'PROCEEDING', NOW(), NOW()),
-(177, 100, 1000, '한식당', 1177, '가요', 'NON_MATCHED', NOW(), NOW()),
-(178, 100, 1000, '겉옷', 1178, '사요', 'MATCHED', NOW(), NOW()),
-(179, 100, 1000, '슬리퍼', 1179, '사요', 'PROCEEDING', NOW(), NOW()),
-(180, 100, 1000, '청소기', 1180, '사요', 'NON_MATCHED', NOW(), NOW()),
-(181, 100, 1000, '책상', 1181, '사요', 'MATCHED', NOW(), NOW()),
-(182, 100, 1000, '쿠팡', 1182, '주문해요', 'PROCEEDING', NOW(), NOW()),
-(183, 100, 1000, '택배받기', 1183, '받아요', 'NON_MATCHED', NOW(), NOW()),
-(184, 100, 1000, '대청소', 1184, '해요', 'MATCHED', NOW(), NOW()),
-(185, 100, 1000, '계약서', 1185, '써요', 'PROCEEDING', NOW(), NOW()),
-(186, 100, 1000, '전화하기', 1186, '해요', 'NON_MATCHED', NOW(), NOW()),
-(187, 100, 1000, '메일보내기', 1187, '보내요', 'MATCHED', NOW(), NOW()),
-(188, 100, 1000, '약먹기', 1188, '먹어요', 'PROCEEDING', NOW(), NOW()),
-(189, 100, 1000, '진찰', 1189, '받아요', 'NON_MATCHED', NOW(), NOW()),
-(190, 100, 1000, '물리치료받기', 1190, '받아요', 'MATCHED', NOW(), NOW()),
-(191, 100, 1000, '재활치료', 1191, '해요', 'PROCEEDING', NOW(), NOW()),
-(192, 100, 1000, '스트레칭하기', 1192, '해요', 'NON_MATCHED', NOW(), NOW()),
-(193, 100, 1000, '요가하기', 1193, '해요', 'MATCHED', NOW(), NOW()),
-(194, 100, 1000, '명상하기', 1194, '해요', 'PROCEEDING', NOW(), NOW()),
-(195, 100, 1000, '음악듣기', 1195, '들어요', 'NON_MATCHED', NOW(), NOW()),
-(196, 100, 1000, '그림그리기', 1196, '그려요', 'MATCHED', NOW(), NOW()),
-(197, 100, 1000, '만들기', 1197, '만들어요', 'PROCEEDING', NOW(), NOW()),
-(198, 100, 1000, '꽃심기', 1198, '심어요', 'NON_MATCHED', NOW(), NOW()),
-(199, 100, 1000, '강아지산책', 1199, '시켜요', 'MATCHED', NOW(), NOW()),
-(200, 100, 1000, '여가활동', 1200, '해요', 'PROCEEDING', NOW(), NOW())
+-- 김철수(100)의 매칭 완료 채팅방
+(23, 100, 700, '병원 동행 도와주실 분', 1001, '다음 주 화요일 오전 10시에 병원 갈게요', 'MATCHED', NOW() - INTERVAL 3 HOUR, NOW()),
+(24, 100, 800, '문화센터 수업 동행', 1003, '월, 목 오후 2시 문화센터 수업이에요', 'MATCHED', NOW() - INTERVAL 15 HOUR, NOW()),
+(25, 100, 900, '쇼핑몰 쇼핑 동행', 1009, '이번 주말 백화점 같이 가요', 'MATCHED', NOW() - INTERVAL 2 DAY - INTERVAL 18 HOUR, NOW()),
+(26, 100, 1000, '주말 방문 목욕', 1012, '토요일 오전 9시에 와주세요', 'MATCHED', NOW() - INTERVAL 4 DAY - INTERVAL 6 HOUR, NOW()),
+(27, 100, 700, '침상 목욕 도움', 1018, '목, 일 오전에 침상 목욕 부탁드려요', 'MATCHED', NOW() - INTERVAL 6 DAY - INTERVAL 10 HOUR, NOW()),
+(28, 100, 800, '당뇨 환자 혈당 체크', 1021, '매일 아침 7시 혈당 체크해주세요', 'MATCHED', NOW() - INTERVAL 8 DAY, NOW()),
+(29, 100, 900, '기관지 흡인 케어', 1030, '하루 3회 기관지 흡인 처치 필요해요', 'MATCHED', NOW() - INTERVAL 11 DAY, NOW()),
+(30, 100, 1000, '설거지 도움', 1033, '저녁 식사 후 설거지 부탁드려요', 'MATCHED', NOW() - INTERVAL 12 DAY - INTERVAL 16 HOUR, NOW()),
+(31, 100, 700, '화장실 청소', 1036, '주 2회 화장실 청소 해주세요', 'MATCHED', NOW() - INTERVAL 13 DAY - INTERVAL 12 HOUR, NOW()),
+(32, 100, 800, '환기 및 먼지 청소', 1039, '월, 금 오전에 환기하고 청소해요', 'MATCHED', NOW() - INTERVAL 14 DAY - INTERVAL 6 HOUR, NOW()),
+(33, 100, 900, '점심 도시락 만들기', 1042, '평일 점심 도시락 준비 부탁해요', 'MATCHED', NOW() - INTERVAL 15 DAY - INTERVAL 7 HOUR, NOW()),
+(34, 100, 1000, '식사 보조', 1045, '하루 3끼 식사 보조 필요합니다', 'MATCHED', NOW() - INTERVAL 16 DAY - INTERVAL 6 HOUR, NOW()),
+(35, 100, 700, '식재료 손질', 1048, '장 보고 오면 재료 손질 도와주세요', 'MATCHED', NOW() - INTERVAL 17 DAY, NOW()),
+(36, 100, 800, '영어 회화 연습', 1051, '주 2회 영어 회화 연습해요', 'MATCHED', NOW() - INTERVAL 18 DAY, NOW()),
+(37, 100, 900, '독서 도움', 1054, '매일 저녁 책 읽어주세요', 'MATCHED', NOW() - INTERVAL 19 DAY, NOW()),
+(38, 100, 1000, '그림 그리기 교육', 1057, '주말에 같이 그림 그려요', 'MATCHED', NOW() - INTERVAL 19 DAY - INTERVAL 18 HOUR, NOW()),
+(39, 100, 700, '글쓰기 연습', 1060, '매일 일기 쓰기 도와주세요', 'MATCHED', NOW() - INTERVAL 20 DAY - INTERVAL 16 HOUR, NOW()),
+(40, 100, 800, '게임 상대', 1063, '오후에 보드게임 같이 해요', 'MATCHED', NOW() - INTERVAL 21 DAY - INTERVAL 14 HOUR, NOW()),
+(41, 100, 900, '라디오 청취 동반', 1066, '오전 라디오 들으며 수다 떨어요', 'MATCHED', NOW() - INTERVAL 22 DAY - INTERVAL 12 HOUR, NOW()),
+(42, 100, 1000, '정원 가꾸기', 1069, '주말에 베란다 화분 가꿔요', 'MATCHED', NOW() - INTERVAL 23 DAY - INTERVAL 8 HOUR, NOW()),
+(43, 100, 700, '전구 교체', 1075, '전구 갈아끼우는 거 도와주세요', 'MATCHED', NOW() - INTERVAL 25 DAY - INTERVAL 6 HOUR, NOW()),
+(44, 100, 800, '약국 대리 방문', 1078, '약 처방전 가지고 받아와 주세요', 'MATCHED', NOW() - INTERVAL 26 DAY, NOW()),
+(45, 100, 900, '종합 돌봄 서비스', 1081, '외출동행, 가사지원, 식사도움 종합 서비스 필요해요', 'MATCHED', NOW() - INTERVAL 27 DAY, NOW()),
+(46, 100, 1000, '전일 케어', 1084, '아침부터 저녁까지 돌봄 서비스 부탁드려요', 'MATCHED', NOW() - INTERVAL 28 DAY, NOW()),
+(47, 100, 700, '재활 지원 서비스', 1087, '물리치료 동행과 운동 보조 필요합니다', 'MATCHED', NOW() - INTERVAL 28 DAY - INTERVAL 18 HOUR, NOW()),
+(48, 100, 800, '휴일 돌봄 서비스', 1093, '공휴일에도 돌봄 가능하신가요?', 'MATCHED', NOW() - INTERVAL 30 DAY - INTERVAL 6 HOUR, NOW()),
+
+-- 김민수(200)의 매칭 완료 채팅방
+(49, 200, 900, '주말 공원 산책 동행', 1002, '토요일 오전 공원에서 만나요', 'MATCHED', NOW() - INTERVAL 8 HOUR, NOW()),
+(50, 200, 1000, '도서관 이용 도움', 1005, '수요일 오후 도서관 같이 가요', 'MATCHED', NOW() - INTERVAL 1 DAY - INTERVAL 5 HOUR, NOW()),
+(51, 200, 700, '정기 통원 치료 동행', 1008, '화, 목 오전 물리치료 동행 부탁해요', 'MATCHED', NOW() - INTERVAL 2 DAY - INTERVAL 6 HOUR, NOW()),
+(52, 200, 800, '주 2회 방문 목욕 서비스', 1011, '화, 목 저녁 7시에 와주세요', 'MATCHED', NOW() - INTERVAL 4 DAY, NOW()),
+(53, 200, 900, '장애인 샤워 도움', 1014, '주 3회 샤워 보조 필요해요', 'MATCHED', NOW() - INTERVAL 5 DAY, NOW()),
+(54, 200, 1000, '전신 목욕 서비스', 1017, '일요일 오전 전신 목욕 부탁드려요', 'MATCHED', NOW() - INTERVAL 6 DAY, NOW()),
+(55, 200, 700, '장기 목욕 서비스', 1020, '3개월간 주 2회 목욕 서비스 계약해요', 'MATCHED', NOW() - INTERVAL 7 DAY, NOW()),
+(56, 200, 800, '혈압 측정 서비스', 1023, '주 3회 혈압 측정하고 기록해주세요', 'MATCHED', NOW() - INTERVAL 8 DAY - INTERVAL 16 HOUR, NOW()),
+(57, 200, 900, '도뇨관 관리', 1026, '도뇨관 교체 시기에 도와주세요', 'MATCHED', NOW() - INTERVAL 9 DAY - INTERVAL 14 HOUR, NOW()),
+(58, 200, 1000, '빨래 및 다림질', 1032, '주 1회 빨래와 다림질 해주세요', 'MATCHED', NOW() - INTERVAL 12 DAY - INTERVAL 8 HOUR, NOW()),
+(59, 200, 700, '주방 청소 도움', 1035, '화, 금 주방 청소 부탁드려요', 'MATCHED', NOW() - INTERVAL 13 DAY - INTERVAL 6 HOUR, NOW()),
+(60, 200, 800, '창문 청소', 1038, '분기별 창문 청소 서비스 신청해요', 'MATCHED', NOW() - INTERVAL 14 DAY, NOW()),
+(61, 200, 900, '아침 식사 준비', 1041, '평일 아침 식사 준비 도와주세요', 'MATCHED', NOW() - INTERVAL 15 DAY, NOW()),
+(62, 200, 1000, '저녁 식사 보조', 1043, '저녁 식사 먹을 때 보조 필요해요', 'MATCHED', NOW() - INTERVAL 15 DAY - INTERVAL 14 HOUR, NOW()),
+(63, 200, 700, '영양식 조리', 1047, '당뇨식 조리 가능하신 분 찾아요', 'MATCHED', NOW() - INTERVAL 16 DAY - INTERVAL 18 HOUR, NOW()),
+(64, 200, 800, '특별식 조리', 1050, '저염식 조리 부탁드려요', 'MATCHED', NOW() - INTERVAL 17 DAY - INTERVAL 16 HOUR, NOW()),
+(65, 200, 900, '수화 배우기', 1056, '수화 기초부터 가르쳐주세요', 'MATCHED', NOW() - INTERVAL 19 DAY - INTERVAL 12 HOUR, NOW()),
+(66, 200, 1000, '악기 연주 배우기', 1059, '피아노 기초 배우고 싶어요', 'MATCHED', NOW() - INTERVAL 20 DAY - INTERVAL 8 HOUR, NOW()),
+(67, 200, 700, '취미 활동 함께하기', 1065, '뜨개질 같이 해요', 'MATCHED', NOW() - INTERVAL 22 DAY - INTERVAL 6 HOUR, NOW()),
+(68, 200, 800, '운동 보조', 1068, '재활 운동 같이 해주세요', 'MATCHED', NOW() - INTERVAL 23 DAY, NOW()),
+(69, 200, 900, '애완동물 산책', 1070, '강아지 산책 대신 해주세요', 'MATCHED', NOW() - INTERVAL 23 DAY - INTERVAL 16 HOUR, NOW()),
+(70, 200, 1000, '우편물 확인', 1071, '주 1회 우편물 확인하고 정리해요', 'MATCHED', NOW() - INTERVAL 24 DAY, NOW()),
+(71, 200, 700, '화초 물주기', 1074, '화, 목 화분에 물 주세요', 'MATCHED', NOW() - INTERVAL 25 DAY, NOW()),
+(72, 200, 800, '휴대폰 충전', 1077, '매일 휴대폰 충전 확인 부탁해요', 'MATCHED', NOW() - INTERVAL 25 DAY - INTERVAL 18 HOUR, NOW()),
+(73, 200, 900, '공과금 납부', 1079, '은행 가서 공과금 납부 대행해요', 'MATCHED', NOW() - INTERVAL 26 DAY - INTERVAL 8 HOUR, NOW()),
+(74, 200, 1000, '오전 케어 서비스', 1082, '아침 식사 준비와 청소 함께 해주세요', 'MATCHED', NOW() - INTERVAL 27 DAY - INTERVAL 7 HOUR, NOW()),
+(75, 200, 700, '주말 돌봄 서비스', 1085, '주말 외출동행과 식사 준비 부탁해요', 'MATCHED', NOW() - INTERVAL 28 DAY - INTERVAL 6 HOUR, NOW()),
+(76, 200, 800, '통합 가사 서비스', 1088, '청소, 빨래, 설거지 통합 서비스 원해요', 'MATCHED', NOW() - INTERVAL 29 DAY, NOW()),
+(77, 200, 900, '생활 밀착 케어', 1089, '일상생활 전반 도움 필요합니다', 'MATCHED', NOW() - INTERVAL 29 DAY - INTERVAL 8 HOUR, NOW()),
+
+-- 이영희(300)의 매칭 완료 채팅방
+(78, 300, 1000, '마트 장보기 동행', 1004, '주 1회 마트 장보기 도와주세요', 'MATCHED', NOW() - INTERVAL 1 DAY, NOW()),
+(79, 300, 700, '관공서 방문 동행', 1007, '구청 방문 시 동행 부탁드려요', 'MATCHED', NOW() - INTERVAL 2 DAY, NOW()),
+(80, 300, 800, '미용실 방문 동행', 1010, '월 1회 미용실 같이 가요', 'MATCHED', NOW() - INTERVAL 3 DAY, NOW()),
+(81, 300, 900, '방문 목욕 정기 서비스', 1015, '월, 수, 금 정기 방문 목욕 부탁해요', 'MATCHED', NOW() - INTERVAL 5 DAY - INTERVAL 8 HOUR, NOW()),
+(82, 300, 1000, '주중 오전 목욕 도움', 1016, '월, 수, 금 오전 목욕 보조 요청해요', 'MATCHED', NOW() - INTERVAL 5 DAY - INTERVAL 16 HOUR, NOW()),
+(83, 300, 700, '상처 드레싱 케어', 1022, '욕창 상처 드레싱 간호 필요해요', 'MATCHED', NOW() - INTERVAL 8 DAY - INTERVAL 8 HOUR, NOW()),
+(84, 300, 800, '방문 물리치료', 1025, '주 2회 방문 물리치료 서비스 원해요', 'MATCHED', NOW() - INTERVAL 9 DAY - INTERVAL 6 HOUR, NOW()),
+(85, 300, 900, '욕창 관리 간호', 1028, '욕창 예방 및 관리 간호 서비스 필요해요', 'MATCHED', NOW() - INTERVAL 10 DAY - INTERVAL 8 HOUR, NOW()),
+(86, 300, 1000, '주 3회 청소 도움', 1031, '월, 수, 금 오전 집안 청소 부탁해요', 'MATCHED', NOW() - INTERVAL 12 DAY, NOW()),
+(87, 300, 700, '이불 빨래 서비스', 1037, '월 1회 이불 빨래 도와주세요', 'MATCHED', NOW() - INTERVAL 13 DAY - INTERVAL 18 HOUR, NOW()),
+(88, 300, 800, '유동식 준비', 1046, '유동식 만들어주실 분 찾아요', 'MATCHED', NOW() - INTERVAL 16 DAY - INTERVAL 12 HOUR, NOW()),
+(89, 300, 900, '컴퓨터 활용 교육', 1052, '컴퓨터 기초 사용법 알려주세요', 'MATCHED', NOW() - INTERVAL 18 DAY - INTERVAL 7 HOUR, NOW()),
+(90, 300, 1000, '점자 학습 지원', 1055, '점자 배우는 것 도와주세요', 'MATCHED', NOW() - INTERVAL 19 DAY - INTERVAL 6 HOUR, NOW()),
+(91, 300, 700, '대화 상대', 1061, '말벗이 되어주세요', 'MATCHED', NOW() - INTERVAL 21 DAY, NOW()),
+(92, 300, 800, '영화 감상 동행', 1064, '주말 영화 보러 갈 친구 찾아요', 'MATCHED', NOW() - INTERVAL 22 DAY, NOW()),
+(93, 300, 900, '쓰레기 배출', 1073, '분리수거 도와주세요', 'MATCHED', NOW() - INTERVAL 24 DAY - INTERVAL 14 HOUR, NOW()),
+(94, 300, 1000, '긴급 외출 동행', 1091, '오늘 긴급하게 병원 동행 필요해요', 'MATCHED', NOW() - INTERVAL 30 DAY, NOW()),
+(95, 300, 700, '장거리 이동 동행', 1094, '타지역 병원 가는 것 동행해주세요', 'MATCHED', NOW() - INTERVAL 30 DAY - INTERVAL 9 HOUR, NOW()),
+(96, 300, 800, '입원 동행 서비스', 1095, '입원 수속 및 초기 케어 도와주세요', 'MATCHED', NOW() - INTERVAL 30 DAY - INTERVAL 12 HOUR, NOW()),
+(97, 300, 900, '응급 상황 대응', 1097, '응급 상황 시 연락 가능한 분 찾아요', 'MATCHED', NOW() - INTERVAL 30 DAY - INTERVAL 18 HOUR, NOW()),
+(98, 300, 1000, '특별 식단 조리', 1098, '암 환자 특별 식단 조리 부탁해요', 'MATCHED', NOW() - INTERVAL 30 DAY - INTERVAL 20 HOUR, NOW()),
+(99, 300, 700, '전문 간병 서비스', 1099, '중증 환자 전문 간병 필요합니다', 'MATCHED', NOW() - INTERVAL 30 DAY - INTERVAL 22 HOUR, NOW())
+
 ON DUPLICATE KEY UPDATE
     member1_id = VALUES(member1_id),
     member2_id = VALUES(member2_id),
