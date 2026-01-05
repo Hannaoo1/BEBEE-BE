@@ -8,6 +8,7 @@ import com.lgcns.bebee.payment.presentation.dto.res.PreparePaymentResDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -20,7 +21,26 @@ public interface PaymentSwagger {
 
     @Operation(
             summary = "결제 준비",
-            description = "토스페이먼츠 결제를 위한 orderId를 생성하고 결제 정보를 임시 저장합니다."
+            description = """
+                토스페이먼츠 결제를 위한 orderId를 생성하고 결제 정보를 임시 저장합니다.
+                * api 요청 타이밍 : 결제 위젯 렌더링 직전
+            """,
+            requestBody = @RequestBody(
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = PreparePaymentReqDTO.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "결제 준비 요청 예시",
+                                            value = """
+                                                    {
+                                                      "amount": 100000
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            )
     )
     @ApiResponses({
             @ApiResponse(
@@ -28,7 +48,18 @@ public interface PaymentSwagger {
                     description = "결제 준비 성공",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = PreparePaymentResDTO.class)
+                            schema = @Schema(implementation = PreparePaymentResDTO.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "결제 준비 응답 예시",
+                                            value = """
+                                                        {
+                                                            "orderId": "0P2V16C5HW8MN",
+                                                            "amount": 100000
+                                                        }
+                                                    """
+                                    )
+                            }
                     )
             ),
             @ApiResponse(
@@ -59,7 +90,25 @@ public interface PaymentSwagger {
 
     @Operation(
             summary = "결제 승인",
-            description = "임시 저장 데이터와 비교하여 결제 정보를 검증 후 승인하여 꿀을 충전합니다."
+            description = "임시 저장 데이터와 비교하여 결제 정보를 검증 후 승인하여 꿀을 충전합니다.",
+            requestBody = @RequestBody(
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = PreparePaymentReqDTO.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "결제 승인 요청 예시",
+                                            value = """
+                                                    {
+                                                         "paymentKey": "5EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1",
+                                                         "orderId": "0P2V16C5HW8MN",
+                                                         "amount": 100000
+                                                     }
+                                                    """
+                                    )
+                            }
+                    )
+            )
     )
     @ApiResponses({
             @ApiResponse(
@@ -67,7 +116,19 @@ public interface PaymentSwagger {
                     description = "결제 승인 및 꿀 충전 성공",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ConfirmPaymentResDTO.class)
+                            schema = @Schema(implementation = ConfirmPaymentResDTO.class),
+                            examples = {
+                                @ExampleObject(
+                                        name = "결제 승인 응답 예시",
+                                        value = """
+                                                    {
+                                                        "paymentKey": "tviva20240101000000ABCD1234",
+                                                        "currentBalance": 500000,
+                                                        "paymentId": "5EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1",
+                                                    }
+                                                """
+                                )
+                            }
                     )
             ),
             @ApiResponse(
