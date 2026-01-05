@@ -90,7 +90,7 @@ public class ConfirmPaymentUseCase implements UseCase<ConfirmPaymentUseCase.Para
 
         return new Result(
                 String.valueOf(savedPayment.getPaymentId()),
-                wallet.getBalance().intValue(),
+                wallet.getBalance(),
                 response.paymentKey()
         );
     }
@@ -108,7 +108,7 @@ public class ConfirmPaymentUseCase implements UseCase<ConfirmPaymentUseCase.Para
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Result {
         private final String paymentId;
-        private final Integer currentBalance;
+        private final Long currentBalance;
         private final String paymentKey;
     }
 }
