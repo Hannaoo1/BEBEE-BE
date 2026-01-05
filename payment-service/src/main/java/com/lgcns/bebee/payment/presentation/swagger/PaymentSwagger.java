@@ -1,10 +1,10 @@
 package com.lgcns.bebee.payment.presentation.swagger;
 
 import com.lgcns.bebee.common.annotation.CurrentMember;
-import com.lgcns.bebee.payment.presentation.dto.req.ConfirmPaymentReqDTO;
-import com.lgcns.bebee.payment.presentation.dto.req.PreparePaymentReqDTO;
-import com.lgcns.bebee.payment.presentation.dto.res.ConfirmPaymentResDTO;
-import com.lgcns.bebee.payment.presentation.dto.res.PreparePaymentResDTO;
+import com.lgcns.bebee.payment.presentation.dto.req.PaymentConfirmReqDTO;
+import com.lgcns.bebee.payment.presentation.dto.req.PaymentPrepareReqDTO;
+import com.lgcns.bebee.payment.presentation.dto.res.PaymentConfirmResDTO;
+import com.lgcns.bebee.payment.presentation.dto.res.PaymentPrepareResDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -28,7 +28,7 @@ public interface PaymentSwagger {
             requestBody = @RequestBody(
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = PreparePaymentReqDTO.class),
+                            schema = @Schema(implementation = PaymentPrepareReqDTO.class),
                             examples = {
                                     @ExampleObject(
                                             name = "결제 준비 요청 예시",
@@ -48,7 +48,7 @@ public interface PaymentSwagger {
                     description = "결제 준비 성공",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = PreparePaymentResDTO.class),
+                            schema = @Schema(implementation = PaymentPrepareResDTO.class),
                             examples = {
                                     @ExampleObject(
                                             name = "결제 준비 응답 예시",
@@ -73,7 +73,7 @@ public interface PaymentSwagger {
                     content = @Content(mediaType = "application/json")
             )
     })
-    ResponseEntity<PreparePaymentResDTO> preparePayment(
+    ResponseEntity<PaymentPrepareResDTO> preparePayment(
             @Parameter(hidden = true)
             @CurrentMember Long currentMemberId,
 
@@ -82,10 +82,10 @@ public interface PaymentSwagger {
                     required = true,
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = PreparePaymentReqDTO.class)
+                            schema = @Schema(implementation = PaymentPrepareReqDTO.class)
                     )
             )
-            @org.springframework.web.bind.annotation.RequestBody PreparePaymentReqDTO reqDTO
+            @org.springframework.web.bind.annotation.RequestBody PaymentPrepareReqDTO reqDTO
     );
 
     @Operation(
@@ -94,7 +94,7 @@ public interface PaymentSwagger {
             requestBody = @RequestBody(
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ConfirmPaymentReqDTO.class),
+                            schema = @Schema(implementation = PaymentConfirmReqDTO.class),
                             examples = {
                                     @ExampleObject(
                                             name = "결제 승인 요청 예시",
@@ -116,7 +116,7 @@ public interface PaymentSwagger {
                     description = "결제 승인 및 꿀 충전 성공",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ConfirmPaymentResDTO.class),
+                            schema = @Schema(implementation = PaymentConfirmResDTO.class),
                             examples = {
                                 @ExampleObject(
                                         name = "결제 승인 응답 예시",
@@ -147,7 +147,7 @@ public interface PaymentSwagger {
                     content = @Content(mediaType = "application/json")
             )
     })
-    ResponseEntity<ConfirmPaymentResDTO> confirmPayment(
+    ResponseEntity<PaymentConfirmResDTO> confirmPayment(
             @Parameter(hidden = true)
             @CurrentMember Long currentMemberId,
 
@@ -156,9 +156,9 @@ public interface PaymentSwagger {
                     required = true,
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ConfirmPaymentReqDTO.class)
+                            schema = @Schema(implementation = PaymentConfirmReqDTO.class)
                     )
             )
-            @org.springframework.web.bind.annotation.RequestBody ConfirmPaymentReqDTO reqDTO
+            @org.springframework.web.bind.annotation.RequestBody PaymentConfirmReqDTO reqDTO
     );
 }
