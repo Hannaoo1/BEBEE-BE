@@ -24,6 +24,7 @@ public class OpenApiConfig extends BaseOpenApiConfig {
                         "v1.0.0"
                 ))
                 .components(openApiComponents())
+                .security(openApiSecurityRequirements())
                 .servers(List.of(
                         new Server()
                                 .url(springdocApiProperties.host())

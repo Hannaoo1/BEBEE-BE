@@ -1,0 +1,6 @@
+dependencies {
+    implementation project(":common")
+
+    // Spring Actuator - 어플리케이션 모니터링 및 관리 엔드포인트를 제공
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+}

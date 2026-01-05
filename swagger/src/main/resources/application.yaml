@@ -1,0 +1,30 @@
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: true
+  swagger-ui:
+    urls-primary-name: "3. Match Service"
+    urls:
+      - name: "1. File Service"
+        url: /file/api-docs
+      - name: "2. Chat Service"
+        url: /chat/api-docs
+      - name: "3. Match Service"
+        url: /match/api-docs
+      - name: "4. Member Service"
+        url: /member/api-docs
+      - name: "5. Notification Service"
+        url: /notification/api-docs
+      - name: "6. Payment Service"
+        url: /payment/api-docs
+    path: /swagger-ui.html
+    enabled: true
+    tags-sorter: alpha
+    operations-sorter: alpha
+
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+
+  api:
+    host: "${SPRINGDOC_API_HOST:https://api.be-bee.link}"
+    desc: "${SPRINGDOC_API_DESC:}"

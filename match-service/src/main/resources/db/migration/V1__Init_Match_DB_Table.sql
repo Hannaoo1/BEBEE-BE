@@ -253,7 +253,7 @@ CREATE TABLE `match_member_sync`
     `address_road`      VARCHAR(255)    NULL,
     `latitude`          DECIMAL(10,7)   NOT NULL,
     `longitude`         DECIMAL(10,7)   NOT NULL,
-    `district_code`     CHAR(10)        NOT NULL,
+    `legal_dong_code`   CHAR(10)        NOT NULL,
     `created_at`       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at`       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 

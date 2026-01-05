@@ -29,6 +29,9 @@ dependencies {
 
 	// firebase admin sdk - FCM 웹 푸시 메시지 전송
 	implementation 'com.google.firebase:firebase-admin:9.7.0'
+
+	// Spring Actuator - 어플리케이션 모니터링 및 관리 엔드포인트를 제공
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 
 // Querydsl Q-Class 생성 경로

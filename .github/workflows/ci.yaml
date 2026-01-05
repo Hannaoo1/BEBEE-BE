@@ -1,0 +1,142 @@
+name: CI - Build and Push to ECR
+
+on:
+  push:
+    branches: ["develop"]
+    paths:
+      - 'common/**'
+      - 'common-data/**'
+      - 'chat-service/**'
+      - 'match-service/**'
+      - 'member-service/**'
+      - 'notification-service/**'
+      - 'payment-service/**'
+      - 'file-service/**'
+      - 'build.gradle'
+
+env:
+  AWS_REGION: ap-northeast-2
+  ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-northeast-2.amazonaws.com
+  INFRA_REPO: lgcns1team/BEBEE-Infra
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - chat
+          - match
+          - member
+          - notification
+          - payment
+          - file
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 변경 감지
+      - name: Check for changes
+        uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            src:
+              - '${{ matrix.service }}-service/**'
+              - 'common/**'
+              - 'common-data/**'
+              - 'build.gradle'
+              - 'settings.gradle'
+
+      # --- 변경된 경우에만 실행 ---
+      - name: Set up JDK 17
+        if: steps.changes.outputs.src == 'true'
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Build with Gradle
+        if: steps.changes.outputs.src == 'true'
+        run: |
+          chmod +x gradlew
+          ./gradlew clean :${{ matrix.service }}-service:bootJar -x test
+
+      # AWS 자격 증명
+      - name: Configure AWS credentials
+        if: steps.changes.outputs.src == 'true'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # ECR 로그인
+      - name: Login to Amazon ECR
+        if: steps.changes.outputs.src == 'true'
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # Docker 이미지 빌드 및 ECR 푸시
+      - name: Build and Push to ECR
+        if: steps.changes.outputs.src == 'true'
+        id: build-image
+        run: |
+          IMAGE_TAG="${{ env.ECR_REGISTRY }}/bebee-${{ matrix.service }}-service:${{ github.sha }}"
+          IMAGE_TAG_LATEST="${{ env.ECR_REGISTRY }}/bebee-${{ matrix.service }}-service:latest"
+
+          docker build --no-cache -t $IMAGE_TAG -t $IMAGE_TAG_LATEST -f ${{ matrix.service }}-service/Dockerfile .
+          docker push $IMAGE_TAG
+          docker push $IMAGE_TAG_LATEST
+
+          echo "image=$IMAGE_TAG" >> $GITHUB_OUTPUT
+          echo "image_tag=${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      # BEBEE-Infra 레포지토리 업데이트
+      - name: Checkout BEBEE-Infra repository
+        if: steps.changes.outputs.src == 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.INFRA_REPO }}
+          token: ${{ secrets.INFRA_REPO_TOKEN }}
+          path: infra
+          ref: ${{ github.ref_name }}
+
+
+      - name: Update image tag in BEBEE-Infra
+        if: steps.changes.outputs.src == 'true'
+        run: |
+          cd infra
+          
+          TARGET_PATH="k8s-temp/apps/${{ matrix.service }}-service/overlays/dev/kustomization.yaml"
+
+          echo "Target file: $TARGET_PATH"
+          
+          if [ -f "$TARGET_PATH" ]; then
+            echo "Updating image tag to: ${{ steps.build-image.outputs.image_tag }}"
+            sed -i "s|newTag:.*|newTag: ${{ steps.build-image.outputs.image_tag }}|g" "$TARGET_PATH"
+          
+            cat "$TARGET_PATH" | grep "newTag"
+          else
+            echo "Error: $TARGET_PATH 파일을 찾을 수 없습니다."
+            exit 1
+          fi
+
+      - name: Commit and push changes
+        if: steps.changes.outputs.src == 'true'
+        run: |
+          cd infra
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add .
+          
+          git commit -m "chore: update ${{ matrix.service }}-service image to ${{ steps.build-image.outputs.image_tag }}" || echo "No changes to commit"
+          git push
