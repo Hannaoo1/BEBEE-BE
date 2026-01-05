@@ -1,5 +1,7 @@
 package com.lgcns.bebee.chat.domain.entity;
 
+import com.lgcns.bebee.chat.domain.entity.sync.HelpCategorySync;
+import com.lgcns.bebee.chat.domain.entity.sync.MatchStatusSync;
 import com.lgcns.bebee.common.data.domain.BaseTimeEntity;
 import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.*;
@@ -13,14 +15,6 @@ import java.util.List;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Table(
-    uniqueConstraints = {
-        @UniqueConstraint(
-            name = "uk_chatroom_members",
-            columnNames = {"member1_id", "member2_id"}
-        )
-    }
-)
 public class Chatroom extends BaseTimeEntity {
     @Id @Tsid
     @Column(name = "chatroom_id")
@@ -46,33 +40,21 @@ public class Chatroom extends BaseTimeEntity {
     @Builder.Default
     private List<ChatroomHelpCategory> chatroomHelpCategories = new ArrayList<>();
 
-    public static Chatroom create(MemberSync member1, MemberSync member2){
+    @Enumerated(EnumType.STRING)
+    private MatchStatusSync matchStatus = MatchStatusSync.NON_MATCHED;
+
+    public static Chatroom create(MemberSync member1, MemberSync member2, Long postId, String postTitle, List<HelpCategorySync> helpCategories) {
         Chatroom chatroom = new Chatroom();
         chatroom.member1 = member1;
         chatroom.member2 = member2;
+        chatroom.postId = postId;
+        chatroom.title = postTitle;
+        helpCategories.forEach(category -> {
+            ChatroomHelpCategory chatroomHelpCategory = ChatroomHelpCategory.create(chatroom, category);
+            chatroom.chatroomHelpCategories.add(chatroomHelpCategory);
+        });
 
         return chatroom;
-    }
-
-    /**
-     * 게시글을 연결하고 도움 카테고리를 설정합니다.
-     *
-     * @param postId 게시글 ID
-     * @param postTitle 게시글 제목
-     * @param helpCategories 도움 카테고리 목록
-     */
-    public void linkPost(Long postId, String postTitle, List<HelpCategorySync> helpCategories){
-        this.postId = postId;
-        this.title = postTitle;
-
-        this.chatroomHelpCategories.clear();
-
-        if(postId != null){
-            helpCategories.forEach(helpCategory -> {
-                ChatroomHelpCategory chatroomHelpCategory = ChatroomHelpCategory.create(this, helpCategory);
-                this.chatroomHelpCategories.add(chatroomHelpCategory);
-            });
-        }
     }
 
     public void updateLastMessage(String lastMessage){

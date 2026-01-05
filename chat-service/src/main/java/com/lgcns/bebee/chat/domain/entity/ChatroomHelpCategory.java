@@ -1,5 +1,6 @@
 package com.lgcns.bebee.chat.domain.entity;
 
+import com.lgcns.bebee.chat.domain.entity.sync.HelpCategorySync;
 import com.lgcns.bebee.common.data.domain.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,16 +24,10 @@ public class ChatroomHelpCategory extends BaseTimeEntity {
     @JoinColumn(name = "chatroom_id", nullable = false)
     private Chatroom chatroom;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("helpCategorySyncId")
-    @JoinColumn(name = "help_category_id", nullable = false)
-    private HelpCategorySync helpCategory;
-
     public static ChatroomHelpCategory create(Chatroom chatroom, HelpCategorySync helpCategory) {
         ChatroomHelpCategory entity = new ChatroomHelpCategory();
         entity.id = new ChatroomHelpCategoryId(chatroom.getId(), helpCategory.getId());
         entity.chatroom = chatroom;
-        entity.helpCategory = helpCategory;
         return entity;
     }
 
@@ -48,7 +43,7 @@ public class ChatroomHelpCategory extends BaseTimeEntity {
         @Column(name = "chatroom_id")
         private Long chatroomId;
 
-        @Column(name = "help_category_sync_id")
-        private Long helpCategorySyncId;
+        @Column(name = "help_category_id")
+        private Long helpCategoryId;
     }
 }
