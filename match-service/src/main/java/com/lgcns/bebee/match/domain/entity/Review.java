@@ -48,15 +48,19 @@ public class Review extends BaseTimeEntity {
         review.engagementId = engagementId;
         review.reviewerId = reviewerId;
         review.revieweeId = revieweeId;
-        review.reviewDirection =reviewDirection;
-        
-        // ReviewKeyword 엔티티 생성
-        List<ReviewKeyword> reviewKeywords = keywordIds.stream()
-                .map(ReviewKeyword::create)
-                .toList();
-        reviewKeywords.forEach(keyword -> keyword.assignToReview(review));
-        review.keywords = reviewKeywords;
+        review.reviewDirection = reviewDirection;
+
+        keywordIds.forEach(keywordId ->
+                review.addKeyword(keywordId));
 
         return review;
+    }
+
+    // 키워드 추가
+    public void addKeyword(Integer keywordId) {
+        ReviewKeyword reviewKeyword = new ReviewKeyword();
+        reviewKeyword.setKeywordId(keywordId);
+        reviewKeyword.setReview(this);
+        this.keywords.add(reviewKeyword);
     }
 }
