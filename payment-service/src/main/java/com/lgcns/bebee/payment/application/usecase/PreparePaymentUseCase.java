@@ -2,7 +2,7 @@ package com.lgcns.bebee.payment.application.usecase;
 
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
-import com.lgcns.bebee.payment.infrastructure.redis.RedisTempPaymentService;
+import com.lgcns.bebee.payment.application.port.out.TempPaymentPort;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,11 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class PreparePaymentUseCase implements UseCase<PreparePaymentUseCase.Param, PreparePaymentUseCase.Result> {
 
-    private final RedisTempPaymentService redisTempPaymentService;
+    private final TempPaymentPort tempPaymentPort;
 
     @Override
     public Result execute(Param param) {
-        String orderId = redisTempPaymentService.save(
+        String orderId = tempPaymentPort.save(
                 param.getMemberId(),
                 param.getAmount()
         );

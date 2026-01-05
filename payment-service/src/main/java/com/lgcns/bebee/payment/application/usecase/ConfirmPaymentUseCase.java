@@ -3,6 +3,8 @@ package com.lgcns.bebee.payment.application.usecase;
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
 import com.lgcns.bebee.payment.application.client.TossPaymentsClient;
+import com.lgcns.bebee.payment.application.port.out.TempPaymentPort;
+import com.lgcns.bebee.payment.application.port.out.dto.TempPaymentInfo;
 import com.lgcns.bebee.payment.common.exception.PaymentErrors;
 import com.lgcns.bebee.payment.domain.entity.HoneyHistory;
 import com.lgcns.bebee.payment.domain.entity.HoneyWallet;
@@ -11,7 +13,6 @@ import com.lgcns.bebee.payment.domain.entity.vo.HoneyHistoryType;
 import com.lgcns.bebee.payment.domain.repository.HoneyHistoryRepository;
 import com.lgcns.bebee.payment.domain.repository.HoneyWalletRepository;
 import com.lgcns.bebee.payment.domain.repository.PaymentRepository;
-import com.lgcns.bebee.payment.infrastructure.redis.RedisTempPaymentService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ConfirmPaymentUseCase implements UseCase<ConfirmPaymentUseCase.Param, ConfirmPaymentUseCase.Result> {
 
-    private final RedisTempPaymentService redisTempPaymentService;
+    private final TempPaymentPort tempPaymentPort;
     private final TossPaymentsClient tossPaymentsClient;
     private final PaymentRepository paymentRepository;
     private final HoneyWalletRepository honeyWalletRepository;
@@ -35,7 +36,7 @@ public class ConfirmPaymentUseCase implements UseCase<ConfirmPaymentUseCase.Para
     @Override
     public Result execute(Param param) {
         // Redis에 이전에 저장한 임시 결제 정보 조회 + 값이 일치하는지 검증
-        RedisTempPaymentService.TempPaymentDto temp = redisTempPaymentService.get(param.getOrderId());
+        TempPaymentInfo temp = tempPaymentPort.get(param.getOrderId());
 
         if (!temp.getAmount().equals(param.getAmount())) {
             log.error("결제 금액 불일치: Redis={}, Param={}", temp.getAmount(), param.getAmount());
@@ -84,7 +85,7 @@ public class ConfirmPaymentUseCase implements UseCase<ConfirmPaymentUseCase.Para
         log.info("허니 히스토리 기록 완료: historyId={}", history.getHoneyHistoryId());
 
         // 6. Redis 임시 데이터 삭제
-        redisTempPaymentService.delete(param.getOrderId());
+        tempPaymentPort.delete(param.getOrderId());
         log.info("Redis 임시 데이터 삭제 완료: orderId={}", param.getOrderId());
 
         return new Result(

@@ -2,11 +2,10 @@ package com.lgcns.bebee.payment.infrastructure.redis;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lgcns.bebee.payment.application.port.out.TempPaymentPort;
+import com.lgcns.bebee.payment.application.port.out.dto.TempPaymentInfo;
 import com.lgcns.bebee.payment.common.exception.PaymentErrors;
 import io.hypersistence.utils.hibernate.id.Tsid;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -17,7 +16,7 @@ import java.time.Duration;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class RedisTempPaymentService {
+public class RedisTempPaymentService implements TempPaymentPort {
 
     private static final String KEY_PREFIX = "payment:";
     private static final long TTL_MINUTES = 10;
@@ -28,10 +27,11 @@ public class RedisTempPaymentService {
     /**
      * orderId 생성 및 결제 정보 임시 저장
      */
+    @Override
     public String save(Long memberId, Integer amount) {
         String orderId = Tsid.FactorySupplier.INSTANCE.get().generate().toString();
 
-        TempPaymentDto dto = new TempPaymentDto(orderId, amount, memberId);
+        TempPaymentInfo dto = new TempPaymentInfo(orderId, amount, memberId);
 
         try {
             String key = KEY_PREFIX + orderId;
@@ -50,7 +50,8 @@ public class RedisTempPaymentService {
     /**
      * orderId로 임시 결제 정보 조회
      */
-    public TempPaymentDto get(String orderId) {
+    @Override
+    public TempPaymentInfo get(String orderId) {
         String key = KEY_PREFIX + orderId;
         String value = redisTemplate.opsForValue().get(key);
 
@@ -60,24 +61,16 @@ public class RedisTempPaymentService {
         }
 
         try {
-            return objectMapper.readValue(value, TempPaymentDto.class);
+            return objectMapper.readValue(value, TempPaymentInfo.class);
         } catch (JsonProcessingException e) {
             log.error("Redis 조회 실패", e);
             throw new RuntimeException("임시 결제 정보 조회 실패", e);
         }
     }
 
+    @Override
     public void delete(String orderId) {
         String key = KEY_PREFIX + orderId;
         redisTemplate.delete(key);
-    }
-
-    @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class TempPaymentDto {
-        private String orderId;
-        private Integer amount;
-        private Long memberId;
     }
 }
