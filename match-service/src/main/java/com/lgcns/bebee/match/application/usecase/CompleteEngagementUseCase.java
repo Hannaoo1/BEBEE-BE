@@ -65,9 +65,11 @@ public class CompleteEngagementUseCase
         // 케이스 3: 도우미만 완료 (PENDING 유지, 3일 후 스케줄러 처리)
         // 케이스 4: 둘 다 클릭 x (3일 후 스케줄러 처리)
 
+        boolean isLastActivity = engagement.isLastActivity(agreement);
+
         return new Result(
                 engagement.getStatus().name(),
-                true
+                isLastActivity
         );
     }
 

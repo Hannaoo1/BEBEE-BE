@@ -77,4 +77,14 @@ public class Engagement extends BaseTimeEntity {
     public Boolean isDisabledCheck() {
         return isDisabledCheck;
     }
+
+    public boolean isLastActivity(Agreement agreement) {
+        if (this.type == EngagementType.DAY) {
+
+            // 하루 도움은 항상 마지막 활동
+            return true;
+        }
+
+        return true;
+    }
 }
