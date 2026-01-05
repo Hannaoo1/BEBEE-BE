@@ -38,11 +38,22 @@ public class Payment extends BaseTimeEntity {
         payment.paymentKey = paymentKey;
         payment.orderId = orderId;
         payment.amount = amount;
+        payment.status = PaymentStatus.PENDING;  // 초기 상태
 
         return payment;
     }
 
-//    public void markAsPaid() {}
-//
-//    public void validateOwner(Long memberId) {}
+    public void markAsPaid() {
+        this.status = PaymentStatus.PAID;
+    }
+
+    public void markAsCanceled() {
+        this.status = PaymentStatus.CANCELED;
+    }
+
+    public void validateOwner(Long memberId) {
+        if (!this.memberId.equals(memberId)) {
+            throw new IllegalArgumentException("결제 소유자가 아닙니다.");
+        }
+    }
 }
