@@ -1,6 +1,8 @@
 package com.lgcns.bebee.payment.application.usecase;
 
 import com.lgcns.bebee.payment.application.client.TossPaymentsClient;
+import com.lgcns.bebee.payment.application.port.out.TempPaymentPort;
+import com.lgcns.bebee.payment.application.port.out.dto.TempPaymentInfo;
 import com.lgcns.bebee.payment.common.exception.PaymentErrors;
 import com.lgcns.bebee.payment.common.exception.PaymentException;
 import com.lgcns.bebee.payment.domain.entity.HoneyHistory;
@@ -10,7 +12,6 @@ import com.lgcns.bebee.payment.domain.entity.vo.HoneyHistoryType;
 import com.lgcns.bebee.payment.domain.repository.HoneyHistoryRepository;
 import com.lgcns.bebee.payment.domain.repository.HoneyWalletRepository;
 import com.lgcns.bebee.payment.domain.repository.PaymentRepository;
-import com.lgcns.bebee.payment.infrastructure.redis.RedisTempPaymentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -19,27 +20,28 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.*;
 
 /**
  * ConfirmPaymentUseCase 단위 테스트
  *
  * 테스트 범위: 결제 승인 유스케이스 로직
- * Mock 대상: RedisTempPaymentService, TossPaymentsClient, PaymentRepository, HoneyWalletRepository, HoneyHistoryRepository
+ * Mock 대상: TempPaymentPort, TossPaymentsClient, PaymentRepository, HoneyWalletRepository, HoneyHistoryRepository
  */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ConfirmPaymentUseCase 단위 테스트")
 class ConfirmPaymentUseCaseTest {
 
     @Mock
-    private RedisTempPaymentService redisTempPaymentService;
+    private TempPaymentPort tempPaymentPort;
 
     @Mock
     private TossPaymentsClient tossPaymentsClient;
@@ -58,14 +60,14 @@ class ConfirmPaymentUseCaseTest {
 
     private String testOrderId;
     private String testPaymentKey;
-    private Integer testAmount;
+    private Long testAmount;
     private Long testMemberId;
 
     @BeforeEach
     void setUp() {
         testOrderId = "0P2V16C5HW8MN";
         testPaymentKey = "5EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1";
-        testAmount = 100000;
+        testAmount = 100000L;
         testMemberId = 100L;
     }
 
@@ -82,14 +84,13 @@ class ConfirmPaymentUseCaseTest {
             );
 
             // Redis 임시 데이터
-            RedisTempPaymentService.TempPaymentDto tempDto =
-                    new RedisTempPaymentService.TempPaymentDto(testOrderId, testAmount, testMemberId);
-            given(redisTempPaymentService.get(testOrderId)).willReturn(tempDto);
+            TempPaymentInfo tempDto = new TempPaymentInfo(testOrderId, testAmount, testMemberId);
+            given(tempPaymentPort.get(testOrderId)).willReturn(tempDto);
 
             // 토스 API 응답
             TossPaymentsClient.TossPaymentResponse tossResponse =
                     new TossPaymentsClient.TossPaymentResponse(
-                            testPaymentKey, testOrderId, "DONE", testAmount,
+                            testPaymentKey, testOrderId, "DONE", testAmount.intValue(),
                             "카드", "2024-01-01T00:00:00", "2024-01-01T00:00:01"
                     );
             given(tossPaymentsClient.confirmPayment(testPaymentKey, testOrderId, testAmount))
@@ -115,16 +116,15 @@ class ConfirmPaymentUseCaseTest {
             // then
             assertThat(result).isNotNull();
             assertThat(result.getPaymentId()).isEqualTo("1");
-            assertThat(result.getCurrentBalance()).isEqualTo(testAmount);
             assertThat(result.getPaymentKey()).isEqualTo(testPaymentKey);
 
-            then(redisTempPaymentService).should().get(testOrderId);
+            then(tempPaymentPort).should().get(testOrderId);
             then(tossPaymentsClient).should().confirmPayment(testPaymentKey, testOrderId, testAmount);
             then(paymentRepository).should().save(any(Payment.class));
             then(honeyWalletRepository).should().findByMemberIdWithLock(testMemberId);
             then(honeyWalletRepository).should().save(any(HoneyWallet.class));
             then(honeyHistoryRepository).should().save(any(HoneyHistory.class));
-            then(redisTempPaymentService).should().delete(testOrderId);
+            then(tempPaymentPort).should().delete(testOrderId);
         }
 
         @Test
@@ -135,13 +135,12 @@ class ConfirmPaymentUseCaseTest {
                     testOrderId, testPaymentKey, testAmount, testMemberId
             );
 
-            RedisTempPaymentService.TempPaymentDto tempDto =
-                    new RedisTempPaymentService.TempPaymentDto(testOrderId, testAmount, testMemberId);
-            given(redisTempPaymentService.get(testOrderId)).willReturn(tempDto);
+            TempPaymentInfo tempDto = new TempPaymentInfo(testOrderId, testAmount, testMemberId);
+            given(tempPaymentPort.get(testOrderId)).willReturn(tempDto);
 
             TossPaymentsClient.TossPaymentResponse tossResponse =
                     new TossPaymentsClient.TossPaymentResponse(
-                            testPaymentKey, testOrderId, "DONE", testAmount,
+                            testPaymentKey, testOrderId, "DONE", testAmount.intValue(),
                             "카드", "2024-01-01T00:00:00", "2024-01-01T00:00:01"
                     );
             given(tossPaymentsClient.confirmPayment(testPaymentKey, testOrderId, testAmount))
@@ -165,7 +164,7 @@ class ConfirmPaymentUseCaseTest {
 
             // then
             assertThat(result).isNotNull();
-            assertThat(result.getCurrentBalance()).isEqualTo(150000);
+            assertThat(result.getCurrentBalance()).isEqualTo(150000L);
             then(honeyWalletRepository).should().findByMemberIdWithLock(testMemberId);
         }
     }
@@ -182,7 +181,7 @@ class ConfirmPaymentUseCaseTest {
                     testOrderId, testPaymentKey, testAmount, testMemberId
             );
 
-            given(redisTempPaymentService.get(testOrderId))
+            given(tempPaymentPort.get(testOrderId))
                     .willThrow(PaymentErrors.PAYMENT_NOT_FOUND.toException());
 
             // when & then
@@ -190,7 +189,7 @@ class ConfirmPaymentUseCaseTest {
                     .isInstanceOf(PaymentException.class)
                     .hasMessageContaining("결제 정보를 찾을 수 없습니다");
 
-            then(tossPaymentsClient).should(never()).confirmPayment(anyString(), anyString(), anyInt());
+            then(tossPaymentsClient).should(never()).confirmPayment(anyString(), anyString(), anyLong());
             then(paymentRepository).should(never()).save(any(Payment.class));
         }
 
@@ -198,21 +197,20 @@ class ConfirmPaymentUseCaseTest {
         @DisplayName("결제 금액이 일치하지 않으면 예외가 발생한다")
         void execute_withAmountMismatch_throwsException() {
             // given
-            Integer differentAmount = 50000; // Redis: 100,000원, Param: 50,000원
+            Long differentAmount = 50000L; // Redis: 100,000원, Param: 50,000원
             ConfirmPaymentUseCase.Param param = new ConfirmPaymentUseCase.Param(
                     testOrderId, testPaymentKey, differentAmount, testMemberId
             );
 
-            RedisTempPaymentService.TempPaymentDto tempDto =
-                    new RedisTempPaymentService.TempPaymentDto(testOrderId, testAmount, testMemberId);
-            given(redisTempPaymentService.get(testOrderId)).willReturn(tempDto);
+            TempPaymentInfo tempDto = new TempPaymentInfo(testOrderId, testAmount, testMemberId);
+            given(tempPaymentPort.get(testOrderId)).willReturn(tempDto);
 
             // when & then
             assertThatThrownBy(() -> confirmPaymentUseCase.execute(param))
                     .isInstanceOf(PaymentException.class)
                     .hasMessageContaining("결제 금액이 일치하지 않습니다");
 
-            then(tossPaymentsClient).should(never()).confirmPayment(anyString(), anyString(), anyInt());
+            then(tossPaymentsClient).should(never()).confirmPayment(anyString(), anyString(), anyLong());
             then(paymentRepository).should(never()).save(any(Payment.class));
         }
 
@@ -225,16 +223,15 @@ class ConfirmPaymentUseCaseTest {
                     testOrderId, testPaymentKey, testAmount, differentMemberId
             );
 
-            RedisTempPaymentService.TempPaymentDto tempDto =
-                    new RedisTempPaymentService.TempPaymentDto(testOrderId, testAmount, testMemberId);
-            given(redisTempPaymentService.get(testOrderId)).willReturn(tempDto);
+            TempPaymentInfo tempDto = new TempPaymentInfo(testOrderId, testAmount, testMemberId);
+            given(tempPaymentPort.get(testOrderId)).willReturn(tempDto);
 
             // when & then
             assertThatThrownBy(() -> confirmPaymentUseCase.execute(param))
                     .isInstanceOf(PaymentException.class)
                     .hasMessageContaining("결제 회원 정보가 일치하지 않습니다");
 
-            then(tossPaymentsClient).should(never()).confirmPayment(anyString(), anyString(), anyInt());
+            then(tossPaymentsClient).should(never()).confirmPayment(anyString(), anyString(), anyLong());
             then(paymentRepository).should(never()).save(any(Payment.class));
         }
     }
@@ -251,9 +248,8 @@ class ConfirmPaymentUseCaseTest {
                     testOrderId, testPaymentKey, testAmount, testMemberId
             );
 
-            RedisTempPaymentService.TempPaymentDto tempDto =
-                    new RedisTempPaymentService.TempPaymentDto(testOrderId, testAmount, testMemberId);
-            given(redisTempPaymentService.get(testOrderId)).willReturn(tempDto);
+            TempPaymentInfo tempDto = new TempPaymentInfo(testOrderId, testAmount, testMemberId);
+            given(tempPaymentPort.get(testOrderId)).willReturn(tempDto);
 
             given(tossPaymentsClient.confirmPayment(testPaymentKey, testOrderId, testAmount))
                     .willThrow(PaymentErrors.TOSS_API_ERROR.toException());
@@ -265,7 +261,7 @@ class ConfirmPaymentUseCaseTest {
 
             then(paymentRepository).should(never()).save(any(Payment.class));
             then(honeyWalletRepository).should(never()).findByMemberIdWithLock(anyLong());
-            then(redisTempPaymentService).should(never()).delete(anyString());
+            then(tempPaymentPort).should(never()).delete(anyString());
         }
     }
 
@@ -301,13 +297,12 @@ class ConfirmPaymentUseCaseTest {
                     testOrderId, testPaymentKey, testAmount, testMemberId
             );
 
-            RedisTempPaymentService.TempPaymentDto tempDto =
-                    new RedisTempPaymentService.TempPaymentDto(testOrderId, testAmount, testMemberId);
-            given(redisTempPaymentService.get(testOrderId)).willReturn(tempDto);
+            TempPaymentInfo tempDto = new TempPaymentInfo(testOrderId, testAmount, testMemberId);
+            given(tempPaymentPort.get(testOrderId)).willReturn(tempDto);
 
             TossPaymentsClient.TossPaymentResponse tossResponse =
                     new TossPaymentsClient.TossPaymentResponse(
-                            testPaymentKey, testOrderId, "DONE", testAmount,
+                            testPaymentKey, testOrderId, "DONE", testAmount.intValue(),
                             "카드", "2024-01-01T00:00:00", "2024-01-01T00:00:01"
                     );
             given(tossPaymentsClient.confirmPayment(testPaymentKey, testOrderId, testAmount))
@@ -330,7 +325,7 @@ class ConfirmPaymentUseCaseTest {
 
             // then
             assertThat(result.getPaymentId()).isEqualTo("999");
-            assertThat(result.getCurrentBalance()).isEqualTo(500000);
+            assertThat(result.getCurrentBalance()).isEqualTo(500000L);
             assertThat(result.getPaymentKey()).isEqualTo(testPaymentKey);
         }
     }
