@@ -62,10 +62,13 @@ public record PostsGetReqDTO(
                         - 1: 지체장애
                         - 2: 시각장애
                         - 3: 청각장애
+                        - 4: 발달장애
+                        - 5: 내부기관장애
+                        - 6: 기타장애
                         """,
                 example = "1"
         )
-        Long disabilityCategoryId,
+        List<Long> disabilityCategoryIds,
 
         @Schema(
                 description = """
@@ -92,7 +95,7 @@ public record PostsGetReqDTO(
                 this.gender,
                 this.minHoney,
                 this.maxHoney,
-                this.disabilityCategoryId,
+                this.disabilityCategoryIds,
                 this.days,
                 parsedLastPostId,
                 count

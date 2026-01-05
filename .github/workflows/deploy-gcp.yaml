@@ -81,7 +81,7 @@ jobs:
       - name: Build and Push to Docker Hub
         if: steps.changes.outputs.src == 'true'
         run: |
-          IMAGE_TAG="${{ env.DOCKER_USERNAME }}/bebee-${{ matrix.service }}:latest"
+          IMAGE_TAG="${{ env.DOCKER_USERNAME }}/bebee-${{ matrix.service }}:${{ github.sha }}"
           
           docker build --no-cache -t $IMAGE_TAG -f ${{ matrix.service }}-service/Dockerfile .
           docker push $IMAGE_TAG
@@ -112,6 +112,7 @@ jobs:
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             REDIS_HOST=${{ secrets.REDIS_HOST }}
             REDIS_PORT=6379
+            MONGODB_HOST=${{ secrets.MONGODB_HOST }}
             SPRINGDOC_API_DESC="임시 GCP 개발 서버"
 
       - name: Deploy to Cloud Run (Match Service)
@@ -130,6 +131,7 @@ jobs:
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             REDIS_HOST=${{ secrets.REDIS_HOST }}
             REDIS_PORT=6379
+            KAKAO_API_KEY=${{ secrets.KAKAO_API_KEY }}
             SPRINGDOC_API_DESC="임시 GCP 개발 서버"
 
       - name: Deploy to Cloud Run (File Service)

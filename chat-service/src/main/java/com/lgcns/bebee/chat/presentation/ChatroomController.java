@@ -9,9 +9,11 @@ import com.lgcns.bebee.chat.presentation.dto.res.ChatroomOpenResDTO;
 import com.lgcns.bebee.chat.presentation.dto.res.ChatroomsGetResDTO;
 import com.lgcns.bebee.chat.presentation.swagger.ChatroomSwagger;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/chatrooms")
 @RequiredArgsConstructor
@@ -47,6 +49,8 @@ public class ChatroomController implements ChatroomSwagger {
             @RequestParam(required = false) String lastChatroomId,
             @RequestParam(defaultValue = "20") Integer count
     ) {
+        log.info("채팅룸 리스트 조회");
+
         Long parsedCurrentMemberId = currentMemberId != null ? Long.parseLong(currentMemberId) : null;
         Long parsedLastChatroomId = lastChatroomId != null ? Long.parseLong(lastChatroomId) : null;
 

@@ -3,12 +3,12 @@ package com.lgcns.bebee.match.application;
 import com.lgcns.bebee.common.exception.InvalidParamException;
 import com.lgcns.bebee.match.application.usecase.CreateAgreementUseCase;
 import com.lgcns.bebee.match.domain.entity.Agreement;
+import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
+import com.lgcns.bebee.match.domain.entity.sync.Role;
 import com.lgcns.bebee.match.domain.entity.vo.AgreementStatus;
 import com.lgcns.bebee.match.domain.entity.vo.EngagementType;
 import com.lgcns.bebee.match.domain.repository.AgreementRepository;
-import com.lgcns.bebee.match.domain.entity.MatchMemberSync;
-import com.lgcns.bebee.match.domain.entity.vo.MemberRole;
-import com.lgcns.bebee.match.domain.service.MemberReader;
+import com.lgcns.bebee.match.domain.service.MemberManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -37,7 +37,7 @@ class CreateAgreementUseCaseTest {
     private AgreementRepository agreementRepository;
 
     @Mock
-    private MemberReader memberReader;
+    private MemberManager memberManager;
 
     @InjectMocks
     private CreateAgreementUseCase useCase;
@@ -53,9 +53,9 @@ class CreateAgreementUseCaseTest {
         helperId = 2L;
         disabledId = 3L;
 
-        MatchMemberSync mockMember = mock(MatchMemberSync.class);
-        when(mockMember.getRole()).thenReturn(MemberRole.DISABLED);
-        when(memberReader.getById(disabledId)).thenReturn(mockMember);
+        MemberSync mockMember = mock(MemberSync.class);
+        when(mockMember.getRole()).thenReturn(Role.DISABLED);
+        when(memberManager.findExistingMember(disabledId)).thenReturn(mockMember);
     }
 
     @Nested

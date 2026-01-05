@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import static com.lgcns.bebee.common.exception.AuthenticationErrors.INVALID_TOKEN_TYPE;
 import static com.lgcns.bebee.common.exception.AuthenticationErrors.TOKEN_MISSING;
 
+
 public class AuthenticationUtil {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";

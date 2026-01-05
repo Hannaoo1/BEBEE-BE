@@ -14,9 +14,9 @@ public record PostSearchCond(
     Gender gender,
     Integer minHoney,
     Integer maxHoney,
-    Long disabilityCategoryId,
+    List<Long> disabilityCategoryId,
     List<DayOfWeek> dayOfWeeks,
-    PostStatus postStatus,
+    List<PostStatus> postStatuses,
     Long lastPostId,
     Integer count
 ) {

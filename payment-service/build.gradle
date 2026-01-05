@@ -26,6 +26,9 @@ dependencies {
 	// flyway - DB migration tool, DB 스키마 관리를 자동화하여 체계적으로 수행할 수 있게 도와준다.
 	implementation 'org.flywaydb:flyway-core:11.18.0'
 	implementation 'org.flywaydb:flyway-mysql:11.18.0'
+
+	// Spring Actuator - 어플리케이션 모니터링 및 관리 엔드포인트를 제공
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 
 // Querydsl Q-Class 생성 경로

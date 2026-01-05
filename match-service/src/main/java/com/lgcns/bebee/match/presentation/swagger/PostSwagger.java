@@ -1,5 +1,6 @@
 package com.lgcns.bebee.match.presentation.swagger;
 
+import com.lgcns.bebee.common.annotation.CurrentMember;
 import com.lgcns.bebee.match.presentation.dto.req.PostCreateReqDTO;
 import com.lgcns.bebee.match.presentation.dto.req.PostsGetReqDTO;
 import com.lgcns.bebee.match.presentation.dto.res.PostCreateResDTO;
@@ -68,12 +69,8 @@ public interface PostSwagger {
             )
     })
     ResponseEntity<PostsGetResDTO> getPosts(
-            @Parameter(
-                    description = "현재 로그인한 회원 ID(임시, 나중에 토큰으로 처리)",
-                    required = true,
-                    example = "100"
-            )
-            @RequestParam String currentMemberId,
+            @Parameter(hidden = true)
+            @CurrentMember Long currentMemberId,
 
             @Parameter(
                     description = """
@@ -166,17 +163,13 @@ public interface PostSwagger {
             )
     })
     ResponseEntity<PostGetResDTO> getSinglePost(
-            @Parameter(
-                    description = "현재 로그인한 회원 ID (임시, 나중에 토큰으로 처리)",
-                    required = true,
-                    example = "100"
-            )
-            @RequestParam String currentMemberId,
+            @Parameter(hidden = true)
+            @CurrentMember Long currentMemberId,
 
             @Parameter(
                     description = "조회할 게시글 ID",
                     required = true,
-                    example = "1234567890"
+                    example = "1001"
             )
             @PathVariable String postId
     );
@@ -233,12 +226,8 @@ public interface PostSwagger {
             )
     })
     ResponseEntity<PostCreateResDTO> createPost(
-            @Parameter(
-                    description = "현재 로그인한 회원 ID (임시, 나중에 토큰으로 처리)",
-                    required = true,
-                    example = "100"
-            )
-            @RequestParam String currentMemberId,
+            @Parameter(hidden = true)
+            @CurrentMember Long currentMemberId,
 
             @RequestBody(
                     description = "게시글 작성 정보",

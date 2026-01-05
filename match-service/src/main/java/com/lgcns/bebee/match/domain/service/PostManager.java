@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -42,9 +41,8 @@ public class PostManager {
             Integer unitHoney,
             Integer totalHoney,
             String region,
-            String legalDongCode,
-            BigDecimal latitude,
-            BigDecimal longitude
+            Double latitude,
+            Double longitude
     ){
         EngagementType type = EngagementType.from(postType);
 
@@ -87,7 +85,6 @@ public class PostManager {
                 unitHoney,
                 totalHoney,
                 region,
-                legalDongCode,
                 latitude,
                 longitude
         );

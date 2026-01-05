@@ -96,33 +96,26 @@ public record PostCreateReqDTO(
         String region,
 
         @Schema(
-                description = "법정동 코드",
-                example = "1168010100",
-                requiredMode = Schema.RequiredMode.REQUIRED
-        )
-        String legalDongCode,
-
-        @Schema(
                 description = "위도",
                 example = "37.5012767241426",
                 requiredMode = Schema.RequiredMode.REQUIRED
         )
-        BigDecimal latitude,
+        Double latitude,
 
         @Schema(
                 description = "경도",
                 example = "127.039604663862",
                 requiredMode = Schema.RequiredMode.REQUIRED
         )
-        BigDecimal longitude
+        Double longitude
 ) {
-    public CreatePostUseCase.Param toParam(String memberId) {
+    public CreatePostUseCase.Param toParam(Long memberId) {
         List<CreatePostUseCase.ScheduleParam> scheduleParams = schedules.stream()
                 .map(s -> new CreatePostUseCase.ScheduleParam(s.dayOfWeek(), s.startTime(), s.endTime()))
                 .toList();
 
         return new CreatePostUseCase.Param(
-                Long.parseLong(memberId),
+                memberId,
                 postType,
                 postImages,
                 title,
@@ -135,7 +128,6 @@ public record PostCreateReqDTO(
                 unitHoney,
                 totalHoney,
                 region,
-                legalDongCode,
                 latitude,
                 longitude
         );

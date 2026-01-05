@@ -43,10 +43,10 @@ public class GetSinglePostUseCase implements UseCase<GetSinglePostUseCase.Param,
     @RequiredArgsConstructor
     public static class Result{
         private final String memberNickname;
-        private final String memberLegalDongCode;
+        private final String memberAddress;
         private final String memberProfileImageUrl;
 
-        private final List<String> helpCategories;
+        private final List<Long> helpCategoryIds;
 
         private final String engagementType;
         private final String title;
@@ -58,16 +58,15 @@ public class GetSinglePostUseCase implements UseCase<GetSinglePostUseCase.Param,
         private final LocalDate endDate;
 
         private final List<ScheduleDTO> schedules;
-        private final String postLegalDongCode;
+        private final String postAddress;
 
         private final String content;
         private final Integer applicantCount;
         private final List<String> postImageUrls;
 
         public static Result from(Post post, MemberSync member) {
-            List<String> helpCategoryNames = post.getHelpCategories().stream()
+            List<Long> helpCategoryIds = post.getHelpCategories().stream()
                     .map(postHelpCategory -> postHelpCategory.getId().getHelpCategoryId())
-                    .map(HelpCategoryType::getNameById)
                     .toList();
 
             List<ScheduleDTO> scheduleDTOs = post.getSchedules().stream()
@@ -102,9 +101,9 @@ public class GetSinglePostUseCase implements UseCase<GetSinglePostUseCase.Param,
 
             return new Result(
                     member.getNickname(),
-                    member.getLegalDongCode(),
+                    member.getAddressRoad(),
                     member.getProfileImageUrl(),
-                    helpCategoryNames,
+                    helpCategoryIds,
                     post.getType().name(),
                     post.getTitle(),
                     post.getUnitHoney(),
@@ -113,7 +112,7 @@ public class GetSinglePostUseCase implements UseCase<GetSinglePostUseCase.Param,
                     startDate,
                     endDate,
                     scheduleDTOs,
-                    post.getLegalDongCode(),
+                    post.getRegion(),
                     post.getContent(),
                     post.getApplicantCount(),
                     imageUrls
