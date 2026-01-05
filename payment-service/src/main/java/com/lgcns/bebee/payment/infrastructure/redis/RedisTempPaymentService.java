@@ -67,6 +67,11 @@ public class RedisTempPaymentService {
         }
     }
 
+    public void delete(String orderId) {
+        String key = KEY_PREFIX + orderId;
+        redisTemplate.delete(key);
+    }
+
     @Getter
     @AllArgsConstructor
     @NoArgsConstructor
