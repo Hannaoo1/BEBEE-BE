@@ -6,6 +6,7 @@ import com.lgcns.bebee.common.exception.InvalidParamException;
 import com.lgcns.bebee.match.common.exception.MatchErrors;
 import com.lgcns.bebee.match.common.exception.MatchInvalidParamErrors;
 import com.lgcns.bebee.match.common.util.ParamValidator;
+import com.lgcns.bebee.match.domain.entity.Agreement;
 import com.lgcns.bebee.match.domain.entity.Engagement;
 import com.lgcns.bebee.match.domain.entity.Match;
 import com.lgcns.bebee.match.domain.entity.Review;
@@ -21,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
-import static com.lgcns.bebee.match.domain.entity.QAgreement.agreement;
+
 
 // 리뷰 작성 UseCase
 @Service
@@ -43,6 +44,7 @@ public class CreateReviewUseCase implements UseCase<CreateReviewUseCase.Param, C
         // Engagement 조회
         Engagement engagement = engagementReader.getById(param.getEngagementId());
 
+        Agreement agreement = agreementReader.getById(engagement.getAgreementId());
 
         // 검증
         reviewManager.validateEngagementCompleted(engagement);
