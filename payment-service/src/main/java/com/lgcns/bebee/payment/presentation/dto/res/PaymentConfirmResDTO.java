@@ -4,7 +4,7 @@ import com.lgcns.bebee.payment.application.usecase.ConfirmPaymentUseCase;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "결제 승인 응답 DTO")
-public record ConfirmPaymentResDTO(
+public record PaymentConfirmResDTO(
         @Schema(
                 description = "결제 ID",
                 example = "1234567890"
@@ -12,7 +12,7 @@ public record ConfirmPaymentResDTO(
         String paymentId,
 
         @Schema(
-                description = "현재 허니 잔액",
+                description = "현재 꿀 잔액",
                 example = "50000"
         )
         Long currentBalance,
@@ -23,8 +23,8 @@ public record ConfirmPaymentResDTO(
         )
         String paymentKey
 ) {
-    public static ConfirmPaymentResDTO from(ConfirmPaymentUseCase.Result result) {
-        return new ConfirmPaymentResDTO(
+    public static PaymentConfirmResDTO from(ConfirmPaymentUseCase.Result result) {
+        return new PaymentConfirmResDTO(
                 result.getPaymentId(),
                 result.getCurrentBalance(),
                 result.getPaymentKey()

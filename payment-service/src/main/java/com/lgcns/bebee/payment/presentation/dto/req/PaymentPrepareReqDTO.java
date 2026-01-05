@@ -4,7 +4,7 @@ import com.lgcns.bebee.payment.application.usecase.PreparePaymentUseCase;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "결제 준비 요청 DTO")
-public record PreparePaymentReqDTO(
+public record PaymentPrepareReqDTO(
         @Schema(
                 description = "충전 금액",
                 example = "10000",
