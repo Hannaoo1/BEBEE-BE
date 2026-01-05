@@ -19,12 +19,11 @@ public class CurrentMemberArgumentResolver implements HandlerMethodArgumentResol
     }
 
     @Override
-    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
-            NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
         Object memberKey = request.getAttribute(MEMBER_KEY);
 
-        if (memberKey == null) {
+        if(memberKey == null){
             throw new IllegalStateException("인증된 사용자 정보가 없습니다. @CurrentMember는 인증된 사용에서만 사용 가능합니다.");
         }
         return Long.parseLong(String.valueOf(memberKey));
