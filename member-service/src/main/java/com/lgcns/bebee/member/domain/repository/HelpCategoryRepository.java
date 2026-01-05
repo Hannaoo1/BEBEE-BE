@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface HelpCategoryRepository extends JpaRepository<HelpCategory, Long> {
-    Optional<HelpCategory> findByName(String name);
+    Optional<HelpCategory> findByHelpType(String helpType);
 }

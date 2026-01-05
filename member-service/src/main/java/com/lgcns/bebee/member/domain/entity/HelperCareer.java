@@ -34,4 +34,3 @@ public class HelperCareer extends BaseTimeEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 }
-

@@ -29,19 +29,18 @@ public class Document extends BaseTimeEntity {
     @Column(nullable = false, length = 255)
     private String description;
 
-    private Long memberId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
-    /**
-     * Document 생성 (정적 팩토리 메서드)
-     */
-    public static Document create(Long memberId, String targetRole, String docCode, String docNameKo,
-            String description) {
+    public static Document create(String targetRole, String docCode, String docNameKo, String description,
+            Member member) {
         Document document = new Document();
-        document.memberId = memberId;
         document.targetRole = targetRole;
         document.docCode = docCode;
         document.docNameKo = docNameKo;
         document.description = description;
+        document.member = member;
         return document;
     }
 }
