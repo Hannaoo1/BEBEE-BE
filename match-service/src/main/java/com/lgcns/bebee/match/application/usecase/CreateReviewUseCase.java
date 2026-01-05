@@ -2,15 +2,17 @@ package com.lgcns.bebee.match.application.usecase;
 
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
+import com.lgcns.bebee.common.exception.InvalidParamException;
 import com.lgcns.bebee.match.common.exception.MatchErrors;
+import com.lgcns.bebee.match.common.exception.MatchInvalidParamErrors;
+import com.lgcns.bebee.match.common.util.ParamValidator;
 import com.lgcns.bebee.match.domain.entity.Engagement;
 import com.lgcns.bebee.match.domain.entity.Match;
 import com.lgcns.bebee.match.domain.entity.Review;
 import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
 import com.lgcns.bebee.match.domain.entity.sync.Role;
-import com.lgcns.bebee.match.domain.entity.vo.Keyword;
 import com.lgcns.bebee.match.domain.entity.vo.ReviewDirection;
-import com.lgcns.bebee.match.domain.repository.EngagementRepository;
+import com.lgcns.bebee.match.domain.repository.ReviewRepository;
 import com.lgcns.bebee.match.domain.service.EngagementReader;
 import com.lgcns.bebee.match.domain.service.MatchReader;
 import com.lgcns.bebee.match.domain.service.MemberManager;
@@ -23,31 +25,30 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
+// 리뷰 작성 UseCase
+
 @Service
 @RequiredArgsConstructor
 public class CreateReviewUseCase implements UseCase<CreateReviewUseCase.Param, CreateReviewUseCase.Result> {
 
-    private final ReviewManager reviewManager;
-    private final EngagementRepository engagementRepository;
-    private final MemberManager memberManager;
-    private final MatchReader matchReader;
     private final EngagementReader engagementReader;
+    private final MatchReader matchReader;
+    private final MemberManager memberManager;
+    private final ReviewManager reviewManager;
+    private final ReviewRepository reviewRepository;
 
     @Transactional
     @Override
     public Result execute(Param param) {
+        param.validate();
 
         // Engagement 조회
         Engagement engagement = engagementReader.getById(param.getEngagementId());
 
-        // 활동 완료 검증
-        reviewManager.validateEngagementCompleted(engagement);
 
-        // 중복 리뷰 검증
-        reviewManager.validateNoDuplicateReview(
-                param.getEngagementId(),
-                param.getReviewerId()
-        );
+        // 검증
+        reviewManager.validateEngagementCompleted(engagement);
+        reviewManager.validateNoDuplicateReview(param.getEngagementId(), param.getReviewerId());
 
         // Match 조회
         Match match = matchReader.getByAgreementId(engagement.getAgreementId());
@@ -60,17 +61,21 @@ public class CreateReviewUseCase implements UseCase<CreateReviewUseCase.Param, C
         // 작성자 조회
         MemberSync reviewer = memberManager.findExistingMember(param.getReviewerId());
 
-        // ReviewDirection 결정
+        // reviewdirection 결정
         ReviewDirection direction = reviewManager.determineReviewDirection(reviewer);
 
         // revieweeId 결정
-        Long revieweeId = determineRevieweeId(match, reviewer.getRole());
+        Long revieweeId = determineRevieweeId(
+                reviewer.getRole(),
+                match.getHelperId(),
+                match.getDisabledId()
+        );
 
-        // 키워드 검증
-        validateKeywords(param.getKeywordIds());
+        // 키워드 검증 (Manager에 위임)
+        reviewManager.validateKeywords(param.getKeywordIds(), direction);
 
         // 리뷰 생성
-        Review review = reviewManager.createReview(
+        Review review = Review.create(
                 param.getEngagementId(),
                 param.getReviewerId(),
                 revieweeId,
@@ -78,25 +83,17 @@ public class CreateReviewUseCase implements UseCase<CreateReviewUseCase.Param, C
                 param.getKeywordIds()
         );
 
-        return new Result(review.getId());
+        // 저장
+        Review savedReview = reviewRepository.save(review);
+
+        return Result.from(savedReview);
     }
-    // revieweeId 결정
-    private Long determineRevieweeId(Match match, Role reviewerRole) {
+
+    private Long determineRevieweeId(Role reviewerRole, Long helperId, Long disabledId) {
         if (reviewerRole == Role.DISABLED) {
-            return match.getHelperId();  // 장애인 → 도우미 평가
+            return helperId;
         } else {
-            return match.getDisabledId();  // 도우미 → 장애인 평가
-        }
-    }
-
-    // 키워드 유효성 검증
-    private void validateKeywords(List<Integer> keywordIds) {
-        if (keywordIds == null || keywordIds.isEmpty()) {
-            throw MatchErrors.INVALID_KEYWORD.toException();
-        }
-
-        for (Integer keywordId : keywordIds) {
-            Keyword.fromId(keywordId);
+            return disabledId;
         }
     }
 
@@ -106,11 +103,29 @@ public class CreateReviewUseCase implements UseCase<CreateReviewUseCase.Param, C
         private final Long engagementId;
         private final Long reviewerId;
         private final List<Integer> keywordIds;
+
+        @Override
+        public boolean validate() {
+            if (!ParamValidator.isValidId(engagementId)) {
+                throw new InvalidParamException(MatchInvalidParamErrors.REQUIRED_FIELD, "engagementId");
+            }
+            if (!ParamValidator.isValidId(reviewerId)) {
+                throw new InvalidParamException(MatchInvalidParamErrors.REQUIRED_FIELD, "reviewerId");
+            }
+            if (keywordIds == null || keywordIds.isEmpty()) {
+                throw new InvalidParamException(MatchInvalidParamErrors.REQUIRED_FIELD, "keywordIds");
+            }
+            return true;
+        }
     }
 
     @Getter
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Result {
-        private Long reviewId;
+        private final Long reviewId;
+
+        public static Result from(Review review) {
+            return new Result(review.getId());
+        }
     }
 }
