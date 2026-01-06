@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@ConditionalOnProperty(name = "event.type", havingValue = "aws")
 @RequiredArgsConstructor
 public class SnsEventPublisher implements EventPublisher {
     private final SnsTemplate snsTemplate;
