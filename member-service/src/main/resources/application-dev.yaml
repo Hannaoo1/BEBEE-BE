@@ -105,3 +105,16 @@ logging:
 
     com.lgcns.bebee.member: ${LOGGING_LEVEL_SERVICE:info}
 
+# AWS S3 설정 (내일 아침 환경 변수 주입 후 주석 해제)
+# aws:
+#   s3:
+#     bucket: ${AWS_S3_BUCKET:bebee-dev-storage}
+#     region: ${AWS_S3_REGION:ap-northeast-2}
+#     access-key: ${AWS_ACCESS_KEY}
+#     secret-key: ${AWS_SECRET_KEY}
+
+# OCR 서비스 설정 (내일 아침 배포 URL 주입 후 주석 해제)
+# ocr:
+#   base-url: ${OCR_BASE_URL:http://localhost:8086}
+#   timeout: ${OCR_TIMEOUT:30}
+

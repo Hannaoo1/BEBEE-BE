@@ -50,12 +50,25 @@ public class UploadDocumentUseCase implements UseCase<UploadDocumentUseCase.Para
 
         log.info("문서 업로드 처리 중... memberName={}, role={}", member.getName(), member.getRole());
 
-        // 1. 파일 저장 (Infrastructure)
-        String fileUrl = fileStorageClient.upload(param.getFile(), "documents");
+        // 1. 파일 준비 (S3 URL이 있으면 다운로드, 없으면 기존 파일 사용)
+        MultipartFile fileToAnalyze;
+        String fileUrl;
+
+        if (param.getFileUrl() != null && !param.getFileUrl().isBlank()) {
+            // S3 URL이 있는 경우: S3에서 다운로드
+            log.info("S3 URL로부터 파일 다운로드: {}", param.getFileUrl());
+            fileToAnalyze = fileStorageClient.download(param.getFileUrl());
+            fileUrl = param.getFileUrl();
+        } else {
+            // 로컬 파일인 경우: 업로드 후 URL 받기
+            log.info("로컬 파일 업로드 중...");
+            fileUrl = fileStorageClient.upload(param.getFile(), "documents");
+            fileToAnalyze = param.getFile();
+        }
 
         // 2. 위변조 분석 (Domain Service) - 실제 회원 정보 전달
         DocumentVerificationService.AnalysisResult analysis = verificationService.analyze(
-                param.getFile(),
+                fileToAnalyze,
                 member.getRole().name(),
                 member.getName(),
                 member.getBirthDate());
@@ -103,7 +116,8 @@ public class UploadDocumentUseCase implements UseCase<UploadDocumentUseCase.Para
     public static class Param implements Params {
         private final Long memberId;
         private final Long documentId;
-        private final MultipartFile file;
+        private final MultipartFile file; // 로컬 환경용
+        private final String fileUrl; // S3 환경용
 
         @Override
         public boolean validate() {
@@ -113,8 +127,9 @@ public class UploadDocumentUseCase implements UseCase<UploadDocumentUseCase.Para
             if (documentId == null) {
                 throw new IllegalArgumentException("문서 ID는 필수입니다.");
             }
-            if (file == null || file.isEmpty()) {
-                throw new IllegalArgumentException("파일은 필수입니다.");
+            // file 또는 fileUrl 중 하나는 필수
+            if ((file == null || file.isEmpty()) && (fileUrl == null || fileUrl.isBlank())) {
+                throw new IllegalArgumentException("파일 또는 파일 URL은 필수입니다.");
             }
             return true;
         }

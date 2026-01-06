@@ -25,7 +25,8 @@ public class LocalFileStorage implements FileStorageClient {
 
     /**
      * 파일 업로드
-     * @param file 업로드할 파일
+     * 
+     * @param file      업로드할 파일
      * @param directory 저장 디렉토리
      * @return 업로드된 파일의 URL
      */
@@ -57,6 +58,7 @@ public class LocalFileStorage implements FileStorageClient {
 
     /**
      * 파일 삭제
+     * 
      * @param fileUrl 삭제할 파일 URL
      */
     @Override
@@ -83,5 +85,10 @@ public class LocalFileStorage implements FileStorageClient {
         }
         return filename.substring(filename.lastIndexOf("."));
     }
-}
 
+    @Override
+    public MultipartFile download(String fileUrl) {
+        // 로컬 환경에서는 S3 다운로드 불필요
+        throw new UnsupportedOperationException("로컬 환경에서는 S3 다운로드를 지원하지 않습니다.");
+    }
+}
