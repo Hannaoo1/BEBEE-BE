@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.annotation.ComponentScan;
 
-
+git
 @SpringBootApplication
 @ComponentScan(basePackages = "com.lgcns.bebee")
 @ConfigurationPropertiesScan(basePackages = "com.lgcns.bebee")
