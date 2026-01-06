@@ -4,6 +4,7 @@ import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
 import com.lgcns.bebee.payment.domain.entity.HoneyWallet;
 import com.lgcns.bebee.payment.domain.repository.HoneyWalletRepository;
+import com.lgcns.bebee.payment.domain.service.HoneyWalletService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,14 +18,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class GetHoneyBalanceUseCase implements UseCase<GetHoneyBalanceUseCase.Param, GetHoneyBalanceUseCase.Result> {
 
-    private final HoneyWalletRepository honeyWalletRepository;
+    private final HoneyWalletService honeyWalletService;
 
     @Override
     @Transactional
     public Result execute(Param param) {
-        Optional<HoneyWallet> wallet = honeyWalletRepository.findByMemberId(param.getMemberId());
-        Long balance = wallet.map(HoneyWallet::getBalance).orElse(0L);
-        Long currentHoney = balance / 100;
+        Long currentHoney = honeyWalletService.getCurrentHoney(param.getMemberId());
 
         return Result.from(currentHoney);
     }
