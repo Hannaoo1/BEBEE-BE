@@ -1,4 +1,4 @@
-package com.lgcns.bebee.common.data.domain;
+package com.lgcns.bebee.common.data.event;
 
 import java.time.LocalDateTime;
 
