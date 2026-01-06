@@ -2,12 +2,12 @@ package com.lgcns.bebee.match.application;
 
 import com.lgcns.bebee.common.exception.InvalidParamException;
 import com.lgcns.bebee.match.application.usecase.RefuseAgreementUseCase;
+import com.lgcns.bebee.match.common.exception.MatchErrors;
+import com.lgcns.bebee.match.common.exception.MatchException;
 import com.lgcns.bebee.match.domain.entity.Agreement;
 import com.lgcns.bebee.match.domain.entity.vo.AgreementStatus;
 import com.lgcns.bebee.match.domain.entity.vo.EngagementType;
 import com.lgcns.bebee.match.domain.service.AgreementReader;
-import com.lgcns.bebee.match.common.exception.MatchErrors;
-import com.lgcns.bebee.match.common.exception.MatchException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -39,11 +39,17 @@ class RefuseAgreementUseCaseTest {
 
     private Long memberId;
     private Long agreementId;
+    private Long postId;
+    private Long helperId;
+    private Long disabledId;
 
     @BeforeEach
     void setUp() {
         memberId = 101L;  // 도우미
         agreementId = 999888777666L;
+        postId = 1L;
+        helperId = 101L;
+        disabledId = 202L;
     }
 
     @Nested
@@ -174,11 +180,16 @@ class RefuseAgreementUseCaseTest {
 
     private Agreement createMockAgreement(Long agreementId, AgreementStatus status) throws Exception {
         Agreement agreement = Agreement.create(
+                postId,
+                helperId,
+                disabledId,
                 EngagementType.DAY,
                 false,
                 200,
                 200,
                 "서울특별시 강동구",
+                null,
+                null,
                 List.of(1L, 2L)
         );
 

@@ -1,6 +1,6 @@
 package com.lgcns.bebee.member.domain.entity;
 
-import com.lgcns.bebee.common.domain.BaseTimeEntity;
+import com.lgcns.bebee.common.data.domain.BaseTimeEntity;
 import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -17,7 +17,12 @@ public class HelpCategory extends BaseTimeEntity {
     @Tsid
     private Long helpCategoryId;
 
-    @Column(nullable = false, length = 30, unique = true)
-    private String name;
-}
+    @Column(name = "help_type", nullable = false, length = 30, unique = true)
+    private String helpType;
 
+    public static HelpCategory create(String helpType) {
+        HelpCategory helpCategory = new HelpCategory();
+        helpCategory.helpType = helpType;
+        return helpCategory;
+    }
+}

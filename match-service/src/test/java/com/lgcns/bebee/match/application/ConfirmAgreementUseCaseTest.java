@@ -2,14 +2,14 @@ package com.lgcns.bebee.match.application;
 
 import com.lgcns.bebee.common.exception.InvalidParamException;
 import com.lgcns.bebee.match.application.usecase.ConfirmAgreementUseCase;
+import com.lgcns.bebee.match.common.exception.MatchErrors;
+import com.lgcns.bebee.match.common.exception.MatchException;
 import com.lgcns.bebee.match.domain.entity.Agreement;
 import com.lgcns.bebee.match.domain.entity.Match;
 import com.lgcns.bebee.match.domain.entity.vo.AgreementStatus;
 import com.lgcns.bebee.match.domain.entity.vo.EngagementType;
 import com.lgcns.bebee.match.domain.repository.MatchRepository;
 import com.lgcns.bebee.match.domain.service.AgreementReader;
-import com.lgcns.bebee.match.common.exception.MatchErrors;
-import com.lgcns.bebee.match.common.exception.MatchException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -354,11 +354,16 @@ class ConfirmAgreementUseCaseTest {
 
     private Agreement createMockAgreement(Long agreementId, AgreementStatus status) throws Exception {
         Agreement agreement = Agreement.create(
+                postId,
+                helperId,
+                disabledId,
                 EngagementType.DAY,
                 false,
                 200,
                 200,
                 "서울특별시 강동구",
+                null,
+                null,
                 List.of(1L, 2L)
         );
 

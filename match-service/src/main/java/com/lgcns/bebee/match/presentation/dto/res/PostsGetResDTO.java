@@ -42,6 +42,7 @@ public record PostsGetResDTO(
                 .map(postDTO -> new PostResDTO(
                         String.valueOf(postDTO.getPostId()),
                         postDTO.getTitle(),
+                        postDTO.getIsCompleted(),
                         postDTO.getUnitHoney(),
                         postDTO.getTotalHoney(),
                         postDTO.getLegalDongName(),
@@ -71,6 +72,12 @@ public record PostsGetResDTO(
             String title,
 
             @Schema(
+                    description = "매칭 완료 여부",
+                    example = "true"
+            )
+            Boolean isMatched,
+
+            @Schema(
                     description = "단위 꿀 금액 (회당 보상) - 단위: 원",
                     example = "5000"
             )
@@ -89,10 +96,10 @@ public record PostsGetResDTO(
             String legalDongName,
 
             @Schema(
-                    description = "도움 카테고리 이름 리스트",
-                    example = "[\"외출동행\", \"방문간호\"]"
+                    description = "도움 카테고리 id 리스트",
+                    example = "[1,3,5]"
             )
-            List<String> helpCategories,
+            List<Long> helpCategories,
 
             @Schema(
                     description = "도움 타입 - DAY(일회성) 또는 TERM(정기적)",

@@ -1,6 +1,6 @@
 package com.lgcns.bebee.match.domain.entity;
 
-import com.lgcns.bebee.common.domain.BaseTimeEntity;
+import com.lgcns.bebee.common.data.domain.BaseTimeEntity;
 import com.lgcns.bebee.match.domain.entity.vo.EngagementType;
 import com.lgcns.bebee.match.domain.entity.vo.PostStatus;
 import io.hypersistence.utils.hibernate.id.Tsid;
@@ -45,14 +45,14 @@ public class Post extends BaseTimeEntity {
     @Column(nullable = false)
     private PostStatus status;
 
-    @Column(nullable = false, length = 10)
+    @Column(length = 10)
     private String legalDongCode;
 
-    @Column(nullable = false, precision = 10, scale = 7)
-    private BigDecimal latitude;
+    @Column(nullable = false)
+    private Double latitude;
 
-    @Column(nullable = false, precision = 10, scale = 7)
-    private BigDecimal longitude;
+    @Column(nullable = false)
+    private Double longitude;
 
     @Column(nullable = true)
     private int applicantCount;
@@ -61,11 +61,11 @@ public class Post extends BaseTimeEntity {
     private String content;
 
     @BatchSize(size = 100)
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostHelpCategory> helpCategories = new ArrayList<>();
 
     @BatchSize(size = 100)
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post",  cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostImage> images = new ArrayList<>();
 
     @OneToOne(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -74,4 +74,50 @@ public class Post extends BaseTimeEntity {
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostSchedule> schedules = new ArrayList<>();
+
+    public static Post create(
+            Long memberId,
+            EngagementType type,
+            List<PostImage> postImages,
+            String title,
+            List<PostHelpCategory> helpCategories,
+            String content,
+            PostPeriod period,
+            List<PostSchedule> schedules,
+            Integer unitHoney,
+            Integer totalHoney,
+            String region,
+            Double latitude,
+            Double longitude
+    ) {
+        Post post = new Post();
+        post.memberId = memberId;
+        post.type = type;
+        post.images = postImages;
+        post.title = title;
+        post.helpCategories = helpCategories;
+        post.content = content;
+        post.unitHoney = unitHoney;
+        post.totalHoney = totalHoney;
+        post.region = region;
+        post.latitude = latitude;
+        post.longitude = longitude;
+
+        post.period =  period;
+        post.schedules = schedules;
+
+        post.status = PostStatus.NON_MATCHED;
+        post.applicantCount = 0;
+
+        postImages.forEach(image -> image.assignToPost(post));
+        helpCategories.forEach(helpCategory -> helpCategory.assignToPost(post));
+        period.assignToPost(post);
+        schedules.forEach(schedule -> schedule.assignToPost(post));
+
+        return post;
+    }
+
+    public void updateLegalDongCode(String legalDongCode){
+        this.legalDongCode = legalDongCode;
+    }
 }

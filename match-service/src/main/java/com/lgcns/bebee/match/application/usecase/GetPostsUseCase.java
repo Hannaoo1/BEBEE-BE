@@ -39,10 +39,10 @@ public class GetPostsUseCase implements UseCase<GetPostsUseCase.Param, GetPostsU
                 .map(DayOfWeek::valueOf)
                 .toList();
 
-        // isMatched를 PostStatus로 변환
-        PostStatus postStatus = null;
+        // isMatched를 PostStatus 리스트로 변환
+        List<PostStatus> postStatuses = null;
         if (params.isMatched != null) {
-            postStatus = PostStatus.NON_MATCHED;
+            postStatuses = List.of(PostStatus.NON_MATCHED, PostStatus.PROCEEDING);
         }
 
         // lastPostId가 null이면 Long.MAX_VALUE로 설정 (최초 요청)
@@ -55,9 +55,9 @@ public class GetPostsUseCase implements UseCase<GetPostsUseCase.Param, GetPostsU
                 gender,
                 params.minHoney,
                 params.maxHoney,
-                params.disabilityCategoryId,
+                params.disabilityCategoryIds,
                 daysOfWeek,
-                postStatus,
+                postStatuses,
                 cursorId,
                 params.count + 1  // 다음 페이지 존재 여부 확인을 위해 +1
         );
@@ -86,7 +86,7 @@ public class GetPostsUseCase implements UseCase<GetPostsUseCase.Param, GetPostsU
         private final String gender;
         private final Integer minHoney;
         private final Integer maxHoney;
-        private final Long disabilityCategoryId;
+        private final List<Long> disabilityCategoryIds;
         private final List<String> days;
         private final Long lastPostId;
         private final Integer count;
@@ -112,19 +112,21 @@ public class GetPostsUseCase implements UseCase<GetPostsUseCase.Param, GetPostsU
         public static class PostDTO {
             private final Long postId;
             private final String title;
+            private final Boolean isCompleted;
             private final Integer unitHoney;
             private final Integer totalHoney;
             private final String legalDongName;
-            private final List<String> helpCategories;
+            private final List<Long> helpCategories;
             private final String helpType;
             private final String imageUrl;
             private final LocalDate date;  // DAY 타입일 때만 값 있음
             private final List<String> dayOfWeeks;
 
             public static PostDTO from(Post post) {
-                List<String> helpCategoryNames = post.getHelpCategories().stream()
+                Boolean isCompleted = post.getStatus() == PostStatus.MATCHED;
+
+                List<Long> helpCategoryNames = post.getHelpCategories().stream()
                         .map(postHelpCategory -> postHelpCategory.getId().getHelpCategoryId())
-                        .map(HelpCategoryType::getNameById)
                         .collect(Collectors.toList());
 
                 String imageUrl = post.getImages().isEmpty()
@@ -146,6 +148,7 @@ public class GetPostsUseCase implements UseCase<GetPostsUseCase.Param, GetPostsU
                 return new PostDTO(
                         post.getId(),
                         post.getTitle(),
+                        isCompleted,
                         post.getUnitHoney(),
                         post.getTotalHoney(),
                         post.getRegion(),

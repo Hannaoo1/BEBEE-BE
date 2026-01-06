@@ -26,6 +26,11 @@ spring:
       idle-timeout: 30000
       max-lifetime: 1800000
 
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
   # JPA (Java Persistence API) 설정
   jpa:
     # Hibernate 설정
@@ -78,10 +83,24 @@ spring:
     # clean-disabled: true
 
 jwt:
-  secret: ${JWT_SECRET}
+  secret: ${JWT_SECRET:IFcjMn4AY1Dj/liTDpn1/Wvymrwyl+2BWvTFWDY/ke2JYBItYr+yP1u8Zxi2c7Mv}
   issuer: ${JWT_ISSUER:bebee}
-  access-token-expires-time-in: ${JWT_ACCESS_TOKEN_EXPIRES_IN}
-  refresh-token-expires-time-in: ${JWT_REFRESH_TOKEN_EXPIRES_IN}
+  access-token-expires-time-in: ${JWT_ACCESS_TOKEN_EXPIRES_IN:3600}
+  refresh-token-expires-time-in: ${JWT_REFRESH_TOKEN_EXPIRES_IN:604800}
+
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+
+  api:
+    host: "${SPRINGDOC_API_HOST:}"
+    desc: "${SPRINGDOC_API_DESC:dev server}"
 
 # CORS (Cross-Origin Resource Sharing) 설정
 cors:
@@ -92,6 +111,11 @@ cors:
   allow-credentials: ${CORS_ALLOW_CREDENTIALS:true}
   max-age: ${CORS_MAX_AGE:3600}
 
+# OCR 서비스 설정
+ocr:
+  base-url: ${OCR_SERVICE_URL:http://localhost:8086}
+  timeout: ${OCR_TIMEOUT:90000}
+
 # 로깅 설정
 logging:
   level:
@@ -101,7 +125,7 @@ logging:
     p6spy: INFO
 
     # Hibernate 파라미터 바인딩 로그 레벨 (trace: 모든 파라미터 값 출력)
-    org.hibernate.type: trace
+    org.hibernate.type: INFO
 
     com.lgcns.bebee.member: ${LOGGING_LEVEL_SERVICE:info}
 

@@ -5,11 +5,16 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
+@Table(name = "member_sync")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberSync {
@@ -29,6 +34,9 @@ public class MemberSync {
     @Column(nullable = false)
     private Role role;
 
+    @Column(nullable = false)
+    private LocalDate birthDate;
+
     @Column(nullable = false, precision = 10, scale = 7)
     private BigDecimal latitude;
 
@@ -38,8 +46,8 @@ public class MemberSync {
     @Column(length = 512)
     private String profileImageUrl;
 
-    @Column(nullable = false, precision = 5, scale = 2)
-    private BigDecimal sweetness;
+    @Column
+    private String addressRoad;
 
     @Column(nullable = false)
     private String legalDongCode;
@@ -49,4 +57,8 @@ public class MemberSync {
 
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    @BatchSize(size = 100)
+    @OneToMany(mappedBy = "memberSync", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberDisabilityCategorySync> disabilityCategories = new ArrayList<>();
 }

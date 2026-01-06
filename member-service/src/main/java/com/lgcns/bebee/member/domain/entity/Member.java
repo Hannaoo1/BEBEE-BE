@@ -1,6 +1,6 @@
 package com.lgcns.bebee.member.domain.entity;
 
-import com.lgcns.bebee.common.domain.BaseTimeEntity;
+import com.lgcns.bebee.common.data.domain.BaseTimeEntity;
 import com.lgcns.bebee.member.core.exception.MemberErrors;
 import com.lgcns.bebee.member.domain.entity.vo.Gender;
 import com.lgcns.bebee.member.domain.entity.vo.MemberStatus;
@@ -21,7 +21,8 @@ import java.time.LocalDate;
 public class Member extends BaseTimeEntity {
 
     @Id
-    @Tsid @Column(name = "member_id")
+    @Tsid
+    @Column(name = "member_id")
     private Long id;
 
     @Column(nullable = false, length = 30, unique = true)
@@ -76,17 +77,17 @@ public class Member extends BaseTimeEntity {
     private BigDecimal sweetness = BigDecimal.valueOf(40.00);
 
     public static Member create(String email,
-                                String encodedPassword,
-                                String name,
-                                String nickname,
-                                LocalDate birthDate,
-                                String gender,
-                                String phoneNumber,
-                                String role,
-                                String addressRoad,
-                                BigDecimal latitude,
-                                BigDecimal longitude,
-                                String districtCode) {
+            String encodedPassword,
+            String name,
+            String nickname,
+            LocalDate birthDate,
+            String gender,
+            String phoneNumber,
+            String role,
+            String addressRoad,
+            BigDecimal latitude,
+            BigDecimal longitude,
+            String districtCode) {
         Member member = new Member();
         member.email = email;
         member.password = encodedPassword;
@@ -109,7 +110,8 @@ public class Member extends BaseTimeEntity {
      * 입력된 비밀번호가 회원의 비밀번호와 일치하는지 검증합니다.
      *
      * @param encodedPassword 암호화된 입력 비밀번호
-     * @throws com.lgcns.bebee.member.core.exception.MemberException 비밀번호가 일치하지 않는 경우
+     * @throws com.lgcns.bebee.member.core.exception.MemberException 비밀번호가 일치하지 않는
+     *                                                               경우
      */
     public void validatePassword(String encodedPassword) {
         if (!encodedPassword.equals(this.password)) {
@@ -127,8 +129,8 @@ public class Member extends BaseTimeEntity {
         switch (this.status) {
             case REJECTED -> throw MemberErrors.MEMBER_STATUS_REJECTED.toException();
             case WITHDRAWN, WITHDRAW_APPROVAL -> throw MemberErrors.MEMBER_STATUS_WITHDRAWN.toException();
-            case ACTIVE, PENDING_APPROVAL -> { /* 정상 */ }
+            case ACTIVE, PENDING_APPROVAL -> {
+                /* 정상 */ }
         }
     }
 }
-

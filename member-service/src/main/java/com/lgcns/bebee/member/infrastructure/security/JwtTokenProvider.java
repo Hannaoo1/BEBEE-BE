@@ -35,7 +35,7 @@ public class JwtTokenProvider implements TokenProvider {
 
     public TokenInfo reissueTokens(Member member, String refreshToken) {
         Claims claims = parseClaims(refreshToken);
-        if (!claims.getSubject().equals(member.getEmail())) {
+        if (!claims.getSubject().equals(String.valueOf(member.getId()))) {
             throw new IllegalArgumentException("Invalid refresh token owner");
         }
         return generateTokens(member);
@@ -43,6 +43,7 @@ public class JwtTokenProvider implements TokenProvider {
 
     public Claims parseClaims(String token) {
         return Jwts.parserBuilder()
+                .requireIssuer(jwtProperties.issuer())
                 .setSigningKey(secretKey)
                 .build()
                 .parseClaimsJws(token)
@@ -52,7 +53,9 @@ public class JwtTokenProvider implements TokenProvider {
     private String createToken(Member member, Instant issuedAt, long expiresTime) {
         Instant expiry = issuedAt.plusSeconds(expiresTime);
         return Jwts.builder()
+                .setIssuer("bebee")
                 .setSubject(String.valueOf(member.getId()))
+                .setIssuer(jwtProperties.issuer())
                 .claim("role", member.getRole().name())
                 .setIssuedAt(Date.from(issuedAt))
                 .setExpiration(Date.from(expiry))
@@ -60,4 +63,3 @@ public class JwtTokenProvider implements TokenProvider {
                 .compact();
     }
 }
-

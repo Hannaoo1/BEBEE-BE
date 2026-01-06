@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: gateway
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+  config:
+    import: optional:file:.env[.properties]
+
+jwt:
+  secret: ${JWT_SECRET}
+  issuer: ${JWT_ISSUER:bebee}
+  access-token-expires-time-in: ${JWT_ACCESS_TOKEN_EXPIRES_IN:3600}
+  refresh-token-expires-time-in: ${JWT_REFRESH_TOKEN_EXPIRES_IN:604800}
+
+gateway:
+  auth:
+    exclude-paths:
+      - /auth/login
+      - /auth/signup
+      - /auth/check-*
+      - /documents/**
+      - /swagger-ui/**
+      - /v3/api-docs/**
+      - /actuator/**
+
+# Swagger/OpenAPI 설정
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    urls:
+      - name: Member Service
+        url: /member/api-docs
+      - name: Match Service
+        url: /match/api-docs
+      - name: Chat Service
+        url: /chat/api-docs
+      - name: Payment Service
+        url: /payment/api-docs
+      - name: Notification Service
+        url: /notification/api-docs
+      - name: File Service
+        url: /file/api-docs

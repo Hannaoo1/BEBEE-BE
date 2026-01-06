@@ -1,6 +1,6 @@
 package com.lgcns.bebee.member.domain.entity;
 
-import com.lgcns.bebee.common.domain.BaseTimeEntity;
+import com.lgcns.bebee.common.data.domain.BaseTimeEntity;
 import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -29,6 +29,18 @@ public class Document extends BaseTimeEntity {
     @Column(nullable = false, length = 255)
     private String description;
 
-    private Long memberId;
-}
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
+    public static Document create(String targetRole, String docCode, String docNameKo, String description,
+            Member member) {
+        Document document = new Document();
+        document.targetRole = targetRole;
+        document.docCode = docCode;
+        document.docNameKo = docNameKo;
+        document.description = description;
+        document.member = member;
+        return document;
+    }
+}

@@ -1,6 +1,6 @@
 package com.lgcns.bebee.match.domain.entity;
 
-import com.lgcns.bebee.common.domain.BaseTimeEntity;
+import com.lgcns.bebee.common.data.domain.BaseTimeEntity;
 import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -31,4 +31,16 @@ public class PostSchedule extends BaseTimeEntity {
 
     @Column(nullable = false)
     private LocalTime endTime;
+
+    public static PostSchedule create(DayOfWeek dayOfWeek, LocalTime startTime, LocalTime endTime) {
+        PostSchedule schedule = new PostSchedule();
+        schedule.dayOfWeek = dayOfWeek;
+        schedule.startTime = startTime;
+        schedule.endTime = endTime;
+        return schedule;
+    }
+
+    protected void assignToPost(Post post) {
+        this.post = post;
+    }
 }

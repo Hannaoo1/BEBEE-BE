@@ -23,7 +23,8 @@ public class QueryDSLChatroomRepository{
                 .leftJoin(chatroom.member2).fetchJoin()
                 .where(
                         chatroomIdEq(condition.chatroomId()),
-                        memberIdsEq(condition.member1Id(), condition.member2Id())
+                        memberIdsEq(condition.member1Id(), condition.member2Id()),
+                        postIdEq(condition.postId())
                 )
                 .fetchOne();
 
@@ -46,5 +47,16 @@ public class QueryDSLChatroomRepository{
         }
         return chatroom.member1.id.eq(member1Id)
                 .and(chatroom.member2.id.eq(member2Id));
+    }
+
+    /**
+     * postId 조건
+     */
+    private BooleanExpression postIdEq(Long postId) {
+        if (postId == null) {
+            return null;
+        }
+
+        return chatroom.postId.eq(postId);
     }
 }

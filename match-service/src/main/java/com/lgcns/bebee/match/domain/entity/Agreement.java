@@ -1,17 +1,24 @@
 package com.lgcns.bebee.match.domain.entity;
 
-import com.lgcns.bebee.common.domain.BaseTimeEntity;
+import com.lgcns.bebee.common.data.domain.BaseTimeEntity;
 import com.lgcns.bebee.match.domain.entity.vo.AgreementStatus;
 import com.lgcns.bebee.match.domain.entity.vo.EngagementType;
+import com.lgcns.bebee.match.presentation.dto.AgreementScheduleDTO;
+import com.lgcns.bebee.match.presentation.dto.DayEngagementTimeDTO;
+import com.lgcns.bebee.match.presentation.dto.TermEngagementTimeDTO;
 import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.lgcns.bebee.match.common.exception.MatchErrors.ALREADY_CONFIRMED_AGREEMENT;
 
@@ -23,6 +30,15 @@ public class Agreement extends BaseTimeEntity {
     @Tsid
     @Column(name = "agreement_id")
     private Long id;
+
+    @Column(nullable = false)
+    private Long postId;
+
+    @Column(nullable = false)
+    private Long disabledId;
+
+    @Column(nullable = false)
+    private Long helperId;
 
     @Column(nullable = false)
     private Integer unitHoney;
@@ -50,23 +66,30 @@ public class Agreement extends BaseTimeEntity {
     private AgreementStatus status = AgreementStatus.BEFORE;
 
     @OneToMany(mappedBy = "agreement", cascade = CascadeType.ALL, orphanRemoval = true)
+    @org.hibernate.annotations.BatchSize(size = 10)
     private List<AgreementHelpCategory> helpCategories= new ArrayList<>();
 
     @OneToOne(mappedBy = "agreement", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private AgreementEngagementTimeDay day;
+    private AgreementPeriod period;
 
-    @OneToOne(mappedBy = "agreement", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private AgreementEngagementTimeTerm term;
+    @OneToMany(mappedBy = "agreement", cascade = CascadeType.ALL, orphanRemoval = true)
+    @org.hibernate.annotations.BatchSize(size = 10)
+    private List<AgreementSchedule> schedules = new ArrayList<>();
 
     @Column
     private Boolean isVolunteer;
 
     public static Agreement create(
+            Long postId,
+            Long disabledId,
+            Long helperId,
             EngagementType type,
             Boolean isVolunteer,
             Integer unitHoney,
             Integer totalHoney,
             String region,
+            DayEngagementTimeDTO dayTime,
+            TermEngagementTimeDTO termTime,
             List<Long> helpCategoryIds
     ) {
         if (isVolunteer) {
@@ -75,6 +98,9 @@ public class Agreement extends BaseTimeEntity {
         }
 
         Agreement agreement = new Agreement();
+        agreement.postId = postId;
+        agreement.disabledId = disabledId;
+        agreement.helperId = helperId;
         agreement.type = type;
         agreement.isVolunteer = isVolunteer;
         agreement.unitHoney = unitHoney;
@@ -84,6 +110,43 @@ public class Agreement extends BaseTimeEntity {
         agreement.status = AgreementStatus.BEFORE;
         agreement.isDayComplete = Boolean.FALSE;
         agreement.isTermComplete = Boolean.FALSE;
+
+        if (type == EngagementType.DAY && dayTime != null) {
+            // DAY 타입: period 생성 및 주입
+            AgreementPeriod period = AgreementPeriod.create(
+                    dayTime.getDate(),
+                    dayTime.getDate()
+            );
+            period.assignToAgreement(agreement);
+            agreement.period = period;
+            
+            AgreementScheduleDTO scheduleDTO = dayTime.getSchedule();
+            AgreementSchedule schedule = AgreementSchedule.create(
+                    scheduleDTO.getDayOfWeek(),
+                    scheduleDTO.getStartTime(),
+                    scheduleDTO.getEndTime()
+            );
+            schedule.assignToAgreement(agreement);
+            agreement.schedules.add(schedule);
+        } else if (type == EngagementType.TERM && termTime != null) {
+            AgreementPeriod period = AgreementPeriod.create(
+                    termTime.getStartDate(),
+                    termTime.getEndDate()
+            );
+            period.assignToAgreement(agreement);
+            agreement.period = period;
+
+            // TERM 타입: schedules 생성 및 주입
+            termTime.getSchedules().forEach(scheduleDTO -> {
+                AgreementSchedule schedule = AgreementSchedule.create(
+                        scheduleDTO.getDayOfWeek(),
+                        scheduleDTO.getStartTime(),
+                        scheduleDTO.getEndTime()
+                );
+                schedule.assignToAgreement(agreement);
+                agreement.schedules.add(schedule);
+            });
+        }
 
         helpCategoryIds.forEach(helpCategoryId -> {
             String categoryName = com.lgcns.bebee.match.domain.entity.vo.HelpCategoryType.getNameById(helpCategoryId);
@@ -106,5 +169,49 @@ public class Agreement extends BaseTimeEntity {
             throw ALREADY_CONFIRMED_AGREEMENT.toException();
         }
         this.status = AgreementStatus.CONFIRMED;
+    }
+
+    /**
+     * 주어진 기간 내에서 이 Agreement의 활동이 있는 날짜들을 반환
+     * <p>
+     * DAY 타입: 활동 날짜 하나만 반환 (범위 내에 있는 경우)
+     * TERM 타입: 기간 내 활동 요일에 해당하는 모든 날짜 반환
+     *
+     * @param rangeStart 조회 범위 시작일
+     * @param rangeEnd 조회 범위 종료일
+     * @return 활동이 있는 날짜들의 Set
+     */
+    public Set<LocalDate> getActiveDatesInRange(LocalDate rangeStart, LocalDate rangeEnd) {
+        Set<LocalDate> activeDates = new HashSet<>();
+
+        if (this.type == EngagementType.DAY) {
+            // DAY: 활동 날짜 하나만
+            LocalDate activeDate = this.period.getStartDate();
+
+            if (!activeDate.isBefore(rangeStart) && !activeDate.isAfter(rangeEnd)) {
+                activeDates.add(activeDate);
+            }
+        } else {
+            // TERM: 기간 내 활동 요일에 해당하는 모든 날짜
+            LocalDate periodStart = this.period.getStartDate();
+            LocalDate periodEnd = this.period.getEndDate();
+
+            LocalDate calcStart = periodStart.isBefore(rangeStart) ? rangeStart : periodStart;
+            LocalDate calcEnd = periodEnd.isAfter(rangeEnd) ? rangeEnd : periodEnd;
+
+            Set<DayOfWeek> activityDays = this.schedules.stream()
+                    .map(AgreementSchedule::getDayOfWeek)
+                    .collect(Collectors.toSet());
+
+            LocalDate current = calcStart;
+            while (!current.isAfter(calcEnd)) {
+                if (activityDays.contains(current.getDayOfWeek())) {
+                    activeDates.add(current);
+                }
+                current = current.plusDays(1);
+            }
+        }
+
+        return activeDates;
     }
 }

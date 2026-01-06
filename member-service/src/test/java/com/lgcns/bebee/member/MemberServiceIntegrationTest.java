@@ -52,7 +52,7 @@ class MemberServiceIntegrationTest {
         setField(signUpRequest, "birthDate", LocalDate.of(1990, 1, 1));
         setField(signUpRequest, "gender", "MALE");
         setField(signUpRequest, "phoneNumber", "010-1234-5678");
-        setField(signUpRequest, "role", "USER");
+        setField(signUpRequest, "role", "DISABLED");
         setField(signUpRequest, "addressRoad", "서울시 강남구 테헤란로 123");
         setField(signUpRequest, "latitude", 37.123456);
         setField(signUpRequest, "longitude", 127.123456);

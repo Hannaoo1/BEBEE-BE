@@ -2,6 +2,7 @@ package com.lgcns.bebee.chat.infrastructure.jpa;
 
 import com.lgcns.bebee.chat.domain.entity.Chatroom;
 import com.lgcns.bebee.chat.domain.entity.MemberSync;
+import com.lgcns.bebee.chat.domain.entity.sync.HelpCategorySync;
 import com.lgcns.bebee.chat.domain.repository.ChatroomRepository;
 import com.lgcns.bebee.chat.infrastructure.jpa.dto.ChatroomSearchCond;
 import lombok.RequiredArgsConstructor;
@@ -18,11 +19,11 @@ public class ChatroomRepositoryAdapter implements ChatroomRepository {
     private final QueryDSLChatroomRepository queryDSLChatroomRepository;
 
     @Override
-    public Chatroom save(MemberSync member1, MemberSync member2){
+    public Chatroom save(MemberSync member1, MemberSync member2, Long postId, String postTitle, List<HelpCategorySync> helpCategories){
         MemberSync normalizedMember1 = member1.getId() < member2.getId() ? member1 : member2;
         MemberSync normalizedMember2 = member1.getId() < member2.getId() ? member2 : member1;
 
-        Chatroom chatroom = Chatroom.create(normalizedMember1, normalizedMember2);
+        Chatroom chatroom = Chatroom.create(normalizedMember1, normalizedMember2, postId, postTitle, helpCategories);
 
         return chatroomJpaRepository.save(chatroom);
     }
@@ -47,11 +48,11 @@ public class ChatroomRepositoryAdapter implements ChatroomRepository {
     }
 
     @Override
-    public Optional<Chatroom> findChatroomWithMembers(MemberSync member1, MemberSync member2) {
+    public Optional<Chatroom> findChatroomWithMembers(MemberSync member1, MemberSync member2, Long postId) {
         MemberSync normalizedMember1 = member1.getId() < member2.getId() ? member1 : member2;
         MemberSync normalizedMember2 = member1.getId() < member2.getId() ? member2 : member1;
 
-        ChatroomSearchCond cond = ChatroomSearchCond.of(normalizedMember1, normalizedMember2);
+        ChatroomSearchCond cond = ChatroomSearchCond.of(normalizedMember1, normalizedMember2, postId);
         return queryDSLChatroomRepository.findChatroomWithMembers(cond);
     }
 
