@@ -1,4 +1,4 @@
-package com.lgcns.bebee.match.infrastructure.aws;
+package com.lgcns.bebee.match.infrastructure.event.aws;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@ConditionalOnProperty(name = "event", havingValue = "aws")
 @RequiredArgsConstructor
 public class SnsEventPublisher implements EventPublisher {
     private final SnsTemplate snsTemplate;

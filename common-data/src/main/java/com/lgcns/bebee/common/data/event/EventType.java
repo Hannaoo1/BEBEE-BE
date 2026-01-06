@@ -8,7 +8,9 @@ import java.util.Arrays;
 public enum EventType {
     AGREEMENT_CREATED("AgreementCreatedEvent", AgreementCreatedEvent.class),
     AGREEMENT_CONFIRMED("AgreementConfirmedEvent", AgreementConfirmedEvent.class),
-    AGREEMENT_REFUSED("AgreementRefusedEvent", AgreementRefusedEvent.class)
+    AGREEMENT_REFUSED("AgreementRefusedEvent", AgreementRefusedEvent.class),
+
+    POST_CREATED("PostCreatedEvent", PostCreatedEvent.class)
     ;
 
     private final String eventName;

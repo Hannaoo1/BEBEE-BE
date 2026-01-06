@@ -1,4 +1,4 @@
-package com.lgcns.bebee.chat.infrastructure.event;
+package com.lgcns.bebee.match.infrastructure.event;
 
 import com.lgcns.bebee.common.data.event.DomainEvent;
 import com.lgcns.bebee.common.data.event.EventHandler;
