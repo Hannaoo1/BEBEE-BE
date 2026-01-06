@@ -12,13 +12,13 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReviewCreateResDTO {
 
-    @Schema(description = "생성된 리뷰 ID", example = "456")
-    private String reviewId;
+    @Schema(description = "응답 메시지", example = "리뷰가 작성되었습니다")
+    private String message;
 
     //Result → DTO 변환
     public static ReviewCreateResDTO from(CreateReviewUseCase.Result result) {
         return new ReviewCreateResDTO(
-                String.valueOf(result.getReviewId())
+                String.valueOf(result.getMessage())
         );
     }
 }

@@ -39,6 +39,8 @@ public class GetReviewKeywordsListUseCase implements UseCase<GetReviewKeywordsLi
         // ReviewDirection 결정
         ReviewDirection direction = reviewManager.determineReviewDirection(member);
 
+        System.out.println("=== DEBUG: direction = " + direction);
+
         // 키워드 목록 조회
         List<KeywordDTO> keywords = Keyword.getByDirection(direction)
                 .stream()
