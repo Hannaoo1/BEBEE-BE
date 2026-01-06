@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "Review", description = "리뷰 API")
 public interface ReviewSwagger {
@@ -19,58 +18,37 @@ public interface ReviewSwagger {
     @Operation(
             summary = "리뷰 키워드 목록 조회",
             description = """
-            리뷰 작성 화면에 필요한 정보를 조회합니다.
+            사용자 역할에 따른 리뷰 키워드 목록을 조회합니다.
             
-            **제공 정보:**
-            - 게시글 제목
-            - 도움 카테고리 목록 (탭)
-            - 상대방 닉네임
-            - 리뷰 방향에 맞는 키워드 목록
+            **키워드 범위:**
+            - 장애인: 키워드 1~13 (도우미 평가용)
+            - 도우미: 키워드 14~24 (장애인 평가용)
             
-            **작성자에 따른 키워드:**
-            - 장애인 → 도우미: 키워드 1~12
-            - 도우미 → 장애인: 키워드 13~24
-            
-            **제약사항:**
-            - 활동이 완료(COMPLETED) 상태여야 함
-            - 참여자만 조회 가능
+            회원 토큰에서 역할을 자동으로 판단하여 적절한 키워드 목록을 반환합니다.
             """
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "키워드 목록 조회 성공"),
-            @ApiResponse(responseCode = "400", description = "활동 미완료 (ENGAGEMENT_NOT_COMPLETED)"),
-            @ApiResponse(responseCode = "403", description = "권한 없음 - 활동 참여자가 아님 (NOT_ENGAGEMENT_MEMBER)"),
-            @ApiResponse(responseCode = "404", description = "활동을 찾을 수 없음 (ENGAGEMENT_NOT_FOUND)")
+            @ApiResponse(responseCode = "200", description = "키워드 목록 조회 성공")
     })
     ResponseEntity<ReviewKeywordResDTO> getReviewKeywordsList(
-            @Parameter(hidden = true) @CurrentMember Long currentMemberId,
-
-            @Parameter(description = "활동 ID", example = "123", required = true)
-            @RequestParam String engagementId
+            @Parameter(hidden = true) @CurrentMember Long currentMemberId
     );
 
     @Operation(
             summary = "리뷰 작성",
             description = """
-            활동 완료 후 키워드 선택식 리뷰를 작성합니다.
+            키워드 선택식 리뷰를 작성합니다.
             
-            **흐름:**
-            1. 활동 완료 확인 (COMPLETED)
-            2. 중복 리뷰 확인
-            3. 참여자 확인
-            4. 리뷰 방향 결정 (DISABLED_TO_HELPER / HELPER_TO_DISABLED)
-            5. 키워드 검증 (유효성 + 방향 일치)
-            6. 리뷰 저장
-            
-            **제약사항:**
-            - 활동이 완료(COMPLETED) 상태여야 함
-            - 한 활동당 1개 리뷰만 작성 가능
-            - 최소 1개 이상의 키워드 선택 필수
-            - 선택한 키워드는 리뷰 방향과 일치해야 함
+            **요청 정보:**
+            - revieweeId: 리뷰 대상자 ID (상대방 회원 ID)
+            - keywordIds: 선택한 키워드 ID 목록 (최소 1개)
             
             **키워드 범위:**
             - 장애인 → 도우미: 1~13
             - 도우미 → 장애인: 14~24
+            
+            **동작 방식:**
+            회원 토큰에서 작성자 역할을 자동으로 판단하여 리뷰를 생성합니다.
             """
     )
     @ApiResponses({
@@ -80,29 +58,11 @@ public interface ReviewSwagger {
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = """
-                잘못된 요청
-                - 활동이 완료되지 않음 (ENGAGEMENT_NOT_COMPLETED)
-                - 유효하지 않은 키워드 (INVALID_KEYWORD)
-                - 키워드 방향 불일치 (KEYWORD_DIRECTION_MISMATCH)
-                """
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "권한 없음 - 활동 참여자가 아님 (NOT_ENGAGEMENT_MEMBER)"
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "활동을 찾을 수 없음 (ENGAGEMENT_NOT_FOUND)"
-            ),
-            @ApiResponse(
-                    responseCode = "409",
-                    description = "중복 - 이미 작성한 리뷰 (ALREADY_REVIEWED)"
+                    description = "잘못된 요청 (키워드 오류)"
             )
     })
     ResponseEntity<ReviewCreateResDTO> createReview(
             @Parameter(hidden = true) @CurrentMember Long currentMemberId,
-
             @RequestBody ReviewCreateReqDTO reqDTO
     );
 }
