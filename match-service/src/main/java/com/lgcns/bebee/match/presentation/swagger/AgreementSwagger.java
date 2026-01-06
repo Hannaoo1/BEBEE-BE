@@ -1,5 +1,6 @@
 package com.lgcns.bebee.match.presentation.swagger;
 
+import com.lgcns.bebee.common.annotation.CurrentMember;
 import com.lgcns.bebee.match.presentation.dto.req.AgreementCreateReqDTO;
 import com.lgcns.bebee.match.presentation.dto.req.AgreementRefuseReqDTO;
 import com.lgcns.bebee.match.presentation.dto.req.AgreementConfirmReqDTO;
@@ -45,6 +46,9 @@ public interface AgreementSwagger {
             )
     })
     ResponseEntity<AgreementCreateResDTO> createAgreement(
+            @Parameter(hidden = true)
+            @CurrentMember Long currentMemberId,
+
             @RequestBody(
                     required = true,
                     content = @Content(
@@ -59,9 +63,8 @@ public interface AgreementSwagger {
                                         """,
                                         value = """
                                                 {
-                                                    "postId": 404,
-                                                	"helperId": 101,
-                                                    "disabledId": 202,
+                                                    "postId": 1001,
+                                                	"helperId": 700,
                                                     "type": "DAY",
                                                     "isVolunteer": false,
                                                     "helpCategoryIds": [1, 2],
@@ -75,7 +78,8 @@ public interface AgreementSwagger {
                                                             "startTime": "10:00:00",
                                                             "endTime": "12:00:00"
                                                         }
-                                                    }
+                                                    },
+                                                    "chatroomId": "1"
                                                 }
                                                 """
                                 ),
@@ -87,9 +91,9 @@ public interface AgreementSwagger {
                                             """,
                                             value = """
                                                     {
-                                                         "postId": 505,
-                                                     	"helperId": 101,
-                                                         "disabledId": 202,
+                                                         "postId": "1001",
+                                                     	 "helperId": "700",
+                                                         "disabledId": "100",
                                                          "type": "TERM",
                                                          "isVolunteer": false,
                                                          "helpCategoryIds": [7],
@@ -111,7 +115,8 @@ public interface AgreementSwagger {
                                                                      "endTime": "16:00:00"
                                                                  }
                                                              ]
-                                                         }
+                                                         },
+                                                         "chatroomId": "1"
                                                      }
                                                 """
                                     )
@@ -133,6 +138,9 @@ public interface AgreementSwagger {
             )
     })
     ResponseEntity<Void> refuseAgreement(
+            @Parameter(hidden = true)
+            @CurrentMember Long currentMemberId,
+
             @Parameter(
                     description = "거절할 매칭 확인서 ID",
                     required = true,
@@ -150,7 +158,8 @@ public interface AgreementSwagger {
                                         name = "매칭 확인서 거절 요청 예시",
                                         value = """
                                                 {
-                                                  "helperId": 101,
+                                                  "disabledId":"100",
+                                                  "chatroomId":"1"
                                                 }
                                                 """
                                 )
@@ -190,6 +199,9 @@ public interface AgreementSwagger {
             )
     })
     ResponseEntity<AgreementConfirmResDTO> confirmAgreement(
+            @Parameter(hidden = true)
+            @CurrentMember Long currentMemberId,
+
             @Parameter(
                     description = "수락할 매칭 확인서 ID",
                     required = true,
@@ -207,11 +219,10 @@ public interface AgreementSwagger {
                                         name = "매칭 확인서 수락 예시",
                                         value = """
                                                 {
-                                                	"helperId": 101,
-                                                    "disabledId": 202,
-                                                    "postId": 1,
+                                                    "disabledId": "100",
+                                                    "postId": "1001",
                                                     "title": "식사 보조 도우미분 구해요",
-                                                    "chatRoomId": 303
+                                                    "chatroomId": "1"
                                                 }
                                                 """
                                 )

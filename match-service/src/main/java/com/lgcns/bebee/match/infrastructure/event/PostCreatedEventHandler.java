@@ -1,23 +1,24 @@
 package com.lgcns.bebee.match.infrastructure.event;
 
+import com.lgcns.bebee.common.data.event.EventHandler;
+import com.lgcns.bebee.common.data.event.EventType;
+import com.lgcns.bebee.common.data.event.PostCreatedEvent;
 import com.lgcns.bebee.match.application.usecase.UpdatePostLegalDongCodeUseCase;
-import com.lgcns.bebee.match.domain.event.PostCreatedEvent;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
-@ConditionalOnProperty(name = "event.type", havingValue = "spring")
 @RequiredArgsConstructor
-public class SpringEventListener {
+public class PostCreatedEventHandler implements EventHandler<PostCreatedEvent> {
     private final UpdatePostLegalDongCodeUseCase updatePostLegalDongCodeUseCase;
 
-    @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void onPostCreated(PostCreatedEvent event) {
+    @Override
+    public EventType getEventType() {
+        return EventType.POST_CREATED;
+    }
+
+    @Override
+    public void handle(PostCreatedEvent event) {
         UpdatePostLegalDongCodeUseCase.Param param = new UpdatePostLegalDongCodeUseCase.Param(
                 event.getPostId(),
                 event.getLatitude(),

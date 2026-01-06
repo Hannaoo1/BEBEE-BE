@@ -1,6 +1,5 @@
-package com.lgcns.bebee.match.domain.event;
+package com.lgcns.bebee.common.data.event;
 
-import com.lgcns.bebee.common.data.domain.DomainEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
