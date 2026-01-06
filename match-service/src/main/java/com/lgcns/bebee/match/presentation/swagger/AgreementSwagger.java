@@ -211,7 +211,8 @@ public interface AgreementSwagger {
                                                     "disabledId": 202,
                                                     "postId": 1,
                                                     "title": "식사 보조 도우미분 구해요",
-                                                    "chatRoomId": 303
+                                                    "chatRoomId": 303,
+                                                    "agreementId": 10001
                                                 }
                                                 """
                                 )
