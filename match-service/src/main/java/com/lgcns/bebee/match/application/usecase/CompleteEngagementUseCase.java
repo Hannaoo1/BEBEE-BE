@@ -49,21 +49,36 @@ public class CompleteEngagementUseCase
             engagement.setDisabledCheck();
         }
 
-        // 케이스별 완료 여부 확인 및 처리
-        if (engagement.isHelperCheck() && engagement.isDisabledCheck()) {
-
-            // 케이스 1: 둘 다 완료 (즉시 완료)
-            engagement.complete();
-            publishCompletionEvents(engagement, agreement, true, true);
-
-        } else if (engagement.isDisabledCheck()) {
-            // 케이스 2: 장애인만 완료 (즉시 완료)
-            engagement.complete();
-            publishCompletionEvents(engagement, agreement, false, true);
+        if(engagement.isHelperCheck()) {
+            //1. 도우미가 완료여부 확인
+            if(true) // 도우미가 완료한 상태
+            {
+                // 케이스 1: 둘 다 완료
+            } else {
+                //  케이스 2: 장애인만 완료 (즉시 완료)
+            }
+        }
+        if(engagement.isDisabledCheck()){
+            //  케이스 3: 도우미만 완료
         }
 
-        // 케이스 3: 도우미만 완료 (PENDING 유지, 3일 후 스케줄러 처리)
-        // 케이스 4: 둘 다 클릭 x (3일 후 스케줄러 처리)
+
+
+//        // 케이스별 완료 여부 확인 및 처리
+//        if (engagement.isHelperCheck() && engagement.isDisabledCheck()) {
+//
+//            // 케이스 1: 둘 다 완료 (즉시 완료)
+//            engagement.complete();
+//            publishCompletionEvents(engagement, agreement, true, true);
+//
+//        } else if (engagement.isDisabledCheck()) {
+//            // 케이스 2: 장애인만 완료 (즉시 완료)
+//            engagement.complete();
+//            publishCompletionEvents(engagement, agreement, false, true);
+//        }
+//
+//        // 케이스 3: 도우미만 완료 (PENDING 유지, 3일 후 스케줄러 처리)
+//        // 케이스 4: 둘 다 클릭 x (3일 후 스케줄러 처리)
 
         boolean isLastActivity = engagement.isLastActivity(agreement);
 
