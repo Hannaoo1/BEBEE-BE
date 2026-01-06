@@ -1,4 +1,4 @@
-package com.lgcns.bebee.match.common.util;
+package com.lgcns.bebee.common.util;
 
 import java.util.List;
 
@@ -8,8 +8,13 @@ public class ParamValidator {
         return value != null;
     }
 
-    public static boolean isNonNegativeInteger(Integer value) {
+    public static boolean isNonNegativeNumber(Long value) {
+
         return value != null && value >= 0;
+    }
+
+    public static boolean isPositiveNumber(Long value) {
+        return value != null && value > 0;
     }
 
     public static boolean isValidString(String str) {

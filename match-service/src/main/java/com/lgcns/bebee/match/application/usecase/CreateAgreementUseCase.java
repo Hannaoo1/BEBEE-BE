@@ -7,7 +7,7 @@ import com.lgcns.bebee.match.common.exception.MatchErrors;
 import com.lgcns.bebee.match.common.exception.MatchInvalidParamErrors;
 import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
 import com.lgcns.bebee.match.domain.entity.sync.Role;
-import com.lgcns.bebee.match.common.util.ParamValidator;
+import com.lgcns.bebee.common.util.ParamValidator;
 import com.lgcns.bebee.match.domain.entity.Agreement;
 import com.lgcns.bebee.match.domain.repository.AgreementRepository;
 import com.lgcns.bebee.match.domain.entity.vo.AgreementStatus;
@@ -114,10 +114,10 @@ public class CreateAgreementUseCase implements UseCase<CreateAgreementUseCase.Pa
             if (!ParamValidator.isNotNull(isVolunteer)) {
                 throw new InvalidParamException(MatchInvalidParamErrors.REQUIRED_FIELD, "isVolunteer");
             }
-            if (!ParamValidator.isNonNegativeInteger(unitHoney)) {
+            if (!ParamValidator.isNonNegativeNumber(unitHoney.longValue())) {
                 throw new InvalidParamException(MatchInvalidParamErrors.OUT_OF_RANGE, "unitHoney");
             }
-            if (!ParamValidator.isNonNegativeInteger(totalHoney)) {
+            if (!ParamValidator.isNonNegativeNumber(totalHoney.longValue())) {
                 throw new InvalidParamException(MatchInvalidParamErrors.OUT_OF_RANGE, "totalHoney");
             }
             if (!ParamValidator.isValidString(region)) {
