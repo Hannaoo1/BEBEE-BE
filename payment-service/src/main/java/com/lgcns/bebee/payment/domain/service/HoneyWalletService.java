@@ -1,5 +1,6 @@
 package com.lgcns.bebee.payment.domain.service;
 
+import com.lgcns.bebee.payment.common.exception.PaymentErrors;
 import com.lgcns.bebee.payment.domain.entity.HoneyWallet;
 import com.lgcns.bebee.payment.domain.repository.HoneyWalletRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,12 @@ import java.util.Optional;
 public class HoneyWalletService {
 
     private final HoneyWalletRepository honeyWalletRepository;
+
+    @Transactional(readOnly = true)
+    public HoneyWallet findByMemberId(Long memberId) {
+        return honeyWalletRepository.findByMemberId(memberId)
+                .orElseThrow(() -> PaymentErrors.HONEY_WALLET_NOT_FOUND.toException());
+    }
 
     /**
      * 회원의 현재 꿀 개수 조회
