@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UseHoneyUseCase implements UseCase<UseHoneyUseCase.Param, Void> {
 
-    private final HoneyWalletRepository xhoneyWalletRepository;
     private final HoneyWalletService honeyWalletService;
 
     @Override
@@ -40,7 +39,7 @@ public class UseHoneyUseCase implements UseCase<UseHoneyUseCase.Param, Void> {
     @Getter
     @RequiredArgsConstructor
     public static class Param implements Params {
-        private Long memberId;
+        private final Long memberId;
         private final Long useHoney; // 나눔일 때는 api 요청 자체를 x
 
         public boolean validate() {
