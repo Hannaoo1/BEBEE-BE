@@ -1,4 +1,4 @@
-package com.lgcns.bebee.match.infrastructure.event;
+package com.lgcns.bebee.match.infrastructure.spring;
 
 import com.lgcns.bebee.match.application.usecase.UpdatePostLegalDongCodeUseCase;
 import com.lgcns.bebee.match.domain.event.PostCreatedEvent;
