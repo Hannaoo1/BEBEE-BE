@@ -17,10 +17,4 @@ public class MatchReader {
         return matchRepository.findById(matchId)
                 .orElseThrow(() -> MatchErrors.MATCH_NOT_FOUND.toException());
     }
-
-    @Transactional(readOnly = true)
-    public Match getByAgreementId(Long agreementId) {
-        return matchRepository.findByAgreementId(agreementId)
-                .orElseThrow(() -> MatchErrors.MATCH_NOT_FOUND.toException());
-    }
 }
