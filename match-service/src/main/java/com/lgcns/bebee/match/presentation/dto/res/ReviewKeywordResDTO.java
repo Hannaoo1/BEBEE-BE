@@ -14,54 +14,16 @@ import java.util.stream.Collectors;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReviewKeywordResDTO {
 
-    @Schema(description = "게시글 제목", example = "굿모닝 마트에서 한우 육회 1++")
-    private String postTitle;
-
-    @Schema(description = "도움 카테고리 목록")
-    private List<HelpCategoryDTO> helpCategories;
-
-    @Schema(description = "상대방 닉네임", example = "냠냠쩝쩝")
-    private String revieweeName;
-
     @Schema(description = "선택 가능한 키워드 목록")
     private List<KeywordDTO> keywords;
 
     // Result → DTO 변환
     public static ReviewKeywordResDTO from(GetReviewKeywordsListUseCase.Result result) {
-        List<HelpCategoryDTO> helpCategories = result.getHelpCategories().stream()
-                .map(HelpCategoryDTO::from)
-                .collect(Collectors.toList());
-
         List<KeywordDTO> keywords = result.getKeywords().stream()
                 .map(KeywordDTO::from)
                 .collect(Collectors.toList());
 
-        return new ReviewKeywordResDTO(
-                result.getPostTitle(),
-                helpCategories,
-                result.getRevieweeName(),
-                keywords
-        );
-    }
-
-    // 도움 카테고리 DTO
-    @Schema(description = "도움 카테고리")
-    @Getter
-    @AllArgsConstructor
-    public static class HelpCategoryDTO {
-
-        @Schema(description = "카테고리 ID", example = "1")
-        private String helpCategoryId;
-
-        @Schema(description = "카테고리 이름", example = "생활 지원")
-        private String categoryName;
-
-        public static HelpCategoryDTO from(GetReviewKeywordsListUseCase.HelpCategoryDTO dto) {
-            return new HelpCategoryDTO(
-                    String.valueOf(dto.getHelpCategoryId()),
-                    dto.getCategoryName()
-            );
-        }
+        return new ReviewKeywordResDTO(keywords);
     }
 
     // 키워드 DTO

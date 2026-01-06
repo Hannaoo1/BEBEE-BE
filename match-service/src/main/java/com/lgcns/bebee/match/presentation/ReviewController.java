@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 // 리뷰 API Controller
-
 @RestController
 @RequestMapping("/reviews")
 @RequiredArgsConstructor
@@ -26,11 +25,9 @@ public class ReviewController implements ReviewSwagger {
     @Override
     @GetMapping("/keywords")
     public ResponseEntity<ReviewKeywordResDTO> getReviewKeywordsList(
-            @CurrentMember Long currentMemberId,
-            @RequestParam String engagementId
+            @CurrentMember Long currentMemberId
     ) {
         GetReviewKeywordsListUseCase.Param param = new GetReviewKeywordsListUseCase.Param(
-                Long.parseLong(engagementId),
                 currentMemberId
         );
 

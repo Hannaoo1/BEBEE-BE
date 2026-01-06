@@ -1,11 +1,9 @@
 package com.lgcns.bebee.match.domain.service;
 
 import com.lgcns.bebee.match.common.exception.MatchErrors;
-import com.lgcns.bebee.match.domain.entity.Agreement;
-import com.lgcns.bebee.match.domain.entity.Engagement;
+import com.lgcns.bebee.match.domain.entity.Review;
 import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
 import com.lgcns.bebee.match.domain.entity.sync.Role;
-import com.lgcns.bebee.match.domain.entity.vo.EngagementStatus;
 import com.lgcns.bebee.match.domain.entity.vo.Keyword;
 import com.lgcns.bebee.match.domain.entity.vo.ReviewDirection;
 import com.lgcns.bebee.match.domain.repository.ReviewRepository;
@@ -19,50 +17,41 @@ public class ReviewManager {
 
     private final ReviewRepository reviewRepository;
 
-    // 활동 완료 검증
-    public void validateEngagementCompleted(Engagement engagement) {
-        if (engagement.getStatus() != EngagementStatus.COMPLETED) {
-            throw MatchErrors.ENGAGEMENT_NOT_COMPLETED.toException();
-        }
-    }
-
-    // 마지막 활동 검증 
-    // DAY는 항상 마지막 활동
-    public void validateLastActivity(Engagement engagement, Agreement agreement) {
-        if (!engagement.isLastActivity(agreement)) {
-            throw MatchErrors.REVIEW_ONLY_FOR_LAST_ACTIVITY.toException();
-        }
-    }
-
-
-    // 중복 리뷰 검증
-    public void validateNoDuplicateReview(Long engagementId, Long reviewerId) {
-        if (reviewRepository.existsByEngagementIdAndReviewerId(engagementId, reviewerId)) {
-            throw MatchErrors.ALREADY_REVIEWED.toException();
-        }
-    }
-
     // ReviewDirection 결정
-    public ReviewDirection determineReviewDirection(MemberSync reviewer) {
-        if (reviewer.getRole() == Role.DISABLED) {
-            return ReviewDirection.DISABLED_TO_HELPER;
-        } else {
-            return ReviewDirection.HELPER_TO_DISABLED;
-        }
+    public ReviewDirection determineReviewDirection(MemberSync member) {
+        return (member.getRole() == Role.DISABLED)
+                ? ReviewDirection.DISABLED_TO_HELPER
+                : ReviewDirection.HELPER_TO_DISABLED;
     }
 
-    // 키워드 검증 (유효성 + 방향 일치)
+    // 키워드 검증
     public void validateKeywords(List<Integer> keywordIds, ReviewDirection direction) {
-        if (keywordIds == null || keywordIds.isEmpty()) {
-            throw MatchErrors.INVALID_KEYWORD.toException();
-        }
+        List<Integer> validKeywordIds = Keyword.getByDirection(direction)
+                .stream()
+                .map(Keyword::getId)
+                .toList();
 
         for (Integer keywordId : keywordIds) {
-            Keyword keyword = Keyword.fromId(keywordId);
-
-            if (keyword.getDirection() != direction) {
-                throw MatchErrors.KEYWORD_DIRECTION_MISMATCH.toException();
+            if (!validKeywordIds.contains(keywordId)) {
+                throw MatchErrors.INVALID_KEYWORD.toException();
             }
         }
+    }
+
+    // 리뷰 생성 및 검증
+    public Review createReview(
+            Long reviewerId,
+            ReviewDirection direction,
+            List<Integer> keywordIds
+    ) {
+        Review review = Review.create(
+                null,  // engagementId 없음
+                reviewerId,
+                null,  // revieweeId 없음
+                direction,
+                keywordIds
+        );
+
+        return reviewRepository.save(review);
     }
 }
