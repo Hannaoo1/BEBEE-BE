@@ -4,7 +4,7 @@ import com.lgcns.bebee.payment.application.usecase.ConfirmPaymentUseCase;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "결제 승인 요청 DTO")
-public record ConfirmPaymentReqDTO(
+public record PaymentConfirmReqDTO(
         @Schema(
                 description = "토스 결제 키 (토스 위젯에서 받은 값)",
                 example = "tviva20240101000000ABCD1234",
