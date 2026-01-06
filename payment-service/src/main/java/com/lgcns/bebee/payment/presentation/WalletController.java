@@ -2,23 +2,24 @@ package com.lgcns.bebee.payment.presentation;
 
 import com.lgcns.bebee.common.annotation.CurrentMember;
 import com.lgcns.bebee.payment.application.usecase.GetHoneyBalanceUseCase;
+import com.lgcns.bebee.payment.application.usecase.UseHoneyUseCase;
+import com.lgcns.bebee.payment.presentation.dto.req.HoneyUseReqDTO;
 import com.lgcns.bebee.payment.presentation.dto.res.HoneyBalanceGetResDTO;
-import com.lgcns.bebee.payment.presentation.swagger.HoneySwagger;
+import com.lgcns.bebee.payment.presentation.swagger.WalletSwagger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/honeys")
-public class HoneyController implements HoneySwagger {
+@RequestMapping("/wallets")
+public class WalletController implements WalletSwagger {
 
     private final GetHoneyBalanceUseCase getHoneyBalanceUseCase;
+    private final UseHoneyUseCase useHoneyUseCase;
 
     @Override
-    @GetMapping
+    @GetMapping("/honeys")
     public ResponseEntity<HoneyBalanceGetResDTO> getHoneyBalanceByMemberId(
             @CurrentMember Long memberId
     ) {
@@ -27,5 +28,17 @@ public class HoneyController implements HoneySwagger {
         HoneyBalanceGetResDTO resDTO = HoneyBalanceGetResDTO.from(result);
 
         return ResponseEntity.ok().body(resDTO);
+    }
+
+    @Override
+    @PostMapping("/usage")
+    public ResponseEntity<Void> deductHoneyByMemberId(
+            @CurrentMember Long memberId,
+            @RequestBody HoneyUseReqDTO request
+    ) {
+        UseHoneyUseCase.Param param = new UseHoneyUseCase.Param(memberId, request.getUseHoney());
+        useHoneyUseCase.execute(param);
+
+        return ResponseEntity.ok().build();
     }
 }
