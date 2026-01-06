@@ -42,6 +42,7 @@ public class CreateReviewUseCase implements UseCase<CreateReviewUseCase.Param, C
         // 리뷰 생성 & 저장
         reviewManager.createReview(
                 param.getReviewerId(),
+                param.getRevieweeId(),
                 direction,
                 param.getKeywordIds()
         );
@@ -53,6 +54,7 @@ public class CreateReviewUseCase implements UseCase<CreateReviewUseCase.Param, C
     @RequiredArgsConstructor
     public static class Param implements Params {
         private final Long reviewerId;
+        private final Long revieweeId;
         private final List<Integer> keywordIds;
 
         @Override
@@ -61,6 +63,12 @@ public class CreateReviewUseCase implements UseCase<CreateReviewUseCase.Param, C
                 throw new InvalidParamException(
                         MatchInvalidParamErrors.REQUIRED_FIELD,
                         "reviewerId"
+                );
+            }
+            if (!ParamValidator.isValidId(revieweeId)) {
+                throw new InvalidParamException(
+                        MatchInvalidParamErrors.REQUIRED_FIELD,
+                        "revieweeId"
                 );
             }
             if (keywordIds == null || keywordIds.isEmpty()) {

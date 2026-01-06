@@ -64,6 +64,7 @@ spring:
         secret-key: test
 
       sqs:
+        enabled: false
         listener:
           max-delay-between-polls: 10
 

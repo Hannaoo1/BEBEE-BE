@@ -41,13 +41,13 @@ public class ReviewManager {
     // 리뷰 생성 및 검증
     public Review createReview(
             Long reviewerId,
+            Long revieweeId,
             ReviewDirection direction,
             List<Integer> keywordIds
     ) {
         Review review = Review.create(
-                null,  // engagementId 없음
                 reviewerId,
-                null,  // revieweeId 없음
+                revieweeId,
                 direction,
                 keywordIds
         );

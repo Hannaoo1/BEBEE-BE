@@ -25,13 +25,19 @@ public class ReviewKeyword {
     private Integer keywordId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "review_id", insertable = false, updatable = false)
+    @MapsId("reviewId")
+    @JoinColumn(name = "review_id")
     private Review review;
 
+    public static ReviewKeyword create(Integer keywordId) {
+        ReviewKeyword reviewKeyword = new ReviewKeyword();
+        reviewKeyword.keywordId = keywordId;
+        return reviewKeyword;
+    }
+
     // Review 설정 (양방향 연관관계)
-    void setReview(Review review) {
+    public void setReview(Review review) {
         this.review = review;
-        this.reviewId = review.getId();
     }
 
     // KeywordId 설정
@@ -41,7 +47,6 @@ public class ReviewKeyword {
 
     @Getter
     @NoArgsConstructor
-    @AllArgsConstructor
     public static class ReviewKeywordId implements Serializable {
         private Long reviewId;
         private Integer keywordId;

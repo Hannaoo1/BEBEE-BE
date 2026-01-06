@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -20,9 +21,6 @@ public class Review extends BaseTimeEntity {
     @Tsid
     @Column(name = "review_id")
     private Long id;
-
-    @Column(nullable = false)
-    private Long engagementId;
 
     @Column(nullable = false)
     private Long reviewerId;
@@ -39,20 +37,24 @@ public class Review extends BaseTimeEntity {
 
     // 리뷰 생성
     public static Review create(
-            Long engagementId,
             Long reviewerId,
             Long revieweeId,
             ReviewDirection reviewDirection,
             List<Integer> keywordIds
     ) {
         Review review = new Review();
-        review.engagementId = engagementId;
         review.reviewerId = reviewerId;
         review.revieweeId = revieweeId;
         review.reviewDirection = reviewDirection;
 
-        keywordIds.forEach(keywordId ->
-                review.addKeyword(keywordId));
+        // 키워드 연결
+        review.keywords = keywordIds.stream()
+                .map(keywordId -> {
+                    ReviewKeyword reviewKeyword = ReviewKeyword.create(keywordId);
+                    reviewKeyword.setReview(review);
+                    return reviewKeyword;
+                })
+                .collect(Collectors.toList());
 
         return review;
     }
