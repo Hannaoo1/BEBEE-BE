@@ -10,14 +10,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class AgreementRefuseReqDTO {
+    private String disabledId;
+    private String chatroomId;
 
-    private String helperId;
-    private String agreementId;
-
-    public RefuseAgreementUseCase.Param toParam(String agreementId) {
+    public RefuseAgreementUseCase.Param toParam(Long currentMemberId, String agreementId) {
         return new RefuseAgreementUseCase.Param(
-                Long.parseLong(helperId),
-                Long.parseLong(agreementId)
+                currentMemberId,
+                Long.parseLong(disabledId),
+                Long.parseLong(agreementId),
+                Long.parseLong(chatroomId)
         );
     }
 }

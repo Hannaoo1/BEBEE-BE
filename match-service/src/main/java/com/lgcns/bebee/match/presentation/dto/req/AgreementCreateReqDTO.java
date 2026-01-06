@@ -17,16 +17,15 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class AgreementCreateReqDTO {
-
     private String postId;
     private String helperId;
-    private String disabledId;
     private EngagementType type;
     private Boolean isVolunteer;
     private List<Long> helpCategoryIds;
     private Integer unitHoney;
     private Integer totalHoney;
     private String region;
+    private String chatroomId;
 
     @JsonTypeInfo(
             use = JsonTypeInfo.Id.NAME,
@@ -42,7 +41,7 @@ public class AgreementCreateReqDTO {
     /**
      * Request -> UseCase Param
      */
-    public CreateAgreementUseCase.Param toParam() {
+    public CreateAgreementUseCase.Param toParam(Long currentMemberId) {
         DayEngagementTimeDTO dayTime = null;
         TermEngagementTimeDTO termTime = null;
 
@@ -55,7 +54,7 @@ public class AgreementCreateReqDTO {
         return new CreateAgreementUseCase.Param(
                 Long.parseLong(postId),
                 Long.parseLong(helperId),
-                Long.parseLong(disabledId),
+                currentMemberId,
                 type,
                 isVolunteer,
                 unitHoney,
@@ -63,7 +62,8 @@ public class AgreementCreateReqDTO {
                 region,
                 dayTime,
                 termTime,
-                helpCategoryIds
+                helpCategoryIds,
+                Long.parseLong(chatroomId)
         );
     }
 }

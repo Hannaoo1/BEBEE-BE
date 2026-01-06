@@ -3,12 +3,14 @@ package com.lgcns.bebee.match.application.usecase;
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
 import com.lgcns.bebee.common.exception.InvalidParamException;
+import com.lgcns.bebee.match.application.usecase.client.EventPublisher;
 import com.lgcns.bebee.match.common.exception.MatchErrors;
 import com.lgcns.bebee.match.common.exception.MatchInvalidParamErrors;
 import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
 import com.lgcns.bebee.match.domain.entity.sync.Role;
 import com.lgcns.bebee.match.common.util.ParamValidator;
 import com.lgcns.bebee.match.domain.entity.Agreement;
+import com.lgcns.bebee.common.data.event.AgreementCreatedEvent;
 import com.lgcns.bebee.match.domain.repository.AgreementRepository;
 import com.lgcns.bebee.match.domain.entity.vo.AgreementStatus;
 import com.lgcns.bebee.match.domain.entity.vo.EngagementType;
@@ -33,6 +35,8 @@ public class CreateAgreementUseCase implements UseCase<CreateAgreementUseCase.Pa
     private final AgreementRepository agreementRepository;
     private final MemberManager memberManager;
 
+    private final EventPublisher eventPublisher;
+
     @Transactional
     @Override
     public Result execute(Param param) {
@@ -46,12 +50,9 @@ public class CreateAgreementUseCase implements UseCase<CreateAgreementUseCase.Pa
         }
 
         // 이미 성사된 매칭이면 새로 생성 불가
-        agreementRepository.findByPostId(param.getPostId())
-                .ifPresent(existingAgreement -> {
-                    if (existingAgreement.getStatus() == AgreementStatus.CONFIRMED) {
-                        throw MatchErrors.ALREADY_MATCHED.toException();
-                    }
-                });
+        if(agreementRepository.existsByPostIdAndStatus(param.getPostId(), AgreementStatus.CONFIRMED)){
+            throw MatchErrors.ALREADY_MATCHED.toException();
+        }
 
         // 매칭 확인서 생성
         Agreement agreement = Agreement.create(
@@ -79,6 +80,8 @@ public class CreateAgreementUseCase implements UseCase<CreateAgreementUseCase.Pa
             savedAgreement.getSchedules().size(); // 초기화
         }
 
+        eventPublisher.publish(new AgreementCreatedEvent(param.chatroomId));
+
         return Result.from(savedAgreement);
     }
 
@@ -96,6 +99,7 @@ public class CreateAgreementUseCase implements UseCase<CreateAgreementUseCase.Pa
         private final DayEngagementTimeDTO dayEngagementTime;
         private final TermEngagementTimeDTO termEngagementTime;
         private final List<Long> helpCategoryIds;
+        private final Long chatroomId;
 
         @Override
         public boolean validate() {
@@ -128,6 +132,10 @@ public class CreateAgreementUseCase implements UseCase<CreateAgreementUseCase.Pa
             }
             if (!ParamValidator.isValidList(helpCategoryIds)) {
                 throw new InvalidParamException(MatchInvalidParamErrors.REQUIRED_FIELD, "helpCategoryIds");
+            }
+
+            if(!ParamValidator.isValidId(chatroomId)) {
+                throw new InvalidParamException(MatchInvalidParamErrors.REQUIRED_FIELD, "chatroomId");
             }
 
             return true;
