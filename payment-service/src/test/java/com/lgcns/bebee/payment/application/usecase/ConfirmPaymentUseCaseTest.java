@@ -1,14 +1,13 @@
 package com.lgcns.bebee.payment.application.usecase;
 
 import com.lgcns.bebee.payment.application.client.TossPaymentsClient;
-import com.lgcns.bebee.payment.application.port.out.TempPaymentPort;
-import com.lgcns.bebee.payment.application.port.out.dto.TempPaymentInfo;
+import com.lgcns.bebee.payment.application.client.TempPaymentPort;
+import com.lgcns.bebee.payment.application.client.dto.TempPaymentInfo;
 import com.lgcns.bebee.payment.common.exception.PaymentErrors;
 import com.lgcns.bebee.payment.common.exception.PaymentException;
 import com.lgcns.bebee.payment.domain.entity.HoneyHistory;
 import com.lgcns.bebee.payment.domain.entity.HoneyWallet;
 import com.lgcns.bebee.payment.domain.entity.Payment;
-import com.lgcns.bebee.payment.domain.entity.vo.HoneyHistoryType;
 import com.lgcns.bebee.payment.domain.repository.HoneyHistoryRepository;
 import com.lgcns.bebee.payment.domain.repository.HoneyWalletRepository;
 import com.lgcns.bebee.payment.domain.repository.PaymentRepository;

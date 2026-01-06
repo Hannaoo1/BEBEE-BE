@@ -1,4 +1,4 @@
-package com.lgcns.bebee.payment.application.port.out.dto;
+package com.lgcns.bebee.payment.application.client.dto;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

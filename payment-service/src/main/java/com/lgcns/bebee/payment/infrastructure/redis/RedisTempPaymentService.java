@@ -2,8 +2,8 @@ package com.lgcns.bebee.payment.infrastructure.redis;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lgcns.bebee.payment.application.port.out.TempPaymentPort;
-import com.lgcns.bebee.payment.application.port.out.dto.TempPaymentInfo;
+import com.lgcns.bebee.payment.application.client.TempPaymentPort;
+import com.lgcns.bebee.payment.application.client.dto.TempPaymentInfo;
 import com.lgcns.bebee.payment.common.exception.PaymentErrors;
 import io.hypersistence.utils.hibernate.id.Tsid;
 import lombok.RequiredArgsConstructor;

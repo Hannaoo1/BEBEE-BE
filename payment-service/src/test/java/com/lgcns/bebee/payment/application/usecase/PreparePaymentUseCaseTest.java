@@ -1,6 +1,6 @@
 package com.lgcns.bebee.payment.application.usecase;
 
-import com.lgcns.bebee.payment.application.port.out.TempPaymentPort;
+import com.lgcns.bebee.payment.application.client.TempPaymentPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

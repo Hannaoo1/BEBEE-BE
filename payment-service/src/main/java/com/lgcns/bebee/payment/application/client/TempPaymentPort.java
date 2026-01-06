@@ -1,6 +1,6 @@
-package com.lgcns.bebee.payment.application.port.out;
+package com.lgcns.bebee.payment.application.client;
 
-import com.lgcns.bebee.payment.application.port.out.dto.TempPaymentInfo;
+import com.lgcns.bebee.payment.application.client.dto.TempPaymentInfo;
 
 public interface TempPaymentPort {
     String save(Long memberId, Long amount);
