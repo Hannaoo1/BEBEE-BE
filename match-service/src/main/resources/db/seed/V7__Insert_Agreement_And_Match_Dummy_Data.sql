@@ -21,7 +21,7 @@ VALUES (
     CURDATE(),
     FALSE,
     FALSE,
-    'CONFIRMED',
+    'BEFORE',
     FALSE,
     NOW(),
     NOW()
@@ -300,23 +300,6 @@ ON DUPLICATE KEY UPDATE
 -- ========================================
 -- Match (매칭)
 -- ========================================
-
--- Match 1: Agreement 10001
-INSERT INTO `match` (match_id, helper_id, disabled_id, post_id, title, chat_room_id, agreement_id, created_at, updated_at)
-VALUES (
-    40001,
-    700,
-    100,
-    1001,
-    '병원 동행 도와주실 분',
-    50001,
-    10001,
-    NOW(),
-    NOW()
-) ON DUPLICATE KEY UPDATE
-    title = VALUES(title),
-    chat_room_id = VALUES(chat_room_id),
-    updated_at = NOW();
 
 -- Match 2: Agreement 10002
 INSERT INTO `match` (match_id, helper_id, disabled_id, post_id, title, chat_room_id, agreement_id, created_at, updated_at)
