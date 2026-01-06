@@ -27,6 +27,8 @@ dependencies {
 	implementation 'io.awspring.cloud:spring-cloud-aws-starter-sns:3.4.2'
 	implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs:3.4.2'
 
+	implementation 'software.amazon.awssdk:sts:2.40.17'
+
     // flyway - DB migration tool, DB 스키마 관리를 자동화하여 체계적으로 수행할 수 있게 도와준다.
 	implementation 'org.flywaydb:flyway-core:11.18.0'
 	implementation 'org.flywaydb:flyway-mysql:11.18.0'
