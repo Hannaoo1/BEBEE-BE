@@ -60,4 +60,8 @@ public class Chatroom extends BaseTimeEntity {
     public void updateLastMessage(String lastMessage){
         this.lastMessage = lastMessage;
     }
+
+    public void updateMatchStatus(MatchStatusSync matchStatus){
+        this.matchStatus = matchStatus;
+    }
 }
