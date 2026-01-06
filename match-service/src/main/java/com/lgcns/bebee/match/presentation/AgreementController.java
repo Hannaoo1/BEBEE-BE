@@ -1,5 +1,6 @@
 package com.lgcns.bebee.match.presentation;
 
+import com.lgcns.bebee.common.annotation.CurrentMember;
 import com.lgcns.bebee.match.application.usecase.ConfirmAgreementUseCase;
 import com.lgcns.bebee.match.application.usecase.CreateAgreementUseCase;
 import com.lgcns.bebee.match.application.usecase.RefuseAgreementUseCase;
@@ -24,9 +25,12 @@ public class AgreementController implements AgreementSwagger {
     private final ConfirmAgreementUseCase confirmAgreementUseCase;
 
     @PostMapping
-    public ResponseEntity<AgreementCreateResDTO> createAgreement(@RequestBody AgreementCreateReqDTO request) {
+    public ResponseEntity<AgreementCreateResDTO> createAgreement(
+            @CurrentMember Long currentMemberId,
+            @RequestBody AgreementCreateReqDTO request
+    ) {
 
-        CreateAgreementUseCase.Param param = request.toParam();
+        CreateAgreementUseCase.Param param = request.toParam(currentMemberId);
 
         CreateAgreementUseCase.Result result = createAgreementUseCase.execute(param);
 
@@ -37,22 +41,24 @@ public class AgreementController implements AgreementSwagger {
 
     @PatchMapping("/{agreementId}/refuse")
     public ResponseEntity<Void> refuseAgreement(
+            @CurrentMember Long currentMemberId,
             @PathVariable String agreementId,
             @RequestBody AgreementRefuseReqDTO request
             ) {
 
-        RefuseAgreementUseCase.Param param = request.toParam(agreementId);
+        RefuseAgreementUseCase.Param param = request.toParam(currentMemberId, agreementId);
         refuseAgreementUseCase.execute(param);
 
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/{agreementId}/confirm")
+    @PostMapping("/{agreementId}/confirm")
     public ResponseEntity<AgreementConfirmResDTO> confirmAgreement(
+            @CurrentMember Long currentMemberId,
             @PathVariable String agreementId,
             @RequestBody AgreementConfirmReqDTO request
     ) {
-        ConfirmAgreementUseCase.Param param = request.toParam(agreementId);
+        ConfirmAgreementUseCase.Param param = request.toParam(currentMemberId, agreementId);
 
         ConfirmAgreementUseCase.Result result = confirmAgreementUseCase.execute(param);
 

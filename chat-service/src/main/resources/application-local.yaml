@@ -61,6 +61,19 @@ spring:
       uri: ${MONGODB_URI:mongodb://${MONGODB_USERNAME:bebee}:${MONGODB_PASSWORD:bebee1234}@${MONGODB_HOST:localhost}:27017/bebee?authSource=admin}
       auto-index-creation: ${AUTO_INDEX_CREATION:false}
 
+  cloud:
+    aws:
+      endpoint: http://localhost:4566
+      region:
+        static: ap-northeast-2
+      credentials:
+        access-key: test
+        secret-key: test
+
+      sqs:
+        listener:
+          max-delay-between-polls: 10
+
   # Flyway 설정
   flyway:
     # Flyway 활성화
@@ -83,6 +96,14 @@ spring:
     placeholder-replacement: false
     # clean 명령 비활성화 (안전)
     # clean-disabled: true
+
+app:
+  sns:
+    chat-topic-arn: "${AWS_SNS_TOPIC_ARN:arn:aws:sns:ap-northeast-2:000000000000:bebee-local-chat-topic}"
+  sqs:
+    chat-queue-url: "${AWS_SQS_QUEUE_ARN:http://sqs.ap-northeast-2.localhost.localstack.cloud:4566/000000000000/bebee-local-chat-queue}"
+
+
 
 springdoc:
   api-docs:

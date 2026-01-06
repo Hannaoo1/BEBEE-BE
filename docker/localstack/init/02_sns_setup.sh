@@ -16,23 +16,57 @@
 # ------------------------------------------
 source /etc/localstack/init/ready.d/00_env_setup.sh
 
+echo "=========================================="
+echo "SNS 토픽 생성 시작"
+echo "=========================================="
+
 # ------------------------------------------
-# 토픽 생성 명령어 형식
+# 서비스 목록 (각 서비스의 도메인 이벤트 토픽)
 # ------------------------------------------
-# TOPIC_ARN=$(awslocal sns create-topic \
-#   --name [토픽 이름] \
-#   --output text \
-#   --query 'TopicArn')
-# ex)
-# CHAT_EVENTS_TOPIC_ARN=$(awslocal sns create-topic \
-#   --name bebee-chat-events \
-#   --output text \
-#   --query 'TopicArn')
+SERVICES=("member" "match" "chat" "notification" "payment")
 
+# ------------------------------------------
+# 각 서비스별 도메인 이벤트 토픽 생성
+# ------------------------------------------
+declare -A TOPIC_ARNS
 
+for SERVICE in "${SERVICES[@]}"; do
+  TOPIC_NAME="${PROJECT_NAME}-${ENVIRONMENT}-${SERVICE}-topic"
 
+  echo "Creating topic: ${TOPIC_NAME}"
+
+  TOPIC_ARN=$(awslocal sns create-topic \
+    --name "${TOPIC_NAME}" \
+    --output text \
+    --query 'TopicArn')
+
+  if [ $? -eq 0 ]; then
+    echo "✓ ${TOPIC_NAME} 생성 완료"
+    echo "  ARN: ${TOPIC_ARN}"
+    TOPIC_ARNS[$SERVICE]=$TOPIC_ARN
+  else
+    echo "✗ ${TOPIC_NAME} 생성 실패"
+  fi
+done
+
+echo ""
+echo "=========================================="
+echo "SNS 토픽 생성 완료"
+echo "=========================================="
 
 # ------------------------------------------
 # 확인
 # ------------------------------------------
-# awslocal sns list-topics
+echo "생성된 토픽 목록:"
+awslocal sns list-topics | jq -r '.Topics[].TopicArn' | grep "${PROJECT_NAME}-${ENVIRONMENT}"
+
+# ------------------------------------------
+# 토픽 ARN을 파일에 저장 (다음 스크립트에서 사용)
+# ------------------------------------------
+echo "# SNS Topic ARNs" > /tmp/sns_topics.env
+for SERVICE in "${!TOPIC_ARNS[@]}"; do
+  echo "export ${SERVICE^^}_TOPIC_ARN=${TOPIC_ARNS[$SERVICE]}" >> /tmp/sns_topics.env
+done
+
+echo ""
+echo "토픽 ARN이 /tmp/sns_topics.env에 저장되었습니다."

@@ -13,45 +13,96 @@
 # ------------------------------------------
 # 환경 변수 불러오기
 # ------------------------------------------
-#
 source /etc/localstack/init/ready.d/00_env_setup.sh
 
-# ------------------------------------------
-# 큐 생성 명령어 형식
-# ------------------------------------------
-# awslocal sqs create-queue \
-#   --queue-name [큐 이름] \
-#   --attributes '{
-#     "VisibilityTimeout": "30",              # 메시지 처리 시간 (초)
-#     "MessageRetentionPeriod": "345600",     # 보관 기간 (4일)
-#     "ReceiveMessageWaitTimeSeconds": "20"   # Long Polling (초)
-#   }'
+echo "=========================================="
+echo "SQS 큐 생성 시작"
+echo "=========================================="
 
 # ------------------------------------------
-# 1. Dead Letter Queue (DLQ)
+# 서비스 목록
 # ------------------------------------------
-# 처리 실패한 메시지를 모아두는 큐
-#
-# awslocal sqs create-queue \
-#   --queue-name bebee-dlq \
-#   --attributes '{"MessageRetentionPeriod": "1209600"}'
+SERVICES=("member" "match" "chat" "notification" "payment")
 
 # ------------------------------------------
-# DLQ 연결 (선택사항)
+# 각 서비스별 메인 큐 생성
 # ------------------------------------------
-# 3번 실패 시 DLQ로 이동
-#
-# DLQ_ARN="arn:aws:sqs:ap-northeast-2:000000000000:bebee-dlq"
-# QUEUE_URL="http://localhost:4566/000000000000/bebee-chat-message-queue"
-#
-# awslocal sqs set-queue-attributes \
-#   --queue-url "$QUEUE_URL" \
-#   --attributes '{"RedrivePolicy":"{\"deadLetterTargetArn\":\"'$DLQ_ARN'\",\"maxReceiveCount\":\"3\"}"}'
+for SERVICE in "${SERVICES[@]}"; do
+  QUEUE_NAME="${PROJECT_NAME}-${ENVIRONMENT}-${SERVICE}-queue"
 
+  echo "Creating queue: ${QUEUE_NAME}"
 
+  awslocal sqs create-queue \
+    --queue-name "${QUEUE_NAME}" \
+    --attributes '{
+      "VisibilityTimeout": "30",
+      "MessageRetentionPeriod": "345600",
+      "MaximumMessageSize": "262144",
+      "DelaySeconds": "0",
+      "ReceiveMessageWaitTimeSeconds": "20"
+    }'
 
+  if [ $? -eq 0 ]; then
+    echo "✓ ${QUEUE_NAME} 생성 완료"
+  else
+    echo "✗ ${QUEUE_NAME} 생성 실패"
+  fi
+done
+
+echo ""
+
+# ------------------------------------------
+# 각 서비스별 DLQ (Dead Letter Queue) 생성
+# ------------------------------------------
+for SERVICE in "${SERVICES[@]}"; do
+  DLQ_NAME="${PROJECT_NAME}-${ENVIRONMENT}-${SERVICE}-queue-dlq"
+
+  echo "Creating DLQ: ${DLQ_NAME}"
+
+  awslocal sqs create-queue \
+    --queue-name "${DLQ_NAME}" \
+    --attributes '{
+      "MessageRetentionPeriod": "1209600"
+    }'
+
+  if [ $? -eq 0 ]; then
+    echo "✓ ${DLQ_NAME} 생성 완료"
+  else
+    echo "✗ ${DLQ_NAME} 생성 실패"
+  fi
+done
+
+echo ""
+
+# ------------------------------------------
+# DLQ를 메인 큐에 연결 (Redrive Policy)
+# ------------------------------------------
+for SERVICE in "${SERVICES[@]}"; do
+  QUEUE_NAME="${PROJECT_NAME}-${ENVIRONMENT}-${SERVICE}-queue"
+  DLQ_NAME="${PROJECT_NAME}-${ENVIRONMENT}-${SERVICE}-queue-dlq"
+  QUEUE_URL="http://localhost:4566/${AWS_ACCOUNT_ID}/${QUEUE_NAME}"
+  DLQ_ARN="arn:aws:sqs:${AWS_DEFAULT_REGION}:${AWS_ACCOUNT_ID}:${DLQ_NAME}"
+
+  echo "Attaching DLQ to ${QUEUE_NAME}"
+
+  awslocal sqs set-queue-attributes \
+    --queue-url "${QUEUE_URL}" \
+    --attributes "{\"RedrivePolicy\":\"{\\\"deadLetterTargetArn\\\":\\\"${DLQ_ARN}\\\",\\\"maxReceiveCount\\\":\\\"3\\\"}\"}"
+
+  if [ $? -eq 0 ]; then
+    echo "✓ ${QUEUE_NAME}에 DLQ 연결 완료"
+  else
+    echo "✗ ${QUEUE_NAME}에 DLQ 연결 실패"
+  fi
+done
+
+echo ""
+echo "=========================================="
+echo "SQS 큐 생성 완료"
+echo "=========================================="
 
 # ------------------------------------------
 # 확인
 # ------------------------------------------
-# awslocal sqs list-queues
+echo "생성된 큐 목록:"
+awslocal sqs list-queues | jq -r '.QueueUrls[]' | grep "${PROJECT_NAME}-${ENVIRONMENT}"

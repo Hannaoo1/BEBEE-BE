@@ -54,6 +54,19 @@ spring:
       # Redis Port
       port: ${REDIS_PORT:6379}
 
+  cloud:
+    aws:
+      endpoint: http://localhost:4566
+      region:
+        static: ap-northeast-2
+      credentials:
+        access-key: test
+        secret-key: test
+
+      sqs:
+        listener:
+          max-delay-between-polls: 10
+
   # Flyway 설정
   flyway:
     # Flyway 활성화
@@ -76,6 +89,12 @@ spring:
     placeholder-replacement: false
     # clean 명령 비활성화 (안전)
     # clean-disabled: true
+
+app:
+  sns:
+    match-topic-arn: "${AWS_SNS_TOPIC_ARN:arn:aws:sns:ap-northeast-2:000000000000:bebee-local-match-topic}"
+  sqs:
+    match-queue-url: "${AWS_SQS_QUEUE_ARN:http://sqs.ap-northeast-2.localhost.localstack.cloud:4566/000000000000/bebee-local-match-queue}"
 
 springdoc:
   api-docs:
@@ -110,7 +129,7 @@ tsid:
 
 
 event:
-  type: "spring"
+  type: "aws"
 
 kakao:
   api:
@@ -128,5 +147,6 @@ logging:
     # Hibernate 파라미터 바인딩 로그 레벨 (trace: 모든 파라미터 값 출력)
     org.hibernate.type: info
 
+    io.awspring.cloud: DEBUG
     com.lgcns.bebee.match: ${LOGGING_LEVEL_SERVICE:info}
 

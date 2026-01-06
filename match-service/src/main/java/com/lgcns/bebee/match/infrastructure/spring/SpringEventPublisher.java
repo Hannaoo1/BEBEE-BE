@@ -1,6 +1,6 @@
-package com.lgcns.bebee.match.infrastructure.event;
+package com.lgcns.bebee.match.infrastructure.spring;
 
-import com.lgcns.bebee.common.data.domain.DomainEvent;
+import com.lgcns.bebee.common.data.event.DomainEvent;
 import com.lgcns.bebee.match.application.usecase.client.EventPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
