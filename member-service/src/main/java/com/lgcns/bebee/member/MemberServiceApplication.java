@@ -6,7 +6,6 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.annotation.ComponentScan;
 
 
-
 @SpringBootApplication
 @ComponentScan(basePackages = "com.lgcns.bebee")
 @ConfigurationPropertiesScan(basePackages = "com.lgcns.bebee")
