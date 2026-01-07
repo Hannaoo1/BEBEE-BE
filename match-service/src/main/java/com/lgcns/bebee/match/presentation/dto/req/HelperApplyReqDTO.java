@@ -10,11 +10,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class HelperApplyReqDTO {
-    private String memberId;
     private String postId;
     private Boolean isVolunteer;
 
-    public ApplyHelperUseCase.Param toParam() {
-        return new ApplyHelperUseCase.Param(Long.parseLong(memberId), Long.parseLong(postId), isVolunteer);
+    public ApplyHelperUseCase.Param toParam(Long memberId, HelperApplyReqDTO request) {
+        return new ApplyHelperUseCase.Param(
+                memberId,
+                Long.parseLong(request.getPostId()),
+                request.getIsVolunteer()
+        );
     }
 }
