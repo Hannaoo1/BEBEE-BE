@@ -2,7 +2,6 @@ package com.lgcns.bebee.match.presentation;
 
 import com.lgcns.bebee.common.annotation.CurrentMember;
 import com.lgcns.bebee.match.application.usecase.CompleteEngagementUseCase;
-import com.lgcns.bebee.match.presentation.dto.req.EngagementCompleteReqDTO;
 import com.lgcns.bebee.match.presentation.dto.res.EngagementCompleteResDTO;
 import com.lgcns.bebee.match.presentation.swagger.EngagementSwagger;
 import lombok.RequiredArgsConstructor;
@@ -16,19 +15,19 @@ public class EngagementController implements EngagementSwagger {
 
     private final CompleteEngagementUseCase completeEngagementUseCase;
 
+    // 활동 완료 체크
     @Override
     @PostMapping("/{engagementId}/complete")
     public ResponseEntity<EngagementCompleteResDTO> completeEngagement(
-            @CurrentMember Long currentMemberId,
-            @PathVariable String engagementId,
-            @RequestBody EngagementCompleteReqDTO reqDTO
+            //@CurrentMember Long currentMemberId,
+            @RequestParam String currentMemberId,
+            @PathVariable String engagementId
     ) {
 
         // DTO → Param 변환
         CompleteEngagementUseCase.Param param = new CompleteEngagementUseCase.Param(
-                currentMemberId,
-                Long.parseLong(engagementId),
-                reqDTO.getUserType()
+                Long.parseLong(currentMemberId),
+                Long.parseLong(engagementId)
         );
 
         // UseCase 실행

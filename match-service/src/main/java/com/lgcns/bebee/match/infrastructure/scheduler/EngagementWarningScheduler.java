@@ -1,10 +1,7 @@
 package com.lgcns.bebee.match.infrastructure.scheduler;
 
-import com.lgcns.bebee.match.application.usecase.client.EventPublisher;
-import com.lgcns.bebee.match.domain.entity.Agreement;
 import com.lgcns.bebee.match.domain.entity.Engagement;
-import com.lgcns.bebee.match.domain.entity.vo.EngagementStatus;  // ← enum import
-import com.lgcns.bebee.match.domain.event.WarningNotificationEvent;
+import com.lgcns.bebee.match.domain.entity.vo.EngagementStatus;
 import com.lgcns.bebee.match.domain.repository.EngagementRepository;
 import com.lgcns.bebee.match.domain.service.AgreementReader;
 import lombok.RequiredArgsConstructor;
@@ -29,10 +26,10 @@ public class EngagementWarningScheduler {
 
     private final EngagementRepository engagementRepository;
     private final AgreementReader agreementReader;
-    private final EventPublisher eventPublisher;
+    //private final EventPublisher eventPublisher;
 
     @Scheduled(cron = "0 0 3 * * *")
-    @Transactional
+    @Transactional(readOnly = true)
     public void sendWarningNotifications() {
         log.info("=== 활동 완료 경고 스케줄러 시작 ===");
 
@@ -53,16 +50,19 @@ public class EngagementWarningScheduler {
             // 둘 다 체크 안 한 경우만 (케이스 4)
             if (!engagement.isHelperCheck() && !engagement.isDisabledCheck()) {
 
-                Agreement agreement = agreementReader.getById(engagement.getAgreementId());
+                log.info("둘 다 미체크 (경고 발송): engagementId={}, activityDate={}",
+                        engagement.getEngagementId(),
+                        engagement.getActivityDate());
 
                 // 경고 알림 이벤트 발행
-                eventPublisher.publish(new WarningNotificationEvent(
+                /*eventPublisher.publish(new WarningNotificationEvent(
                         engagement.getEngagementId(),
                         agreement.getId(),
                         agreement.getHelperId(),
                         agreement.getDisabledId(),
                         engagement.getActivityDate()
                 ));
+                */
 
                 warningCount++;
             }
