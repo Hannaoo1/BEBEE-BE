@@ -1,42 +1,68 @@
 package com.lgcns.bebee.match.presentation.swagger;
 
 import com.lgcns.bebee.common.annotation.CurrentMember;
-import com.lgcns.bebee.match.presentation.dto.req.EngagementCompleteReqDTO;
 import com.lgcns.bebee.match.presentation.dto.res.EngagementCompleteResDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
-@Tag(name = "Engagement", description = "활동 관리 API")
+@Tag(name = "Engagement", description = "활동 완료 API")
 public interface EngagementSwagger {
 
     @Operation(
             summary = "활동 완료 체크",
             description = """
-                    도우미 또는 장애인이 활동 완료 버튼을 클릭했을 때 호출합니다.
-                    
-                    **처리 케이스:**
-                    - 케이스 1: 둘 다 완료 체크 → 즉시 완료 (COMPLETED)
-                    - 케이스 2: 장애인만 완료 체크 → 즉시 완료 (COMPLETED)
-                    - 케이스 3: 도우미만 완료 체크 → 대기 상태 유지 (PENDING)
-                    
-                    **자동 처리:**
-                    - 2일 후: 둘 다 미체크 시 경고 알림 발송
-                    - 3일 후: 
-                      * 도우미만 체크 → 자동 완료 처리
-                      * 둘 다 미체크 → 미완료 처리 및 환급
-                    
-                    **이벤트 발행:**
-                    - 완료 시: 정산, 완료 알림, 리뷰 요청 이벤트 발행
-                    - 결제 서비스와 알림 서비스가 이벤트를 수신하여 처리
-                    """
+            활동 완료 체크를 처리합니다.
+            
+            ## 테스트 모드
+            - 100: 장애인 (DISABLED)
+            - 700: 도우미 (HELPER)
+            
+            ## 동작 방식
+            토큰에서 회원 정보(Role)를 자동으로 확인하여 처리합니다.
+            
+            ## 케이스별 처리
+            
+            ### 케이스 1: 장애인이 체크
+            - 즉시 완료 처리 (COMPLETED)
+            - is_disabled_check = true
+            - 활동 완료!
+            
+            ### 케이스 2: 도우미가 체크
+            - 대기 상태 유지 (PENDING)
+            - is_helper_check = true
+            - 3일 후 스케줄러에서 처리
+            
+            ### 케이스 3: 도우미 체크 후 3일 경과 (스케줄러)
+            - 자동 완료 처리 (COMPLETED)
+            - is_disabled_check = true (자동 설정)
+            - 활동 완료!
+            
+            ### 케이스 4: 둘 다 미체크 후 3일 경과 (스케줄러)
+            - 미완료 처리 (INCOMPLETED)
+            - 환급 처리
+            
+            ## 응답
+            - status: 활동 상태 (COMPLETED / PENDING)
+            - isLastActivity: 마지막 활동 여부 (DAY는 항상 true)
+            
+            ## 예시
+            ```
+            장애인 체크:
+            POST /engagements/1001/complete
+            → { "status": "COMPLETED", "isLastActivity": true }
+            
+            도우미 체크:
+            POST /engagements/1002/complete
+            → { "status": "PENDING", "isLastActivity": true }
+            ```
+            """
     )
     @ApiResponses({
             @ApiResponse(
@@ -44,44 +70,43 @@ public interface EngagementSwagger {
                     description = "활동 완료 체크 성공",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = EngagementCompleteResDTO.class)
+                            examples = {
+                                    @ExampleObject(
+                                            name = "장애인 체크 (즉시 완료)",
+                                            value = """
+                                            {
+                                              "status": "COMPLETED",
+                                              "isLastActivity": true
+                                            }
+                                            """
+                                    ),
+                                    @ExampleObject(
+                                            name = "도우미 체크 (대기)",
+                                            value = """
+                                            {
+                                              "status": "PENDING",
+                                              "isLastActivity": true
+                                            }
+                                            """
+                                    )
+                            }
                     )
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "잘못된 요청 (필수 필드 누락, 유효하지 않은 값)",
-                    content = @Content(mediaType = "application/json")
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "활동을 찾을 수 없음",
-                    content = @Content(mediaType = "application/json")
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = "서버 내부 오류",
-                    content = @Content(mediaType = "application/json")
+                    description = "활동을 찾을 수 없음"
             )
     })
     ResponseEntity<EngagementCompleteResDTO> completeEngagement(
-            @Parameter(hidden = true)
-            @CurrentMember Long currentMemberId,
-
+            @Parameter(
+                    description = "현재 회원 ID (100: 장애인, 700: 도우미)",
+                    example = "100",
+                    required = true
+            ) @RequestParam String currentMemberId,
             @Parameter(
                     description = "활동 ID",
-                    required = true,
-                    example = "123"
-            )
-            @PathVariable String engagementId,
-
-            @RequestBody(
-                    description = "활동 완료 요청 정보",
-                    required = true,
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = EngagementCompleteReqDTO.class)
-                    )
-            )
-            @org.springframework.web.bind.annotation.RequestBody EngagementCompleteReqDTO reqDTO
+                    example = "1001",
+                    required = true
+            ) String engagementId
     );
 }
