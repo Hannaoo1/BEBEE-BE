@@ -114,8 +114,14 @@ public class CreateAgreementUseCase implements UseCase<CreateAgreementUseCase.Pa
             if (!ParamValidator.isNotNull(isVolunteer)) {
                 throw new InvalidParamException(MatchInvalidParamErrors.REQUIRED_FIELD, "isVolunteer");
             }
+            if (!ParamValidator.isNotNull(unitHoney)) {
+                throw new InvalidParamException(MatchInvalidParamErrors.REQUIRED_FIELD, "unitHoney");
+            }
             if (!ParamValidator.isNonNegativeNumber(unitHoney.longValue())) {
                 throw new InvalidParamException(MatchInvalidParamErrors.OUT_OF_RANGE, "unitHoney");
+            }
+            if (!ParamValidator.isNotNull(totalHoney)) {
+                throw new InvalidParamException(MatchInvalidParamErrors.REQUIRED_FIELD, "totalHoney");
             }
             if (!ParamValidator.isNonNegativeNumber(totalHoney.longValue())) {
                 throw new InvalidParamException(MatchInvalidParamErrors.OUT_OF_RANGE, "totalHoney");
