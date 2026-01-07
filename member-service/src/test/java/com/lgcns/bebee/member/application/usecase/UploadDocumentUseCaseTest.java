@@ -159,5 +159,52 @@ class UploadDocumentUseCaseTest {
                         assertThat(saved.getForgeryScore()).isEqualTo(76);
                         assertThat(saved.getSystemFlag()).isEqualTo("MID");
                 }
+
+                @Test
+                @DisplayName("S3 URL이 제공되면 파일을 다운로드하여 분석을 수행한다")
+                void execute_withFileUrl_downloadsAndAnalyzes() {
+                        // given
+                        Long memberId = 1L;
+                        Long documentId = 1L;
+                        String s3Url = "https://bebee-storage.s3.ap-northeast-2.amazonaws.com/documents/test-license.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256";
+                        UploadDocumentUseCase.Param param = new UploadDocumentUseCase.Param(memberId, documentId, null,
+                                        s3Url);
+
+                        DocumentVerificationService.AnalysisResult analysisResult = new DocumentVerificationService.AnalysisResult(
+                                        80, 75, 77, "LOW");
+
+                        given(fileStorageClient.download(s3Url)).willReturn(testFile);
+                        given(memberManagement.getExistingMember(memberId)).willReturn(testMember);
+                        given(verificationService.analyze(any(), anyString(), anyString(), any()))
+                                        .willReturn(analysisResult);
+                        given(verificationRepository.save(any(DocumentVerification.class)))
+                                        .willAnswer(invocation -> {
+                                                DocumentVerification v = invocation.getArgument(0);
+                                                ReflectionTestUtils.setField(v, "documentVerificationId", 999L);
+                                                return v;
+                                        });
+
+                        // when
+                        Long result = uploadDocumentUseCase.execute(param);
+
+                        // then
+                        assertThat(result).isEqualTo(999L);
+                        verify(fileStorageClient, times(1)).download(s3Url);
+                        verify(verificationService, times(1)).analyze(any(), anyString(), anyString(), any());
+                }
+
+                @Test
+                @DisplayName("파일과 S3 URL이 모두 없으면 예외가 발생한다")
+                void execute_withoutFileAndUrl_throwsException() {
+                        // given
+                        Long memberId = 1L;
+                        Long documentId = 1L;
+                        UploadDocumentUseCase.Param param = new UploadDocumentUseCase.Param(memberId, documentId, null,
+                                        null);
+
+                        // when & then
+                        assertThatThrownBy(() -> uploadDocumentUseCase.execute(param))
+                                        .isInstanceOf(com.lgcns.bebee.member.core.exception.MemberBaseException.class);
+                }
         }
 }

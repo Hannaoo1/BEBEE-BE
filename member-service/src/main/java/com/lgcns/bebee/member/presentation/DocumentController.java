@@ -47,7 +47,8 @@ public class DocumentController implements DocumentSwagger {
                         @RequestParam Long documentId,
                         @RequestPart(required = false) MultipartFile file,
                         @RequestParam(required = false) String fileUrl) {
-                log.info("문서 업로드 처리 시작: memberId={}, documentId={}, fileUrl={}", memberId, documentId, fileUrl);
+                log.info("문서 업로드 처리 시작: memberId={}, documentId={}, fileUrl={}, hasFile={}",
+                                memberId, documentId, fileUrl, file != null && !file.isEmpty());
                 try {
                         UploadDocumentUseCase.Param param = new UploadDocumentUseCase.Param(memberId, documentId, file,
                                         fileUrl);

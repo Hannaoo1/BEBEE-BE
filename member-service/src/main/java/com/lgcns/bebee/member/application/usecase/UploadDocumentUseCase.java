@@ -56,7 +56,11 @@ public class UploadDocumentUseCase implements UseCase<UploadDocumentUseCase.Para
 
         if (param.getFileUrl() != null && !param.getFileUrl().isBlank()) {
             // S3 URL이 있는 경우: S3에서 다운로드
-            log.info("S3 URL로부터 파일 다운로드: {}", param.getFileUrl());
+            String fileName = param.getFileUrl().substring(param.getFileUrl().lastIndexOf('/') + 1);
+            if (fileName.contains("?")) {
+                fileName = fileName.substring(0, fileName.indexOf("?"));
+            }
+            log.info("S3 파일 다운로드 시도: {}", fileName);
             fileToAnalyze = fileStorageClient.download(param.getFileUrl());
             fileUrl = param.getFileUrl();
         } else {

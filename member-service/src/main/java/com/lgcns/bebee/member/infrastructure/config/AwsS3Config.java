@@ -1,15 +1,16 @@
 package com.lgcns.bebee.member.infrastructure.config;
 
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+
+import jakarta.annotation.PostConstruct;
 
 /**
  * AWS S3 설정
@@ -17,7 +18,6 @@ import org.springframework.context.annotation.Profile;
  */
 @Slf4j
 @Configuration
-@Profile({ "dev", "prod" })
 @ConditionalOnProperty(name = "aws.s3.access-key")
 public class AwsS3Config {
 
@@ -30,15 +30,27 @@ public class AwsS3Config {
     @Value("${aws.s3.secret-key}")
     private String secretKey;
 
+    @PostConstruct
+    public void validate() {
+        if (region == null || region.isBlank()) {
+            throw new IllegalStateException("AWS S3 region이 설정되지 않았습니다.");
+        }
+        if (accessKey == null || accessKey.isBlank()) {
+            throw new IllegalStateException("AWS S3 access-key가 설정되지 않았습니다.");
+        }
+        if (secretKey == null || secretKey.isBlank()) {
+            throw new IllegalStateException("AWS S3 secret-key가 설정되지 않았습니다.");
+        }
+    }
+
     @Bean
-    public AmazonS3 amazonS3() {
-        log.info("AWS S3 Client 초기화: region={}", region);
+    public S3Client s3Client() {
+        log.info("AWS S3 Client (v2) 초기화 시작: region={}", region);
 
-        BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
-
-        return AmazonS3ClientBuilder.standard()
-                .withRegion(region)
-                .withCredentials(new AWSStaticCredentialsProvider(credentials))
+        return S3Client.builder()
+                .region(Region.of(region))
+                .credentialsProvider(StaticCredentialsProvider.create(
+                        AwsBasicCredentials.create(accessKey, secretKey)))
                 .build();
     }
 }
