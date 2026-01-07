@@ -90,7 +90,7 @@ public class LocalFileStorage implements FileStorageClient {
 
     @Override
     public MultipartFile download(String fileUrl) {
-        // 로컬 환경에서는 S3 다운로드 불필요
-        throw new UnsupportedOperationException("로컬 환경에서는 S3 다운로드를 지원하지 않습니다.");
+        // 로컬 환경에서 S3 URL 다운로드를 시도할 경우, 일관된 에러 처리를 위해 도메인 예외를 던집니다.
+        throw DocumentErrors.FILE_DOWNLOAD_FAILED.toException();
     }
 }
