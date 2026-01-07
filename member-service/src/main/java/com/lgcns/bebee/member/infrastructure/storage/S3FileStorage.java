@@ -30,12 +30,29 @@ public class S3FileStorage implements FileStorageClient {
     @Override
     public MultipartFile download(String fileUrl) {
         try {
+            // 1. SSRF 방지를 위한 URL 검증 (CodeRabbit 피드백 반영)
+            if (fileUrl == null || fileUrl.isBlank()) {
+                throw new IllegalArgumentException("파일 URL은 필수입니다.");
+            }
+            if (!fileUrl.startsWith("https://") || !fileUrl.contains(".amazonaws.com/")) {
+                log.warn("허용되지 않은 S3 URL 접근 시도 차단 (SSRF 방지): {}", fileUrl);
+                throw new IllegalArgumentException("유효한 S3 URL이 아닙니다.");
+            }
+
             log.info("S3 서버에서 파일 다운로드 시작 (HTTP 방식): {}", fileUrl);
 
             URL url = new URL(fileUrl);
             URLConnection connection = url.openConnection();
             connection.setConnectTimeout(10000); // 10초 내에 연결 안 되면 포기
-            connection.setReadTimeout(10000); // 10초 내에 파일 안 읽히면 포기
+            connection.setReadTimeout(30000); // 30초로 상향 (대용량 파일 고려)
+
+            // 2. 파일 크기 검증 (OOM 방지, 20MB 제한) - CodeRabbit 피드백 반영
+            long contentLength = connection.getContentLengthLong();
+            if (contentLength > 20 * 1024 * 1024) {
+                log.error("파일 크기가 제한(20MB)을 초과했습니다: {} bytes", contentLength);
+                throw new IllegalArgumentException("파일 크기가 너무 큽니다.");
+            }
+
             String contentType = connection.getContentType();
 
             try (InputStream is = connection.getInputStream()) {
