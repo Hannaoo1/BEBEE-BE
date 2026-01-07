@@ -10,7 +10,7 @@ public interface MemberDisabilityCategoryRepository
                 extends JpaRepository<MemberDisabilityCategory, MemberDisabilityCategoryId> {
         /**
          * 회원 ID로 장애 정보 조회
-         * 
+         *
          * @param memberId 회원 ID
          * @return 회원의 장애 정보 목록
          */

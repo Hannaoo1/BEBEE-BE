@@ -34,7 +34,7 @@ public class DocumentVerificationResDTO {
 
     /**
      * 엔티티에서 DTO로 변환
-     * 
+     *
      * @param entity DocumentVerification 엔티티
      * @return DocumentVerificationResDTO
      */
