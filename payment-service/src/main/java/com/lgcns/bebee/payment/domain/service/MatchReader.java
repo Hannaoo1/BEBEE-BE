@@ -1,5 +1,6 @@
 package com.lgcns.bebee.payment.domain.service;
 
+import com.lgcns.bebee.payment.common.exception.PaymentErrors;
 import com.lgcns.bebee.payment.domain.entity.sync.PaymentMatchSync;
 import com.lgcns.bebee.payment.domain.repository.MatchRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ public class MatchReader {
 
     @Transactional(readOnly = true)
     public PaymentMatchSync findById(Long matchId) {
-        return matchRepository.findById(matchId);
+        return matchRepository.findByMatchId(matchId)
+                .orElseThrow(() -> PaymentErrors.MATCH_NOT_FOUND.toException());
     }
 }

@@ -13,7 +13,7 @@ public class HoneyEscrowService {
 
     @Transactional(readOnly = true)
     public Boolean existsByMatchId(Long matchId) {
-        if (honeyEscrowRepository.existsByMatchId(matchId)) {
+        if (honeyEscrowRepository.existsByMatch_MatchId(matchId)) {
             throw PaymentErrors.ESCROW_ALREADY_EXISTS.toException();
         }
 
