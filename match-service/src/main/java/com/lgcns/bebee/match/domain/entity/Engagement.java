@@ -39,6 +39,10 @@ public class Engagement extends BaseTimeEntity {
     @Column(nullable = false)
     private Long completedCount;
 
+    public Long getId() {
+        return this.engagementId;
+    }
+
     public static Engagement create(Long agreementId, EngagementType type, LocalDate activityDate) {
         Engagement engagement = new Engagement();
         engagement.agreementId = agreementId;
@@ -50,13 +54,19 @@ public class Engagement extends BaseTimeEntity {
         engagement.completedCount = 0L;
         return engagement;
     }
-
+    
+    // 체크 여부
     public void setDisabledCheck() {
-        this.isDisabledCheck = true;
+        // 이미 체크되어 있으면 무시
+        if (!this.isDisabledCheck) {
+            this.isDisabledCheck = true;
+        }
     }
 
     public void setHelperCheck() {
-        this.isHelperCheck = true;
+        if (!this.isHelperCheck) {
+            this.isHelperCheck = true;
+        }
     }
 
     // 완료 처리

@@ -3,83 +3,58 @@ package com.lgcns.bebee.match.application.usecase;
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
 import com.lgcns.bebee.common.exception.InvalidParamException;
-import com.lgcns.bebee.match.application.usecase.client.EventPublisher;
 import com.lgcns.bebee.match.common.exception.MatchInvalidParamErrors;
 import com.lgcns.bebee.match.common.util.ParamValidator;
 import com.lgcns.bebee.match.domain.entity.Agreement;
 import com.lgcns.bebee.match.domain.entity.Engagement;
+import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
 import com.lgcns.bebee.match.domain.entity.sync.Role;
-import com.lgcns.bebee.match.domain.event.ActivityCompletedEvent;
-import com.lgcns.bebee.match.domain.event.HoneySettlementEvent;
-import com.lgcns.bebee.match.domain.event.ReviewRequestEvent;
 import com.lgcns.bebee.match.domain.service.AgreementReader;
 import com.lgcns.bebee.match.domain.service.EngagementReader;
+import com.lgcns.bebee.match.domain.service.MemberManager;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CompleteEngagementUseCase
-        implements UseCase<CompleteEngagementUseCase.Param, CompleteEngagementUseCase.Result> {
+public class CompleteEngagementUseCase implements UseCase<CompleteEngagementUseCase.Param, CompleteEngagementUseCase.Result> {
 
     private final EngagementReader engagementReader;
     private final AgreementReader agreementReader;
-    private final EventPublisher eventPublisher;
+    private final MemberManager memberManager;
+    //private final EventPublisher eventPublisher;
 
     @Transactional
     @Override
     public Result execute(Param param) {
-
-
+        
         param.validate();
+
+        MemberSync member = memberManager.findExistingMember(param.getMemberId());
 
         Engagement engagement = engagementReader.getById(param.getEngagementId());
 
         Agreement agreement = agreementReader.getById(engagement.getAgreementId());
 
-        Role userType = param.getUserType();
-        if (userType == Role.HELPER) {
+        Role userType = member.getRole();
+        
+        if (userType == Role.DISABLED) {
+            // 케이스 1: 장애인만 완료시 (즉시 완료)
+            engagement.complete();
+            // publishCompletionEvents(engagement, agreement, false, true);
+
+        } else if (userType == Role.HELPER) {
+            // 케이스 2: 도우미만 완료 (PENDING 유지, 3일 후 스케줄러 처리)
+            // 미완료 상태 유지, 스케줄러에서 처리
             engagement.setHelperCheck();
-        } else if (userType == Role.DISABLED) {
-            engagement.setDisabledCheck();
+            // publishCompletionEvents(engagement, agreement, false, true);
         }
-
-        if(engagement.isHelperCheck()) {
-            //1. 도우미가 완료여부 확인
-            if(true) // 도우미가 완료한 상태
-            {
-                // 케이스 1: 둘 다 완료
-            } else {
-                //  케이스 2: 장애인만 완료 (즉시 완료)
-            }
-        }
-        if(engagement.isDisabledCheck()){
-            //  케이스 3: 도우미만 완료
-        }
-
-
-
-//        // 케이스별 완료 여부 확인 및 처리
-//        if (engagement.isHelperCheck() && engagement.isDisabledCheck()) {
-//
-//            // 케이스 1: 둘 다 완료 (즉시 완료)
-//            engagement.complete();
-//            publishCompletionEvents(engagement, agreement, true, true);
-//
-//        } else if (engagement.isDisabledCheck()) {
-//            // 케이스 2: 장애인만 완료 (즉시 완료)
-//            engagement.complete();
-//            publishCompletionEvents(engagement, agreement, false, true);
-//        }
-//
-//        // 케이스 3: 도우미만 완료 (PENDING 유지, 3일 후 스케줄러 처리)
-//        // 케이스 4: 둘 다 클릭 x (3일 후 스케줄러 처리)
-
+        
+        // 마지막 활동 날짜 체크
         boolean isLastActivity = engagement.isLastActivity(agreement);
 
         return new Result(
@@ -89,6 +64,7 @@ public class CompleteEngagementUseCase
     }
 
     // 완료 처리 이벤트 발행
+    /*
     private void publishCompletionEvents(
             Engagement engagement,
             Agreement agreement,
@@ -118,21 +94,23 @@ public class CompleteEngagementUseCase
                 true
         ));
 
-        // 리뷰 요청 이벤트 (알림 서비스)
-        eventPublisher.publish(new ReviewRequestEvent(
-                agreement.getId(),
-                List.of(engagement.getEngagementId()),
-                agreement.getHelperId(),
-                agreement.getDisabledId()
-        ));
+        // 리뷰 요청 이벤트, 장애인일 완료 하여 완전 완료 시점 (알림 서비스)
+        if (engagement.getStatus() == EngagementStatus.COMPLETED) {
+            eventPublisher.publish(new ReviewRequestEvent(
+                    agreement.getId(),
+                    List.of(engagement.getEngagementId()),
+                    agreement.getHelperId(),
+                    agreement.getDisabledId()
+            ));
+        }
     }
+     */
 
     @Getter
     @RequiredArgsConstructor
     public static class Param implements Params {
         private final Long memberId;
         private final Long engagementId;
-        private final Role userType;
 
         @Override
         public boolean validate() {
@@ -146,18 +124,6 @@ public class CompleteEngagementUseCase
                 throw new InvalidParamException(
                         MatchInvalidParamErrors.REQUIRED_FIELD,
                         "engagementId"
-                );
-            }
-            if (userType == null) {
-                throw new InvalidParamException(
-                        MatchInvalidParamErrors.REQUIRED_FIELD,
-                        "userType"
-                );
-            }
-            if (userType != Role.HELPER && userType != Role.DISABLED) {
-                throw new InvalidParamException(
-                        MatchInvalidParamErrors.INVALID_FORMAT,
-                        "userType"
                 );
             }
             return true;
