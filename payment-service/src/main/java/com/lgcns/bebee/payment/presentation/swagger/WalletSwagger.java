@@ -69,7 +69,7 @@ public interface WalletSwagger {
                                             description = "차감할 꿀의 개수",
                                             value = """
                                                 {
-                                                  "useHoney": 2000,
+                                                  "useHoney": 2000
                                                 }
                                                 """
                                     )
