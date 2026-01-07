@@ -16,13 +16,15 @@ public enum DocumentErrors {
     INVALID_FILE_TYPE("DOCUMENT_004", "지원하지 않는 파일 형식입니다."),
     FILE_UPLOAD_FAILED("DOCUMENT_005", "파일 업로드에 실패했습니다."),
     OCR_FAILED("DOCUMENT_006", "OCR 처리에 실패했습니다."),
-    EXIF_FAILED("DOCUMENT_007", "EXIF 추출에 실패했습니다.");
+    EXIF_FAILED("DOCUMENT_007", "EXIF 추출에 실패했습니다."),
+    FILE_DOWNLOAD_FAILED("DOCUMENT_008", "파일 다운로드에 실패했습니다.");
 
     private final String code;
     private final String message;
 
     /**
      * 에러를 Exception으로 변환
+     * 
      * @return DocumentException
      */
     public DocumentException toException() {

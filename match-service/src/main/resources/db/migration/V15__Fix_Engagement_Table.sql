@@ -1,25 +1,35 @@
--- 외래키 체크 비활성화 (TRUNCATE를 위해 필요)
+-- ========================================
+-- Engagement 테이블 수정
+-- ========================================
+
 SET FOREIGN_KEY_CHECKS = 0;
 
-
--- 1) 기존 FK 제약조건 삭제
+-- 1. 상태(status) 컬럼 추가
 ALTER TABLE `engagement`
-  DROP FOREIGN KEY `FK_engagement_TO_agreement`;
+ADD COLUMN `status` VARCHAR(20) NOT NULL DEFAULT 'PENDING'
+AFTER `type`;
 
--- 2) agreement_id 컬럼 삭제
+-- 2. 활동 날짜 추가
 ALTER TABLE `engagement`
-  DROP COLUMN `agreement_id`;
+ADD COLUMN `activity_date` DATE NOT NULL
+AFTER `status`;
 
--- 3) match_id 컬럼 추가 (원하는 위치에 넣고 싶으면 AFTER 사용)
+-- 3. 장애인 완료 체크
 ALTER TABLE `engagement`
-  ADD COLUMN `match_id` BIGINT NOT NULL AFTER `engagement_id`;
+MODIFY COLUMN `is_disabled_check` BOOLEAN NOT NULL DEFAULT FALSE;
 
--- 5) match_id로 FK 추가 (참조 테이블/컬럼명은 실제 스키마에 맞게 수정)
--- 예: match 테이블의 match_id를 참조하는 경우
+-- 4. 도우미 완료 체크
 ALTER TABLE `engagement`
-  ADD CONSTRAINT `FK_engagement_TO_match`
-  FOREIGN KEY (`match_id`) REFERENCES `match` (`match_id`);
+MODIFY COLUMN `is_helper_check` BOOLEAN NOT NULL DEFAULT FALSE;
 
+-- 5. count 컬럼명 변경 (completed_count)
+ALTER TABLE `engagement`
+CHANGE COLUMN `count` `completed_count` INT NOT NULL DEFAULT 0;
 
--- 외래키 체크 재활성화
+-- 6. 인덱스 추가
+CREATE INDEX idx_engagement_status ON engagement(status);
+CREATE INDEX idx_engagement_date ON engagement(activity_date);
+CREATE INDEX idx_engagement_checks ON engagement(is_disabled_check, is_helper_check);
+CREATE INDEX idx_engagement_status_date ON engagement(status, activity_date);
+
 SET FOREIGN_KEY_CHECKS = 1;
