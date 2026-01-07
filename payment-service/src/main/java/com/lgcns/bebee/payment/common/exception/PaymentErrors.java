@@ -18,6 +18,8 @@ public enum PaymentErrors implements ErrorInfo {
     ESCROW_ALREADY_EXISTS("이미 해당 매칭에 대한 꿀 보관소가 존재합니다."),
     ESCROW_NOT_FOUND("꿀 보관소를 찾을 수 없습니다."),
 
+    MATCH_NOT_FOUND("매칭 정보를 찾을 수 없습니다."),
+
     TOSS_API_ERROR("토스페이먼츠 API 호출에 실패했습니다."),
     TOSS_API_TIMEOUT("토스페이먼츠 API 응답 시간 초과"),
 
