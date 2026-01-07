@@ -4,6 +4,7 @@ import com.lgcns.bebee.member.application.client.FileStorageClient;
 import com.lgcns.bebee.member.core.exception.DocumentErrors;
 import com.lgcns.bebee.member.core.properties.FileStorageProperties;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,6 +18,7 @@ import java.util.UUID;
  * 로컬 파일 저장 구현체
  * 개발/테스트 환경용 (운영 시 S3로 교체)
  */
+@ConditionalOnProperty(name = "aws.s3.enabled", havingValue = "false", matchIfMissing = true)
 @Component
 @RequiredArgsConstructor
 public class LocalFileStorage implements FileStorageClient {
