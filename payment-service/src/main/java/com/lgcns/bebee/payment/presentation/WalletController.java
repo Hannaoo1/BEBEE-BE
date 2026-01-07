@@ -36,7 +36,7 @@ public class WalletController implements WalletSwagger {
             @CurrentMember Long memberId,
             @RequestBody HoneyUseReqDTO request
     ) {
-        UseHoneyUseCase.Param param = new UseHoneyUseCase.Param(memberId, request.getUseHoney());
+        UseHoneyUseCase.Param param = HoneyUseReqDTO.toParam(memberId, request);
         useHoneyUseCase.execute(param);
 
         return ResponseEntity.ok().build();
