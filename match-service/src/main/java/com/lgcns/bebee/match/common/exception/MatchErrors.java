@@ -20,7 +20,16 @@ public enum MatchErrors implements ErrorInfo {
     ALREADY_MATCHED("이미 매칭이 성사된 요청입니다.", HttpStatus.CONFLICT),
     HELPER_ONLY_CAN_APPLY("도우미만 지원할 수 있습니다.", HttpStatus.FORBIDDEN),
     ALREADY_APPLIED("이미 지원한 게시글입니다.", HttpStatus.CONFLICT),
-    UNAUTHORIZED_ACCESS("접근 권한이 없습니다.", HttpStatus.FORBIDDEN);
+    UNAUTHORIZED_ACCESS("접근 권한이 없습니다.", HttpStatus.FORBIDDEN),
+
+    ENGAGEMENT_NOT_FOUND("활동을 찾을 수 없습니다", HttpStatus.NOT_FOUND),
+    ENGAGEMENT_NOT_COMPLETED("완료된 활동만 리뷰를 작성할 수 있습니다", HttpStatus.FORBIDDEN),
+
+    ALREADY_REVIEWED("이미 작성한 리뷰입니다", HttpStatus.CONFLICT),
+    INVALID_KEYWORD("유효하지 않은 키워드입니다", HttpStatus.BAD_REQUEST),
+    KEYWORD_DIRECTION_MISMATCH("리뷰 방향과 키워드가 일치하지 않습니다", HttpStatus.BAD_REQUEST),
+    NOT_ENGAGEMENT_MEMBER("활동 참여자만 리뷰를 작성할 수 있습니다", HttpStatus.FORBIDDEN),
+    REVIEW_ONLY_FOR_LAST_ACTIVITY("마지막 활동만 리뷰를 작성할 수 있습니다", HttpStatus.FORBIDDEN);
 
     private final String desc;
     private final HttpStatus httpStatus;

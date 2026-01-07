@@ -1,0 +1,57 @@
+package com.lgcns.bebee.match.domain.service;
+
+import com.lgcns.bebee.match.common.exception.MatchErrors;
+import com.lgcns.bebee.match.domain.entity.Review;
+import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
+import com.lgcns.bebee.match.domain.entity.sync.Role;
+import com.lgcns.bebee.match.domain.entity.vo.Keyword;
+import com.lgcns.bebee.match.domain.entity.vo.ReviewDirection;
+import com.lgcns.bebee.match.domain.repository.ReviewRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class ReviewManager {
+
+    private final ReviewRepository reviewRepository;
+
+    // ReviewDirection 결정
+    public ReviewDirection determineReviewDirection(MemberSync member) {
+        return (member.getRole() == Role.DISABLED)
+                ? ReviewDirection.DISABLED_TO_HELPER
+                : ReviewDirection.HELPER_TO_DISABLED;
+    }
+
+    // 키워드 검증
+    public void validateKeywords(List<Integer> keywordIds, ReviewDirection direction) {
+        List<Integer> validKeywordIds = Keyword.getByDirection(direction)
+                .stream()
+                .map(Keyword::getId)
+                .toList();
+
+        for (Integer keywordId : keywordIds) {
+            if (!validKeywordIds.contains(keywordId)) {
+                throw MatchErrors.INVALID_KEYWORD.toException();
+            }
+        }
+    }
+
+    // 리뷰 생성 및 검증
+    public Review createReview(
+            Long reviewerId,
+            Long revieweeId,
+            ReviewDirection direction,
+            List<Integer> keywordIds
+    ) {
+        Review review = Review.create(
+                reviewerId,
+                revieweeId,
+                direction,
+                keywordIds
+        );
+
+        return reviewRepository.save(review);
+    }
+}
