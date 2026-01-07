@@ -1,6 +1,5 @@
 package com.lgcns.bebee.match.presentation.swagger;
 
-import com.lgcns.bebee.common.annotation.CurrentMember;
 import com.lgcns.bebee.match.presentation.dto.res.EngagementCompleteResDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -10,7 +9,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "Engagement", description = "활동 완료 API")
 public interface EngagementSwagger {
@@ -20,12 +18,12 @@ public interface EngagementSwagger {
             description = """
             활동 완료 체크를 처리합니다.
             
-            ## 테스트 모드
-            - 100: 장애인 (DISABLED)
-            - 700: 도우미 (HELPER)
+            ## 인증
+            JWT 토큰에서 현재 회원 정보를 자동으로 추출하여 처리합니다.
+            - Authorization: Bearer {token} 헤더 필수
             
             ## 동작 방식
-            토큰에서 회원 정보(Role)를 자동으로 확인하여 처리합니다.
+            토큰에서 확인된 회원의 역할(Role)에 따라 자동으로 처리됩니다.
             
             ## 케이스별 처리
             
@@ -53,15 +51,17 @@ public interface EngagementSwagger {
             - isLastActivity: 마지막 활동 여부 (DAY는 항상 true)
             
             ## 예시
-            ```
-            장애인 체크:
+```
+            장애인이 체크:
             POST /engagements/1001/complete
+            Authorization: Bearer {disabled_token}
             → { "status": "COMPLETED", "isLastActivity": true }
             
-            도우미 체크:
+            도우미가 체크:
             POST /engagements/1002/complete
+            Authorization: Bearer {helper_token}
             → { "status": "PENDING", "isLastActivity": true }
-            ```
+```
             """
     )
     @ApiResponses({
@@ -93,16 +93,16 @@ public interface EngagementSwagger {
                     )
             ),
             @ApiResponse(
+                    responseCode = "401",
+                    description = "인증 실패 (토큰 없음 또는 유효하지 않음)"
+            ),
+            @ApiResponse(
                     responseCode = "404",
                     description = "활동을 찾을 수 없음"
             )
     })
     ResponseEntity<EngagementCompleteResDTO> completeEngagement(
-            @Parameter(
-                    description = "현재 회원 ID (100: 장애인, 700: 도우미)",
-                    example = "100",
-                    required = true
-            ) @RequestParam String currentMemberId,
+            Long currentMemberId,  // @CurrentMember로 자동 주입됨 (Swagger에서는 표시 안 됨)
             @Parameter(
                     description = "활동 ID",
                     example = "1001",
