@@ -4,6 +4,7 @@ import com.lgcns.bebee.member.application.client.FileStorageClient;
 import com.lgcns.bebee.member.core.exception.DocumentErrors;
 import com.lgcns.bebee.member.core.properties.FileStorageProperties;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,6 +18,7 @@ import java.util.UUID;
  * 로컬 파일 저장 구현체
  * 개발/테스트 환경용 (운영 시 S3로 교체)
  */
+@ConditionalOnProperty(name = "aws.s3.enabled", havingValue = "false", matchIfMissing = true)
 @Component
 @RequiredArgsConstructor
 public class LocalFileStorage implements FileStorageClient {
@@ -25,7 +27,8 @@ public class LocalFileStorage implements FileStorageClient {
 
     /**
      * 파일 업로드
-     * @param file 업로드할 파일
+     * 
+     * @param file      업로드할 파일
      * @param directory 저장 디렉토리
      * @return 업로드된 파일의 URL
      */
@@ -57,6 +60,7 @@ public class LocalFileStorage implements FileStorageClient {
 
     /**
      * 파일 삭제
+     * 
      * @param fileUrl 삭제할 파일 URL
      */
     @Override
@@ -83,5 +87,17 @@ public class LocalFileStorage implements FileStorageClient {
         }
         return filename.substring(filename.lastIndexOf("."));
     }
-}
 
+    /**
+     * 파일 다운로드 (로컬 환경 미지원)
+     *
+     * @param fileUrl 다운로드할 파일 URL
+     * @return MultipartFile (항상 예외 발생)
+     * @throws DocumentException 로컬 환경에서는 S3 URL 다운로드를 지원하지 않음
+     */
+    @Override
+    public MultipartFile download(String fileUrl) {
+        // 로컬 환경에서 S3 URL 다운로드를 시도할 경우, 일관된 에러 처리를 위해 도메인 예외를 던집니다.
+        throw DocumentErrors.FILE_DOWNLOAD_FAILED.toException();
+    }
+}

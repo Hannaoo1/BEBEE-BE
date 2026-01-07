@@ -37,17 +37,21 @@ public class DocumentController implements DocumentSwagger {
          * 
          * @param memberId   회원 ID
          * @param documentId 문서 유형 ID
-         * @param file       업로드 파일
+         * @param file       업로드 파일 (로컬 환경용, optional)
+         * @param fileUrl    S3 파일 URL (S3 환경용, optional)
          * @return 업로드 결과
          */
         @PostMapping("/upload")
         public ResponseEntity<DocumentUploadResDTO> uploadDocument(
                         @RequestParam Long memberId,
                         @RequestParam Long documentId,
-                        @RequestPart MultipartFile file) {
-                log.info("문서 업로드 처리 시작: memberId={}, documentId={}", memberId, documentId);
+                        @RequestPart(required = false) MultipartFile file,
+                        @RequestParam(required = false) String fileUrl) {
+                log.info("문서 업로드 처리 시작: memberId={}, documentId={}, fileUrl={}, hasFile={}",
+                                memberId, documentId, fileUrl, file != null && !file.isEmpty());
                 try {
-                        UploadDocumentUseCase.Param param = new UploadDocumentUseCase.Param(memberId, documentId, file);
+                        UploadDocumentUseCase.Param param = new UploadDocumentUseCase.Param(memberId, documentId, file,
+                                        fileUrl);
                         Long verificationId = uploadDocumentUseCase.execute(param);
 
                         // 저장된 검증 정보 조회
