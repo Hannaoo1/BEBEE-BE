@@ -4,6 +4,7 @@ import com.lgcns.bebee.member.application.client.FileStorageClient;
 import com.lgcns.bebee.member.core.exception.DocumentErrors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,40 +18,51 @@ import java.net.URLConnection;
  */
 @Slf4j
 @Component
+@ConditionalOnProperty(name = "aws.s3.enabled", havingValue = "true", matchIfMissing = false)
 @RequiredArgsConstructor
 public class S3FileStorage implements FileStorageClient {
 
     @Override
     public String upload(MultipartFile file, String directory) {
-        // TODO: S3 파일 업로드 구현 필요 (필요 시 추가)
-        log.warn("S3FileStorage.upload()는 아직 구현되지 않았습니다.");
-        return null;
+        throw new UnsupportedOperationException(
+                "S3FileStorage는 HTTP 기반으로 파일 업로드를 지원하지 않습니다. " +
+                        "file-service를 통해 Presigned URL을 사용하여 S3에 직접 업로드하세요.");
     }
 
     @Override
     public MultipartFile download(String fileUrl) {
         try {
-            // 1. SSRF 방지를 위한 URL 검증 (CodeRabbit 피드백 반영)
+            // 1. SSRF 방지를 위한 URL 및 도메인 정밀 검증 (CodeRabbit 피드백 반영)
             if (fileUrl == null || fileUrl.isBlank()) {
                 throw new IllegalArgumentException("파일 URL은 필수입니다.");
             }
-            if (!fileUrl.startsWith("https://") || !fileUrl.contains(".amazonaws.com/")) {
-                log.warn("허용되지 않은 S3 URL 접근 시도 차단 (SSRF 방지): {}", fileUrl);
+
+            URL url = new URL(fileUrl);
+
+            // 프로토콜 검증
+            if (!"https".equals(url.getProtocol())) {
+                log.warn("보안상 HTTPS가 아닌 프로토콜 차단: {}", fileUrl);
+                throw new IllegalArgumentException("HTTPS URL만 허용됩니다.");
+            }
+
+            // 호스트 도메인 엄격 검증
+            String host = url.getHost();
+            if (host == null || !host.endsWith(".amazonaws.com")) {
+                log.warn("허용되지 않은 도메인 접근 시도 차단 (SSRF 방지): {}", fileUrl);
                 throw new IllegalArgumentException("유효한 S3 URL이 아닙니다.");
             }
 
             log.info("S3 서버에서 파일 다운로드 시작 (HTTP 방식): {}", fileUrl);
 
-            URL url = new URL(fileUrl);
             URLConnection connection = url.openConnection();
             connection.setConnectTimeout(10000); // 10초 내에 연결 안 되면 포기
-            connection.setReadTimeout(30000); // 30초로 상향 (대용량 파일 고려)
+            connection.setReadTimeout(30000); // 30초로 상항 (대용량 파일 고려)
 
-            // 2. 파일 크기 검증 (OOM 방지, 20MB 제한) - CodeRabbit 피드백 반영
+            // 2. 파일 크기 검증 (OOM 방지, 20MB 제한)
             long contentLength = connection.getContentLengthLong();
             if (contentLength > 20 * 1024 * 1024) {
                 log.error("파일 크기가 제한(20MB)을 초과했습니다: {} bytes", contentLength);
-                throw new IllegalArgumentException("파일 크기가 너무 큽니다.");
+                throw new IllegalArgumentException("파일 크기가 너무 큽니다. (최대 20MB)");
             }
 
             String contentType = connection.getContentType();
@@ -67,8 +79,11 @@ public class S3FileStorage implements FileStorageClient {
                 return new ByteArrayMultipartFile("file", fileName, contentType, content);
             }
 
+        } catch (IllegalArgumentException e) {
+            log.error("잘못된 S3 다운로드 요청: {}", e.getMessage());
+            throw e;
         } catch (Exception e) {
-            log.error("S3 파일 다운로드 실패 (HTTP): {}", fileUrl, e);
+            log.error("S3 파일 다운로드 중 예기치 않은 오류 실패 (HTTP): {}", fileUrl, e);
             throw DocumentErrors.FILE_UPLOAD_FAILED.toException();
         }
     }
