@@ -46,8 +46,8 @@ dependencies {
     // Redis - 리프레시 토큰 블랙리스트 관리용
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
-    // AWS SDK v2 S3 - S3 파일 업로드/다운로드용
-    implementation 'software.amazon.awssdk:s3:2.20.162'
+    // AWS SDK v2 S3 -    // AWS SDK S3 제거 (HTTP 기반 다운로드로 대체)
+    // implementation 'software.amazon.awssdk:s3:2.20.162'
 
     // Spring Actuator - 어플리케이션 모니터링 및 관리 엔드포인트를 제공
     implementation 'org.springframework.boot:spring-boot-starter-actuator'

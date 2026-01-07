@@ -4,16 +4,12 @@ import com.lgcns.bebee.member.application.client.FileStorageClient;
 import com.lgcns.bebee.member.core.exception.DocumentErrors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.core.ResponseInputStream;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
-import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 
 /**
  * S3 파일 저장 구현체
@@ -22,13 +18,7 @@ import java.io.IOException;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "aws.s3.access-key")
 public class S3FileStorage implements FileStorageClient {
-
-    private final S3Client s3Client;
-
-    @Value("${aws.s3.bucket}")
-    private String bucketName;
 
     @Override
     public String upload(MultipartFile file, String directory) {
@@ -40,54 +30,35 @@ public class S3FileStorage implements FileStorageClient {
     @Override
     public MultipartFile download(String fileUrl) {
         try {
-            log.info("S3에서 파일 다운로드 시작");
+            log.info("S3 서버에서 파일 다운로드 시작 (HTTP 방식): {}", fileUrl);
 
-            String key = extractKeyFromUrl(fileUrl);
+            URL url = new URL(fileUrl);
+            URLConnection connection = url.openConnection();
+            connection.setConnectTimeout(10000); // 10초 내에 연결 안 되면 포기
+            connection.setReadTimeout(10000); // 10초 내에 파일 안 읽히면 포기
+            String contentType = connection.getContentType();
 
-            GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(key)
-                    .build();
+            try (InputStream is = connection.getInputStream()) {
+                byte[] content = is.readAllBytes();
 
-            // v2에서 try-with-resources로 ResponseInputStream을 확실히 닫음
-            try (ResponseInputStream<GetObjectResponse> s3ObjectStream = s3Client.getObject(getObjectRequest)) {
-                String fileName = key.substring(key.lastIndexOf('/') + 1);
-                String contentType = s3ObjectStream.response().contentType();
-                byte[] content = s3ObjectStream.readAllBytes();
+                String fileName = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
+                if (fileName.contains("?")) {
+                    fileName = fileName.substring(0, fileName.indexOf("?"));
+                }
 
-                log.info("S3 파일 다운로드 완료: {}", fileName);
+                log.info("S3 파일 다운로드 및 메모리 로드 완료: {}", fileName);
                 return new ByteArrayMultipartFile("file", fileName, contentType, content);
             }
 
-        } catch (IOException e) {
-            log.error("S3 파일 읽기 실패: {}", fileUrl, e);
-            throw DocumentErrors.FILE_UPLOAD_FAILED.toException(); // 대안 에러 필요 시 추가
         } catch (Exception e) {
-            log.error("S3 파일 다운로드 중 예외 발생: {}", fileUrl, e);
+            log.error("S3 파일 다운로드 실패 (HTTP): {}", fileUrl, e);
             throw DocumentErrors.FILE_UPLOAD_FAILED.toException();
         }
     }
 
     @Override
     public void delete(String fileUrl) {
-        try {
-            String key = extractKeyFromUrl(fileUrl);
-            s3Client.deleteObject(builder -> builder.bucket(bucketName).key(key));
-            log.info("S3 파일 삭제 완료: {}", key);
-        } catch (Exception e) {
-            log.error("S3 파일 삭제 실패: {}", fileUrl, e);
-        }
-    }
-
-    /**
-     * S3 URL에서 key 추출
-     * 예: https://bebee-storage.s3.ap-northeast-2.amazonaws.com/documents/abc.jpg
-     * → documents/abc.jpg
-     */
-    private String extractKeyFromUrl(String fileUrl) {
-        if (fileUrl.contains(".com/")) {
-            return fileUrl.substring(fileUrl.indexOf(".com/") + 5);
-        }
-        throw new IllegalArgumentException("Invalid S3 URL: " + fileUrl);
+        // HTTP 방식으로는 삭제가 불가능하며, 관리 서비스(file-service)를 통해 삭제해야 함
+        log.warn("S3FileStorage.delete()는 HTTP 방식에서 지원되지 않습니다. 관리 서비스를 이용하세요.");
     }
 }
