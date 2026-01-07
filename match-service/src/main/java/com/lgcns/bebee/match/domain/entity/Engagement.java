@@ -71,6 +71,9 @@ public class Engagement extends BaseTimeEntity {
 
     // 완료 처리
     public void complete() {
+        if (this.status == EngagementStatus.COMPLETED) {
+            return; // 또는 예외 발생
+        }
         this.status = EngagementStatus.COMPLETED;
         this.completedCount += 1;
     }
