@@ -171,12 +171,8 @@ public interface MatchSwagger {
             )
     })
     ResponseEntity<MatchesByDateGetResDTO> getMatchesByDate(
-            @Parameter(
-                    description = "현재 로그인한 회원 ID(임시, 나중에 토큰으로 처리)",
-                    required = true,
-                    example = "791168241386394999"
-            )
-            @RequestParam String memberId,
+            @Parameter(hidden = true)
+            @RequestParam Long memberId,
 
             @Parameter(
                     description = "캘린더에서 선택한 날짜",
@@ -235,12 +231,8 @@ public interface MatchSwagger {
             )
     })
     ResponseEntity<MatchCalendarGetResDTO> getActiveDayByMonth(
-            @Parameter(
-                    description = "현재 로그인한 회원 ID(임시, 나중에 토큰으로 처리)",
-                    required = true,
-                    example = "791168241386394999"
-            )
-            @RequestParam String memberId,
+            @Parameter(hidden = true)
+            @RequestParam Long memberId,
 
             @Parameter(
                     description = "캘린더에서 선택한 연도",

@@ -1,5 +1,6 @@
 package com.lgcns.bebee.match.presentation;
 
+import com.lgcns.bebee.common.annotation.CurrentMember;
 import com.lgcns.bebee.match.application.usecase.GetMatchCalendarUseCase;
 import com.lgcns.bebee.match.application.usecase.GetMatchesByDateUseCase;
 import com.lgcns.bebee.match.domain.entity.vo.EngagementType;
@@ -23,12 +24,12 @@ public class MatchController implements MatchSwagger {
 
     @GetMapping
     public ResponseEntity<MatchesByDateGetResDTO> getMatchesByDate(
-            @RequestParam String memberId,
+            @CurrentMember Long memberId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestParam EngagementType engagementType
     ) {
         GetMatchesByDateUseCase.Param param = new GetMatchesByDateUseCase.Param(
-                Long.parseLong(memberId),
+                memberId,
                 date,
                 engagementType
         );
@@ -41,12 +42,12 @@ public class MatchController implements MatchSwagger {
 
     @GetMapping("/calendar")
     public ResponseEntity<MatchCalendarGetResDTO> getActiveDayByMonth(
-            @RequestParam String memberId,
+            @CurrentMember Long memberId,
             @RequestParam Integer year,
             @RequestParam Integer month
     ) {
         GetMatchCalendarUseCase.Param param = new GetMatchCalendarUseCase.Param(
-                Long.parseLong(memberId),
+                memberId,
                 year,
                 month
         );
