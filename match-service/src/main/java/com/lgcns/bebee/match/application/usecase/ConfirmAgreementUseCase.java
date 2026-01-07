@@ -6,7 +6,7 @@ import com.lgcns.bebee.common.data.event.AgreementConfirmedEvent;
 import com.lgcns.bebee.common.exception.InvalidParamException;
 import com.lgcns.bebee.match.application.usecase.client.EventPublisher;
 import com.lgcns.bebee.match.common.exception.MatchInvalidParamErrors;
-import com.lgcns.bebee.match.common.util.ParamValidator;
+import com.lgcns.bebee.common.util.ParamValidator;
 import com.lgcns.bebee.match.domain.entity.Agreement;
 import com.lgcns.bebee.match.domain.entity.Match;
 import com.lgcns.bebee.match.domain.repository.MatchRepository;
