@@ -78,7 +78,7 @@ public class ConfirmPaymentUseCase implements UseCase<ConfirmPaymentUseCase.Para
         HoneyHistory history = HoneyHistory.create(
                 wallet,
                 temp.getMemberId(),
-                response.totalAmount(),
+                response.totalAmount().longValue(),
                 HoneyHistoryType.CHARGE
         );
         honeyHistoryRepository.save(history);
