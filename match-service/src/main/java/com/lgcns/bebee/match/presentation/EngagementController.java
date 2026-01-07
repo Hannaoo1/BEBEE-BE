@@ -19,14 +19,13 @@ public class EngagementController implements EngagementSwagger {
     @Override
     @PostMapping("/{engagementId}/complete")
     public ResponseEntity<EngagementCompleteResDTO> completeEngagement(
-            //@CurrentMember Long currentMemberId,
-            @RequestParam String currentMemberId,
+            @CurrentMember Long currentMemberId,
             @PathVariable String engagementId
     ) {
 
         // DTO → Param 변환
         CompleteEngagementUseCase.Param param = new CompleteEngagementUseCase.Param(
-                Long.parseLong(currentMemberId),
+                currentMemberId,
                 Long.parseLong(engagementId)
         );
 
