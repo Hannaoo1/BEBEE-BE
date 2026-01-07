@@ -58,9 +58,11 @@ public class S3FileStorage implements FileStorageClient {
             connection.setConnectTimeout(10000); // 10초 내에 연결 안 되면 포기
             connection.setReadTimeout(30000); // 30초로 상항 (대용량 파일 고려)
 
-            // 2. 파일 크기 검증 (OOM 방지, 20MB 제한)
+            // 2. 파일 크기 검증 (OOM 방지, 20MB 제한) - CodeRabbit 피드백 반영
+            final long MAX_FILE_SIZE = 20 * 1024 * 1024;
             long contentLength = connection.getContentLengthLong();
-            if (contentLength > 20 * 1024 * 1024) {
+
+            if (contentLength > MAX_FILE_SIZE) {
                 log.error("파일 크기가 제한(20MB)을 초과했습니다: {} bytes", contentLength);
                 throw new IllegalArgumentException("파일 크기가 너무 큽니다. (최대 20MB)");
             }
@@ -68,7 +70,28 @@ public class S3FileStorage implements FileStorageClient {
             String contentType = connection.getContentType();
 
             try (InputStream is = connection.getInputStream()) {
-                byte[] content = is.readAllBytes();
+                byte[] content;
+
+                if (contentLength < 0) {
+                    // Content-Length가 없는 경우(-1)에도 스트리밍 중 크기 제한 강제 (보안 강화)
+                    log.info("Content-Length 미지정으로 스트리밍 크기 제한 모드 진입");
+                    java.io.ByteArrayOutputStream buffer = new java.io.ByteArrayOutputStream();
+                    byte[] chunk = new byte[8192];
+                    int bytesRead;
+                    long totalRead = 0;
+
+                    while ((bytesRead = is.read(chunk)) != -1) {
+                        totalRead += bytesRead;
+                        if (totalRead > MAX_FILE_SIZE) {
+                            log.error("스트리밍 중 파일 크기 제한(20MB) 초과 감지");
+                            throw new IllegalArgumentException("파일 크기가 너무 큽니다. (최대 20MB)");
+                        }
+                        buffer.write(chunk, 0, bytesRead);
+                    }
+                    content = buffer.toByteArray();
+                } else {
+                    content = is.readAllBytes();
+                }
 
                 String fileName = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
                 if (fileName.contains("?")) {
@@ -84,7 +107,7 @@ public class S3FileStorage implements FileStorageClient {
             throw e;
         } catch (Exception e) {
             log.error("S3 파일 다운로드 중 예기치 않은 오류 실패 (HTTP): {}", fileUrl, e);
-            throw DocumentErrors.FILE_UPLOAD_FAILED.toException();
+            throw DocumentErrors.FILE_DOWNLOAD_FAILED.toException();
         }
     }
 
