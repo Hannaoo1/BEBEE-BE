@@ -88,6 +88,13 @@ public class LocalFileStorage implements FileStorageClient {
         return filename.substring(filename.lastIndexOf("."));
     }
 
+    /**
+     * 파일 다운로드 (로컬 환경 미지원)
+     *
+     * @param fileUrl 다운로드할 파일 URL
+     * @return MultipartFile (항상 예외 발생)
+     * @throws DocumentException 로컬 환경에서는 S3 URL 다운로드를 지원하지 않음
+     */
     @Override
     public MultipartFile download(String fileUrl) {
         // 로컬 환경에서 S3 URL 다운로드를 시도할 경우, 일관된 에러 처리를 위해 도메인 예외를 던집니다.
