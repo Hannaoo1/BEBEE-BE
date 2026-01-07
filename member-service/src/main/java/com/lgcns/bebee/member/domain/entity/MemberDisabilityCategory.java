@@ -31,14 +31,26 @@ public class MemberDisabilityCategory extends BaseTimeEntity {
     @Column(nullable = false, length = 300)
     private String disabilityDescription;
 
-    public static MemberDisabilityCategory create(Member member, DisabilityCategory disabilityCategory, String level,
-            String description) {
-        MemberDisabilityCategory entity = new MemberDisabilityCategory();
-        entity.id = new MemberDisabilityCategoryId(member.getId(), disabilityCategory.getDisabilityCategoryId());
-        entity.member = member;
-        entity.disabilityCategory = disabilityCategory;
-        entity.level = level;
-        entity.disabilityDescription = description;
-        return entity;
+    /**
+     * MemberDisabilityCategory 생성 (정적 팩토리 메서드)
+     * 
+     * @param member             회원 엔티티
+     * @param disabilityCategory 장애 카테고리 엔티티
+     * @param level              장애 등급
+     * @param description        장애 설명
+     * @return 생성된 MemberDisabilityCategory
+     */
+    public static MemberDisabilityCategory create(Member member, DisabilityCategory disabilityCategory, 
+                                                   String level, String description) {
+        MemberDisabilityCategory memberDisabilityCategory = new MemberDisabilityCategory();
+        memberDisabilityCategory.id = new MemberDisabilityCategoryId(
+            member.getId(), 
+            disabilityCategory.getDisabilityCategoryId()
+        );
+        memberDisabilityCategory.member = member;
+        memberDisabilityCategory.disabilityCategory = disabilityCategory;
+        memberDisabilityCategory.level = level;
+        memberDisabilityCategory.disabilityDescription = description;
+        return memberDisabilityCategory;
     }
 }

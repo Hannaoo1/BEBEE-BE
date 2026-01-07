@@ -1,0 +1,87 @@
+package com.lgcns.bebee.match.application.usecase;
+
+import com.lgcns.bebee.common.application.Params;
+import com.lgcns.bebee.common.application.UseCase;
+import com.lgcns.bebee.common.exception.InvalidParamException;
+import com.lgcns.bebee.match.common.exception.MatchInvalidParamErrors;
+import com.lgcns.bebee.match.common.util.ParamValidator;
+import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
+import com.lgcns.bebee.match.domain.entity.vo.Keyword;
+import com.lgcns.bebee.match.domain.entity.vo.ReviewDirection;
+import com.lgcns.bebee.match.domain.service.MemberManager;
+import com.lgcns.bebee.match.domain.service.ReviewManager;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+import java.util.stream.Collectors;
+
+
+@Service
+@RequiredArgsConstructor
+public class GetReviewKeywordsListUseCase implements UseCase<GetReviewKeywordsListUseCase.Param, GetReviewKeywordsListUseCase.Result> {
+
+    private final MemberManager memberManager;
+    private final ReviewManager reviewManager;
+
+    @Transactional(readOnly = true)
+    @Override
+    public Result execute(Param param) {
+
+        param.validate();
+
+        // 회원 조회
+        MemberSync member = memberManager.findExistingMember(param.getMemberId());
+
+        // ReviewDirection 결정
+        ReviewDirection direction = reviewManager.determineReviewDirection(member);
+
+        System.out.println("=== DEBUG: direction = " + direction);
+
+        // 키워드 목록 조회
+        List<KeywordDTO> keywords = Keyword.getByDirection(direction)
+                .stream()
+                .map(keyword -> new KeywordDTO(
+                        keyword.getId(),
+                        keyword.getDescription(),
+                        keyword.isPositive()
+                ))
+                .collect(Collectors.toList());
+
+        return new Result(keywords);
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static class Param implements Params {
+        private final Long memberId;
+
+        @Override
+        public boolean validate() {
+            if (!ParamValidator.isValidId(memberId)) {
+                throw new InvalidParamException(
+                        MatchInvalidParamErrors.REQUIRED_FIELD,
+                        "memberId"
+                );
+            }
+            return true;
+        }
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class KeywordDTO {
+        private Integer keywordId;
+        private String description;
+        private Boolean isPositive;
+    }
+
+    @Getter
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Result {
+        private List<KeywordDTO> keywords;
+    }
+}

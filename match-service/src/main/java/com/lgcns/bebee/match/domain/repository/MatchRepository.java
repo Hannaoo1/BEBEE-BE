@@ -2,7 +2,6 @@ package com.lgcns.bebee.match.domain.repository;
 
 import com.lgcns.bebee.match.domain.entity.Match;
 import com.lgcns.bebee.match.domain.entity.vo.EngagementType;
-
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;

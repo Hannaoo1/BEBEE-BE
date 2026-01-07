@@ -1,8 +1,7 @@
 package com.lgcns.bebee.member.presentation;
 
 import com.lgcns.bebee.common.annotation.CurrentMember;
-import com.lgcns.bebee.member.application.usecase.ReadMemberBaseInfoUseCase;
-import com.lgcns.bebee.member.domain.entity.Member;
+import com.lgcns.bebee.member.application.usecase.ReadMemberProfileUseCase;
 import com.lgcns.bebee.member.presentation.dto.res.MemberInfoResDTO;
 import com.lgcns.bebee.member.presentation.swagger.MemberSwagger;
 import lombok.RequiredArgsConstructor;
@@ -16,14 +15,46 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class MemberController implements MemberSwagger {
 
-    private final ReadMemberBaseInfoUseCase readMemberBaseInfoUseCase;
+    private final ReadMemberProfileUseCase readMemberProfileUseCase;
 
     @Override
     @GetMapping("/me")
-    public ResponseEntity<MemberInfoResDTO> getMyInfo(@CurrentMember Member member) {
-        ReadMemberBaseInfoUseCase.Param param = new ReadMemberBaseInfoUseCase.Param(member);
-        ReadMemberBaseInfoUseCase.Result result = readMemberBaseInfoUseCase.execute(param);
+    public ResponseEntity<MemberInfoResDTO> getMyInfo(@CurrentMember Long memberId) {
+        ReadMemberProfileUseCase.Param param = new ReadMemberProfileUseCase.Param(memberId);
+        ReadMemberProfileUseCase.Result result = readMemberProfileUseCase.execute(param);
 
-        return ResponseEntity.ok(MemberInfoResDTO.from(result));
+        MemberInfoResDTO.MemberInfoResDTOBuilder builder = MemberInfoResDTO.builder()
+                .memberId(String.valueOf(result.getMember().getId()))
+                .email(result.getMember().getEmail())
+                .name(result.getMember().getName())
+                .nickname(result.getMember().getNickname())
+                .role(result.getMember().getRole().name())
+                .phoneNumber(result.getMember().getPhoneNumber())
+                .introduction(result.getMember().getIntroduction() != null ? result.getMember().getIntroduction() : "")
+                .profileImageUrl(
+                        result.getMember().getProfileImageUrl() != null ? result.getMember().getProfileImageUrl() : "")
+                .sweetness(result.getMember().getSweetness())
+                .honeyPoint(0)
+                .addressRoad(result.getMember().getAddressRoad() != null ? result.getMember().getAddressRoad() : "")
+                .gender(result.getMember().getGender().name())
+                .birthDate(result.getMember().getBirthDate())
+                .ageGroup(result.getAgeGroup());
+
+        if (result.getHelpTypes() != null) {
+            builder.helpTypes(result.getHelpTypes());
+        }
+
+        if (result.getDocuments() != null) {
+            builder.documents(result.getDocuments().stream()
+                    .map(com.lgcns.bebee.member.presentation.dto.res.DocumentVerificationResDTO::from)
+                    .collect(java.util.stream.Collectors.toList()));
+        }
+
+        if (result.getDisabilityType() != null) {
+            builder.disabilityType(result.getDisabilityType())
+                    .disabilityDescription(result.getDisabilityDescription());
+        }
+
+        return ResponseEntity.ok(builder.build());
     }
 }

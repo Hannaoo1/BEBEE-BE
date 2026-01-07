@@ -2,16 +2,15 @@ package com.lgcns.bebee.match.application.usecase;
 
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
+import com.lgcns.bebee.common.data.event.AgreementConfirmedEvent;
 import com.lgcns.bebee.common.exception.InvalidParamException;
+import com.lgcns.bebee.match.application.usecase.client.EventPublisher;
 import com.lgcns.bebee.match.common.exception.MatchInvalidParamErrors;
-import com.lgcns.bebee.match.common.util.ParamValidator;
+import com.lgcns.bebee.common.util.ParamValidator;
 import com.lgcns.bebee.match.domain.entity.Agreement;
-import com.lgcns.bebee.match.domain.entity.Engagement;
 import com.lgcns.bebee.match.domain.entity.Match;
-import com.lgcns.bebee.match.domain.repository.EngagementRepository;
 import com.lgcns.bebee.match.domain.repository.MatchRepository;
 import com.lgcns.bebee.match.domain.service.AgreementReader;
-import com.lgcns.bebee.match.domain.service.EngagementManager;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,26 +18,33 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.lgcns.bebee.match.common.exception.MatchErrors.*;
+
 @Service
 @RequiredArgsConstructor
 public class ConfirmAgreementUseCase implements UseCase<ConfirmAgreementUseCase.Param, ConfirmAgreementUseCase.Result>{
-
     private final AgreementReader agreementReader;
     private final MatchRepository matchRepository;
     private final EngagementManager engagementManager;
     private final EngagementRepository engagementRepository;
+
+    private final EventPublisher eventPublisher;
 
     @Transactional
     @Override
     public Result execute(ConfirmAgreementUseCase.Param param) {
         param.validate();
 
+        if(param.currentMemberId.equals(param.disabledId)){
+            throw AGREEMENT_DISABLED_CANNOT_CONFIRM.toException();
+        }
+
         Agreement agreement = agreementReader.getById(param.getAgreementId());
 
         agreement.confirm();
 
         Match match = Match.create(
-                param.getHelperId(),
+                param.currentMemberId,
                 param.getDisabledId(),
                 param.getPostId(),
                 param.getTitle(),
@@ -46,6 +52,8 @@ public class ConfirmAgreementUseCase implements UseCase<ConfirmAgreementUseCase.
                 agreement
         );
         Match savedMatch = matchRepository.save(match);
+
+        eventPublisher.publish(new AgreementConfirmedEvent(param.chatRoomId));
 
         Engagement engagement = engagementManager.createEngagement(agreement);
         engagementRepository.save(engagement);
@@ -56,7 +64,7 @@ public class ConfirmAgreementUseCase implements UseCase<ConfirmAgreementUseCase.
     @Getter
     @RequiredArgsConstructor
     public static class Param implements Params {
-        private final Long helperId;
+        private final Long currentMemberId;
         private final Long disabledId;
         private final Long postId;
         private final String title;
@@ -65,9 +73,6 @@ public class ConfirmAgreementUseCase implements UseCase<ConfirmAgreementUseCase.
 
         @Override
         public boolean validate() {
-            if (!ParamValidator.isValidId(helperId)) {
-                throw new InvalidParamException(MatchInvalidParamErrors.REQUIRED_FIELD, "helperId");
-            }
             if (!ParamValidator.isValidId(disabledId)) {
                 throw new InvalidParamException(MatchInvalidParamErrors.REQUIRED_FIELD, "disabledId");
             }

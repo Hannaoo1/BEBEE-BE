@@ -43,7 +43,7 @@ public class GetSinglePostUseCase implements UseCase<GetSinglePostUseCase.Param,
     @RequiredArgsConstructor
     public static class Result{
         private final String memberNickname;
-        private final String memberLegalDongCode;
+        private final String memberAddress;
         private final String memberProfileImageUrl;
 
         private final List<Long> helpCategoryIds;
@@ -58,7 +58,7 @@ public class GetSinglePostUseCase implements UseCase<GetSinglePostUseCase.Param,
         private final LocalDate endDate;
 
         private final List<ScheduleDTO> schedules;
-        private final String postLegalDongCode;
+        private final String postAddress;
 
         private final String content;
         private final Integer applicantCount;
@@ -101,7 +101,7 @@ public class GetSinglePostUseCase implements UseCase<GetSinglePostUseCase.Param,
 
             return new Result(
                     member.getNickname(),
-                    member.getLegalDongCode(),
+                    member.getAddressRoad(),
                     member.getProfileImageUrl(),
                     helpCategoryIds,
                     post.getType().name(),
@@ -112,7 +112,7 @@ public class GetSinglePostUseCase implements UseCase<GetSinglePostUseCase.Param,
                     startDate,
                     endDate,
                     scheduleDTOs,
-                    post.getLegalDongCode(),
+                    post.getRegion(),
                     post.getContent(),
                     post.getApplicantCount(),
                     imageUrls

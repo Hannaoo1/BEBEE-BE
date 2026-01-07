@@ -14,7 +14,7 @@ public interface DocumentVerificationRepository extends JpaRepository<DocumentVe
 
     List<DocumentVerification> findByStatus(DocumentStatus status);
 
-    @Query("SELECT dv FROM DocumentVerification dv WHERE dv.document.memberId = :memberId")
+    @Query("SELECT dv FROM DocumentVerification dv WHERE dv.document.member.id = :memberId")
     List<DocumentVerification> findByMemberId(Long memberId);
 
     List<DocumentVerification> findByDocumentDocumentId(Long documentId);

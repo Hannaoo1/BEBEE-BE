@@ -10,6 +10,7 @@ import com.lgcns.bebee.member.presentation.dto.res.DocumentUploadResDTO;
 import com.lgcns.bebee.member.presentation.dto.res.DocumentVerificationResDTO;
 import com.lgcns.bebee.member.presentation.swagger.DocumentSwagger;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,43 +20,56 @@ import java.util.List;
 /**
  * 문서 검증 API 컨트롤러
  */
+@Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/documents")
+@RequestMapping("/documents")
 public class DocumentController implements DocumentSwagger {
 
         private final UploadDocumentUseCase uploadDocumentUseCase;
         private final ApproveDocumentUseCase approveDocumentUseCase;
         private final RejectDocumentUseCase rejectDocumentUseCase;
         private final DocumentManagement documentManagement;
+        private final com.lgcns.bebee.member.application.client.OcrClient ocrClient;
 
         /**
          * 문서 업로드
          * 
          * @param memberId   회원 ID
          * @param documentId 문서 유형 ID
-         * @param file       업로드 파일
+         * @param file       업로드 파일 (로컬 환경용, optional)
+         * @param fileUrl    S3 파일 URL (S3 환경용, optional)
          * @return 업로드 결과
          */
         @PostMapping("/upload")
         public ResponseEntity<DocumentUploadResDTO> uploadDocument(
                         @RequestParam Long memberId,
                         @RequestParam Long documentId,
-                        @RequestPart MultipartFile file) {
-                UploadDocumentUseCase.Param param = new UploadDocumentUseCase.Param(memberId, documentId, file);
-                Long verificationId = uploadDocumentUseCase.execute(param);
+                        @RequestPart(required = false) MultipartFile file,
+                        @RequestParam(required = false) String fileUrl) {
+                log.info("문서 업로드 처리 시작: memberId={}, documentId={}, fileUrl={}, hasFile={}",
+                                memberId, documentId, fileUrl, file != null && !file.isEmpty());
+                try {
+                        UploadDocumentUseCase.Param param = new UploadDocumentUseCase.Param(memberId, documentId, file,
+                                        fileUrl);
+                        Long verificationId = uploadDocumentUseCase.execute(param);
 
-                // 저장된 검증 정보 조회
-                DocumentVerification verification = documentManagement.load(verificationId);
+                        // 저장된 검증 정보 조회
+                        DocumentVerification verification = documentManagement.load(verificationId);
 
-                DocumentUploadResDTO response = DocumentUploadResDTO.of(
-                                verification.getId(),
-                                verification.getFileUrl(),
-                                verification.getForgeryScore(),
-                                verification.getSystemFlag(),
-                                verification.getStatus().name());
+                        DocumentUploadResDTO response = DocumentUploadResDTO.of(
+                                        verification.getId(),
+                                        verification.getFileUrl(),
+                                        verification.getForgeryScore(),
+                                        verification.getSystemFlag(),
+                                        verification.getStatus().name());
 
-                return ResponseEntity.ok(response);
+                        log.info("문서 업로드 처리 성공: verificationId={}", verificationId);
+                        return ResponseEntity.ok(response);
+                } catch (Exception e) {
+                        log.error("문서 업로드 중 치명적 오류 발생!", e);
+                        throw e;
+                }
         }
 
         /**
@@ -115,5 +129,19 @@ public class DocumentController implements DocumentSwagger {
                                 request.getReason());
                 rejectDocumentUseCase.execute(param);
                 return ResponseEntity.ok().build();
+        }
+
+        /**
+         * OCR 분석 (단순 텍스트 추출)
+         * 
+         * @param file 분석할 이미지 파일
+         * @param role 사용자 역할
+         * @return OCR 분석 결과
+         */
+        @PostMapping("/ocr-extract")
+        public ResponseEntity<com.lgcns.bebee.member.application.client.OcrClient.OcrResult> extractOcr(
+                        @RequestPart MultipartFile file,
+                        @RequestParam(required = false) String role) {
+                return ResponseEntity.ok(ocrClient.analyze(file, role));
         }
 }

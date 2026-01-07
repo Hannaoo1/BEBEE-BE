@@ -1,5 +1,6 @@
 package com.lgcns.bebee.match.presentation;
 
+import com.lgcns.bebee.common.annotation.CurrentMember;
 import com.lgcns.bebee.match.application.usecase.CreatePostUseCase;
 import com.lgcns.bebee.match.application.usecase.GetPostsUseCase;
 import com.lgcns.bebee.match.application.usecase.GetSinglePostUseCase;
@@ -24,7 +25,7 @@ public class PostController implements PostSwagger {
     @Override
     @GetMapping
     public ResponseEntity<PostsGetResDTO> getPosts(
-            @RequestParam String currentMemberId,
+            @CurrentMember Long currentMemberId,
             @RequestParam(required = false) String type,
             @RequestParam(required = false) Boolean isMatched,
             @RequestParam(required = false) String lastPostId,
@@ -32,7 +33,7 @@ public class PostController implements PostSwagger {
             @ModelAttribute PostsGetReqDTO reqDTO
             ){
 
-        GetPostsUseCase.Param param = reqDTO.toParam(Long.parseLong(currentMemberId), type, isMatched, lastPostId, count);
+        GetPostsUseCase.Param param = reqDTO.toParam(currentMemberId, type, isMatched, lastPostId, count);
         GetPostsUseCase.Result result = getPostsUseCase.execute(param);
         PostsGetResDTO resDTO = PostsGetResDTO.from(result);
 
@@ -42,11 +43,11 @@ public class PostController implements PostSwagger {
     @Override
     @GetMapping("/{postId}")
     public ResponseEntity<PostGetResDTO> getSinglePost(
-            @RequestParam String currentMemberId,
+            @CurrentMember Long currentMemberId,
             @PathVariable String postId
     ){
         GetSinglePostUseCase.Param param = new GetSinglePostUseCase.Param(
-                Long.parseLong(currentMemberId),
+                currentMemberId,
                 Long.parseLong(postId)
         );
         GetSinglePostUseCase.Result result = getSinglePostUseCase.execute(param);
@@ -58,7 +59,7 @@ public class PostController implements PostSwagger {
     @Override
     @PostMapping
     public ResponseEntity<PostCreateResDTO> createPost(
-            @RequestParam String currentMemberId,
+            @CurrentMember Long currentMemberId,
             @RequestBody PostCreateReqDTO reqDTO
     ){
         CreatePostUseCase.Param param = reqDTO.toParam(currentMemberId);

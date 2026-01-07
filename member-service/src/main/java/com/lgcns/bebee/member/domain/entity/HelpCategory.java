@@ -17,7 +17,12 @@ public class HelpCategory extends BaseTimeEntity {
     @Tsid
     private Long helpCategoryId;
 
-    @Column(nullable = false, length = 30, unique = true)
-    private String name;
-}
+    @Column(name = "help_type", nullable = false, length = 30, unique = true)
+    private String helpType;
 
+    public static HelpCategory create(String helpType) {
+        HelpCategory helpCategory = new HelpCategory();
+        helpCategory.helpType = helpType;
+        return helpCategory;
+    }
+}

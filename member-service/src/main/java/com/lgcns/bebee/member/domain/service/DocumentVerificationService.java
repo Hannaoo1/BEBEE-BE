@@ -3,6 +3,7 @@ package com.lgcns.bebee.member.domain.service;
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.exif.ExifIFD0Directory;
+import com.lgcns.bebee.common.util.SimilarityUtil;
 import com.lgcns.bebee.member.application.client.OcrClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -141,28 +142,41 @@ public class DocumentVerificationService {
             score -= 10;
         }
 
-        // 2. 이름 일치 여부 확인 (가장 중요)
+        // 2. 이름 일치 여부 확인 (유사도 알고리즘 도입)
         if (result.fields() != null && expectedName != null) {
             String extractedName = result.fields().get("name");
             if (extractedName != null && !extractedName.trim().isEmpty()) {
-                if (!extractedName.contains(expectedName) && !expectedName.contains(extractedName)) {
-                    log.warn("OCR 이름 불일치: 기대값={}, 추출값={}", expectedName, extractedName);
-                    score -= 60; // 이름이 다르면 매우 강력하게 감점
+                double nameSimilarity = SimilarityUtil.calculateSimilarity(expectedName, extractedName);
+                log.info("OCR 이름 유사도 분석: 기대값={}, 추출값={}, 유사도={}", expectedName, extractedName, nameSimilarity);
+
+                if (nameSimilarity < 0.9) { // 90% 미만일 때만 감점 시작
+                    if (nameSimilarity < 0.6) {
+                        score -= 60; // 60% 미만: 완전 불일치 (도용 의심)
+                    } else {
+                        score -= 25; // 60%~90%: 미세 불일치 (OCR 인식 오류 가능성, MID 유도)
+                    }
                 }
+            } else {
+                score -= 30; // 이름이 추출되지 않음
             }
         }
 
-        // 3. 생년월일 일치 여부 확인
+        // 3. 생년월일 일치 여부 확인 (유사도 알고리즘 도입)
         if (result.fields() != null && expectedBirthDate != null) {
             String extractedBirth = result.fields().get("birth");
             if (extractedBirth != null && !extractedBirth.trim().isEmpty()) {
-                // 숫자만 추출하여 비교 (YYYYMMDD 등 다양한 형식 대응)
                 String expectedStr = expectedBirthDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
                 String cleanExtracted = extractedBirth.replaceAll("[^0-9]", "");
 
-                if (!cleanExtracted.contains(expectedStr) && !expectedStr.contains(cleanExtracted)) {
-                    log.warn("OCR 생년월일 불일치: 기대값={}, 추출값={}", expectedStr, cleanExtracted);
-                    score -= 40; // 생년월일이 다르면 강력하게 감점
+                double birthSimilarity = SimilarityUtil.calculateSimilarity(expectedStr, cleanExtracted);
+                log.info("OCR 생년월일 유사도 분석: 기대값={}, 추출값={}, 유사도={}", expectedStr, cleanExtracted, birthSimilarity);
+
+                if (birthSimilarity < 0.9) {
+                    if (birthSimilarity < 0.6) {
+                        score -= 40; // 완전 불일치
+                    } else {
+                        score -= 15; // 미세 불일치
+                    }
                 }
             }
         }
@@ -186,11 +200,11 @@ public class DocumentVerificationService {
      * @return LOW(의심 낮음) / MID(중간) / HIGH(의심 높음)
      */
     private String decideSystemFlag(int score) {
-        if (score >= 80)
-            return "LOW"; // 위변조 의심 거의 없음
-        if (score >= 50)
-            return "MID"; // 중간
-        return "HIGH"; // 의심 높음
+        if (score >= 90)
+            return "LOW"; // 위변조 의심 낮음 (자동 통과)
+        if (score >= 60)
+            return "MID"; // 중간 (관리자 검토 필요)
+        return "HIGH"; // 의심 높음 (가입 차단)
     }
 
     /**
