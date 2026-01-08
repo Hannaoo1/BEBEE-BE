@@ -3,6 +3,7 @@ package com.lgcns.bebee.payment.common.exception;
 import com.lgcns.bebee.common.exception.InvalidParamErrorInfo;
 
 public enum PaymentInvalidParamErrors implements InvalidParamErrorInfo {
+    UNAUTHORIZED("인증되지 않은 사용자입니다."),
     REQUIRED_FIELD("필수 입력값입니다.", "field"),
     HONEY_USE_MUST_BE_POSITIVE("사용할 꿀은 0보다 큰 자연수여야 합니다.");
 
