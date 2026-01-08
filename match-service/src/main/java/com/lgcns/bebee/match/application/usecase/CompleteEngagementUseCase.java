@@ -36,9 +36,8 @@ public class CompleteEngagementUseCase implements UseCase<CompleteEngagementUseC
 
         MemberSync member = memberManager.findExistingMember(param.getMemberId());
 
-        Engagement engagement = engagementReader.getById(param.getEngagementId());
-
-        Agreement agreement = agreementReader.getById(engagement.getAgreementId());
+        Agreement agreement = agreementReader.getById(param.getAgreementId());
+        Engagement engagement = engagementReader.getById(agreement.getId());
 
         Role userType = member.getRole();
         
@@ -110,7 +109,7 @@ public class CompleteEngagementUseCase implements UseCase<CompleteEngagementUseC
     @RequiredArgsConstructor
     public static class Param implements Params {
         private final Long memberId;
-        private final Long engagementId;
+        private final Long agreementId;
 
         @Override
         public boolean validate() {
@@ -120,10 +119,10 @@ public class CompleteEngagementUseCase implements UseCase<CompleteEngagementUseC
                         "memberId"
                 );
             }
-            if (!ParamValidator.isValidId(engagementId)) {
+            if (!ParamValidator.isValidId(agreementId)) {
                 throw new InvalidParamException(
                         MatchInvalidParamErrors.REQUIRED_FIELD,
-                        "engagementId"
+                        "agreementId"
                 );
             }
             return true;

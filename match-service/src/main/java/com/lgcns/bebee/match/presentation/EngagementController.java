@@ -17,16 +17,16 @@ public class EngagementController implements EngagementSwagger {
 
     // 활동 완료 체크
     @Override
-    @PostMapping("/{engagementId}/complete")
+    @PostMapping("/{agreementId}/complete")
     public ResponseEntity<EngagementCompleteResDTO> completeEngagement(
             @CurrentMember Long currentMemberId,
-            @PathVariable String engagementId
+            @PathVariable String agreementId
     ) {
 
         // DTO → Param 변환
         CompleteEngagementUseCase.Param param = new CompleteEngagementUseCase.Param(
                 currentMemberId,
-                Long.parseLong(engagementId)
+                Long.parseLong(agreementId)
         );
 
         // UseCase 실행
