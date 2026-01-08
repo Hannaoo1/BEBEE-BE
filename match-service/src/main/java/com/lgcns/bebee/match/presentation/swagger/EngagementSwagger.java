@@ -104,9 +104,9 @@ public interface EngagementSwagger {
     ResponseEntity<EngagementCompleteResDTO> completeEngagement(
             Long currentMemberId,  // @CurrentMember로 자동 주입됨 (Swagger에서는 표시 안 됨)
             @Parameter(
-                    description = "활동 ID",
+                    description = "매칭 확인서 ID",
                     example = "1001",
                     required = true
-            ) String engagementId
+            ) String agreementId
     );
 }
