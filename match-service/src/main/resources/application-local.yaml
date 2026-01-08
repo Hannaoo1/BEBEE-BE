@@ -85,7 +85,7 @@ spring:
     # 마이그레이션 전 검증
     validate-on-migrate: true
     # 순서 엄격히 지킴
-    out-of-order: false
+    out-of-order: true
     # 플레이스홀더 비활성화
     placeholder-replacement: false
     # clean 명령 비활성화 (안전)
