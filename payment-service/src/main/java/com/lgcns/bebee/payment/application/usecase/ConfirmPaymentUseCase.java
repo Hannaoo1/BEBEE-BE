@@ -70,13 +70,13 @@ public class ConfirmPaymentUseCase implements UseCase<ConfirmPaymentUseCase.Para
         HoneyWallet wallet = honeyWalletRepository.findByMemberIdWithLock(temp.getMemberId())
                 .orElseGet(() -> HoneyWallet.create(temp.getMemberId(), 0L));
         wallet.charge(response.totalAmount().longValue());
-        honeyWalletRepository.save(wallet);
+        HoneyWallet savedWallet = honeyWalletRepository.save(wallet);
         log.info("허니 충전 완료: memberId={}, amount={}, balance={}",
                 temp.getMemberId(), response.totalAmount(), wallet.getBalance());
 
         // HoneyHistory 기록
         HoneyHistory history = HoneyHistory.create(
-                wallet,
+                savedWallet,
                 temp.getMemberId(),
                 response.totalAmount().longValue(),
                 HoneyHistoryType.CHARGE
