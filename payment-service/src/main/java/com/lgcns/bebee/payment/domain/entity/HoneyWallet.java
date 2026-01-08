@@ -21,8 +21,14 @@ public class HoneyWallet extends BaseTimeEntity {
     private Long memberId;
 
     @Column(nullable = false)
-    private Long balance = 0L;
+    private Long balance = 0L; // 잔액 (원 단위)
 
+    /**
+     *
+     * @param memberId
+     * @param balance 잔액(원)
+     * @return
+     */
     public static HoneyWallet create(Long memberId, Long balance) {
         HoneyWallet honeyWallet = new HoneyWallet();
         honeyWallet.memberId = memberId;
@@ -32,7 +38,7 @@ public class HoneyWallet extends BaseTimeEntity {
     }
 
     /**
-     * 허니 충전 (장애인: 결제 완료 시 / 도우미: 꿀 지급 완료 시)
+     * 금액 충전 (장애인: 결제 완료 시 / 도우미: 꿀 지급 완료 시)
      */
     public void charge(Long amount) {
         if (amount <= 0) {
@@ -42,7 +48,7 @@ public class HoneyWallet extends BaseTimeEntity {
     }
 
     /**
-     * 허니 차감 (결제 취소 또는 사용 시)
+     * 금액 차감 (결제 취소 또는 사용 시)
      */
     public void withdraw(Long amount) {
         if (amount <= 0) {
