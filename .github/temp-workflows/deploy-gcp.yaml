@@ -1,18 +1,18 @@
 name: Temp Deployment to GCP
 
-#on:
-#  push:
-#    branches: ["develop"]
-#    paths:
-#      - 'common/**'
-#      - 'common-data/**'
-#      - 'chat-service/**'
-#      - 'match-service/**'
-#      - 'member-service/**'
-#      - 'notification-service/**'
-#      - 'payment-service/**'
-#      - 'file-service/**'
-#      - 'build.gradle'
+on:
+  push:
+    branches: ["develop"]
+    paths:
+      - 'common/**'
+      - 'common-data/**'
+      - 'chat-service/**'
+      - 'match-service/**'
+      - 'member-service/**'
+      - 'notification-service/**'
+      - 'payment-service/**'
+      - 'file-service/**'
+      - 'build.gradle'
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
