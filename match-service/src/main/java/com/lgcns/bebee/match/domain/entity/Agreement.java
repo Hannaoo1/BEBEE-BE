@@ -41,10 +41,10 @@ public class Agreement extends BaseTimeEntity {
     private Long helperId;
 
     @Column(nullable = false)
-    private Integer unitHoney;
+    private Long unitHoney;
 
     @Column(nullable = false)
-    private Integer totalHoney;
+    private Long totalHoney;
 
     @Column(nullable = false, length = 50)
     private String region;
@@ -85,16 +85,16 @@ public class Agreement extends BaseTimeEntity {
             Long helperId,
             EngagementType type,
             Boolean isVolunteer,
-            Integer unitHoney,
-            Integer totalHoney,
+            Long unitHoney,
+            Long totalHoney,
             String region,
             DayEngagementTimeDTO dayTime,
             TermEngagementTimeDTO termTime,
             List<Long> helpCategoryIds
     ) {
         if (isVolunteer) {
-            unitHoney = 0;
-            totalHoney = 0;
+            unitHoney = 0L;
+            totalHoney = 0L;
         }
 
         Agreement agreement = new Agreement();

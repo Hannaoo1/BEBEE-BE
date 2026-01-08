@@ -29,10 +29,10 @@ public record PostGetResDTO(
         String title,
 
         @Schema(description = "단위 꿀 (시간당 보상)", example = "10000")
-        Integer unitHoney,
+        Long unitHoney,
 
         @Schema(description = "총 꿀 (전체 보상)", example = "30000")
-        Integer totalHoney,
+        Long totalHoney,
 
         @Schema(description = "날짜 (DAY 타입인 경우만 사용)", example = "2025-11-21")
         @JsonInclude(JsonInclude.Include.NON_NULL)

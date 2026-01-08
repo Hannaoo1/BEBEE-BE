@@ -86,8 +86,8 @@ public class CreatePostUseCase implements UseCase<CreatePostUseCase.Param, Creat
         private final List<ScheduleParam> schedules;
 
         private final LocalDate date;
-        private final Integer unitHoney;
-        private final Integer totalHoney;
+        private final Long unitHoney;
+        private final Long totalHoney;
         
         private final String region;
 

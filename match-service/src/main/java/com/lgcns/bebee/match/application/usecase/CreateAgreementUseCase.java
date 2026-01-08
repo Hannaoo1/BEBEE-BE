@@ -93,8 +93,8 @@ public class CreateAgreementUseCase implements UseCase<CreateAgreementUseCase.Pa
         private final Long disabledId;
         private final EngagementType type;
         private final Boolean isVolunteer;
-        private final Integer unitHoney;
-        private final Integer totalHoney;
+        private final Long unitHoney;
+        private final Long totalHoney;
         private final String region;
         private final DayEngagementTimeDTO dayEngagementTime;
         private final TermEngagementTimeDTO termEngagementTime;
@@ -157,8 +157,8 @@ public class CreateAgreementUseCase implements UseCase<CreateAgreementUseCase.Pa
         private EngagementType type;
         private Boolean isVolunteer;
         private List<AgreementHelpCategoryDTO> helpCategories;
-        private Integer unitHoney;
-        private Integer totalHoney;
+        private Long unitHoney;
+        private Long totalHoney;
         private String region;
         private Object engagementTime;
         private Boolean isDayComplete;

@@ -81,13 +81,13 @@ public record PostsGetResDTO(
                     description = "단위 꿀 금액 (회당 보상) - 단위: 원",
                     example = "5000"
             )
-            Integer unitHoney,
+            Long unitHoney,
 
             @Schema(
                     description = "총 꿀 금액 (전체 보상) - 단위: 원",
                     example = "50000"
             )
-            Integer totalHoney,
+            Long totalHoney,
 
             @Schema(
                     description = "활동 지역 (법정동 이름)",

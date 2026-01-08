@@ -24,8 +24,8 @@ public class AgreementCreateResDTO {
     private EngagementType type;
     private Boolean isVolunteer;
     private List<AgreementHelpCategoryDTO> helpCategories;
-    private Integer unitHoney;
-    private Integer totalHoney;
+    private Long unitHoney;
+    private Long totalHoney;
     private String region;
 
     @JsonTypeInfo(

@@ -17,10 +17,10 @@ public class PaymentAgreementSync extends BaseTimeEntity {
     private Long id;
 
     @Column(nullable = false)
-    private Integer unitHoney;
+    private Long unitHoney;
 
     @Column(nullable = false)
-    private Integer totalHoney;
+    private Long totalHoney;
 
     @Enumerated(EnumType.STRING)
     private EngagementType type;

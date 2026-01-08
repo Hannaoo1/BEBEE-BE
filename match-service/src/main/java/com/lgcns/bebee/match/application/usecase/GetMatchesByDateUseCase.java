@@ -139,8 +139,8 @@ public class GetMatchesByDateUseCase implements UseCase<GetMatchesByDateUseCase.
         private EngagementType type;
         private List<AgreementHelpCategoryDTO> helpCategories;
         private Boolean isVolunteer;
-        private Integer unitHoney;
-        private Integer totalHoney;
+        private Long unitHoney;
+        private Long totalHoney;
         private String region;
         private Object engagementTime;
         private Boolean isDayComplete;
