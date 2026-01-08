@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class HoneyUseReqDTO {
+    private Long memberId;
     private String matchId;
     private Long useHoney;
 
