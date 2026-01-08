@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public record NearbyPostsGetResDTO(
-        List<NearbyPostDTO> nearByHelpers
+        List<NearbyPostDTO> nearbyPosts
 ) {
 
     public static NearbyPostsGetResDTO from(GetNearbyPostsUseCase.Result result){
