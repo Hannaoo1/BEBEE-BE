@@ -10,6 +10,7 @@ public enum MatchErrors implements ErrorInfo {
     MEMBER_NOT_FOUND("회원 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 
     ONLY_DISABLED_MEMBERS_ALLOWED("장애인 회원에게 주어진 권한입니다.", HttpStatus.FORBIDDEN),
+    ONLY_HELPER_MEMBERS_ALLOWED("도우미 회원에게 주어진 권한입니다.", HttpStatus.FORBIDDEN),
 
     AGREEMENT_NOT_FOUND("매칭 확인서를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     ALREADY_CONFIRMED_AGREEMENT("이미 수락된 매칭 확인서입니다.", HttpStatus.CONFLICT),
