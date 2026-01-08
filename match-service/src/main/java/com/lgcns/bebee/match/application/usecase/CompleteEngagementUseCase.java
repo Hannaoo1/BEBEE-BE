@@ -10,6 +10,7 @@ import com.lgcns.bebee.match.domain.entity.Engagement;
 import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
 import com.lgcns.bebee.match.domain.entity.sync.Role;
 import com.lgcns.bebee.match.domain.service.AgreementReader;
+import com.lgcns.bebee.match.domain.service.EngagementManager;
 import com.lgcns.bebee.match.domain.service.EngagementReader;
 import com.lgcns.bebee.match.domain.service.MemberManager;
 import lombok.AccessLevel;
@@ -26,6 +27,7 @@ public class CompleteEngagementUseCase implements UseCase<CompleteEngagementUseC
     private final EngagementReader engagementReader;
     private final AgreementReader agreementReader;
     private final MemberManager memberManager;
+    private final EngagementManager engagementManager;
     //private final EventPublisher eventPublisher;
 
     @Transactional
@@ -37,7 +39,9 @@ public class CompleteEngagementUseCase implements UseCase<CompleteEngagementUseC
         MemberSync member = memberManager.findExistingMember(param.getMemberId());
 
         Agreement agreement = agreementReader.getById(param.getAgreementId());
-        Engagement engagement = engagementReader.getById(agreement.getId());
+
+        Engagement engagement = engagementReader.findByAgreementId(param.getAgreementId())
+                .orElseGet(() -> engagementManager.createEngagement(agreement));
 
         Role userType = member.getRole();
         

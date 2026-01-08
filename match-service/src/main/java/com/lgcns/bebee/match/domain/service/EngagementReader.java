@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class EngagementReader {
@@ -16,5 +18,10 @@ public class EngagementReader {
     public Engagement getById(Long engagementId) {
         return engagementRepository.findById(engagementId)
                 .orElseThrow(MatchErrors.ENGAGEMENT_NOT_FOUND::toException);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Engagement> findByAgreementId(Long agreementId) {
+        return engagementRepository.findByAgreementId(agreementId);
     }
 }
