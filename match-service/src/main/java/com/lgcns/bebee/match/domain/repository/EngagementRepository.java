@@ -5,8 +5,12 @@ import com.lgcns.bebee.match.domain.entity.vo.EngagementStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface EngagementRepository extends JpaRepository<Engagement, Long> {
+
+    // agreementId로 Engagement 조회
+    Optional<Engagement> findByAgreementId(Long agreementId);
 
     // 특정 날짜의 특정 상태 활동 조회 (스케줄러)
     List<Engagement> findByActivityDateAndStatus(
