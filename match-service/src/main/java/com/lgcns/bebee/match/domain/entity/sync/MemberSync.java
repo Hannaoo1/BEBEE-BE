@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -37,11 +36,11 @@ public class MemberSync {
     @Column(nullable = false)
     private LocalDate birthDate;
 
-    @Column(nullable = false, precision = 10, scale = 7)
-    private BigDecimal latitude;
+    @Column(nullable = false)
+    private Double latitude;
 
-    @Column(nullable = false, precision = 10, scale = 7)
-    private BigDecimal longitude;
+    @Column(nullable = false)
+    private Double longitude;
 
     @Column(length = 512)
     private String profileImageUrl;
@@ -61,4 +60,8 @@ public class MemberSync {
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "memberSync", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberDisabilityCategorySync> disabilityCategories = new ArrayList<>();
+
+    @BatchSize(size = 100)
+    @OneToMany(mappedBy = "memberSync", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberHelpCategorySync> helpCategories = new ArrayList<>();
 }
