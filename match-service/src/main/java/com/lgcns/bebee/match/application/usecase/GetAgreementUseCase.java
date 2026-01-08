@@ -60,8 +60,8 @@ public class GetAgreementUseCase implements UseCase<GetAgreementUseCase.Param, G
         private final LocalDate endDate;
         private final List<ScheduleDTO> schedules;
 
-        private final Integer unitHoney;
-        private final Integer totalHoney;
+        private final Long unitHoney;
+        private final Long totalHoney;
 
         private final Long otherId;
         private final String otherProfileImageUrl;
