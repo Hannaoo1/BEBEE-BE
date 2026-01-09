@@ -52,7 +52,10 @@ public interface WalletSwagger {
 
     @Operation(
             summary = "꿀 사용",
+            deprecated = true,
             description = """
+                    [DEPRECATED] 이 API는 더 이상 사용되지 않습니다. (서버에서 이벤트로 처리)
+
                     매칭 성사 시 장애인이 해당 도움 활동에 대한 전체 꿀을 선결제합니다. (안심결제)
                     - 매칭 확인서 수락 api 요청 후, 성공 시 해당 api를 연달아 요청하여 해당 매칭에 참여하는 장애인의 꿀을 사용합니다.
                     - 현재 보유 중인 꿀이 충분하면 잔고에서 즉시 차감 후 꿀 보관소로 이동, 그렇지 않은 경우 예외 처리
