@@ -35,7 +35,7 @@ public interface EngagementSwagger {
                                     @ExampleObject(
                                             value = """
                                             {
-                                              "isLastActivity": true
+                                              "isLastEngagement": true
                                             }
                                             """
                                     )

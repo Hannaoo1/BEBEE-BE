@@ -12,7 +12,7 @@ import lombok.Getter;
 public class EngagementCompleteResDTO {
     @Schema(description = "마지막 활동 여부 (DAY는 항상 true)",
             example = "true")
-    private Boolean isLastActivity;
+    private Boolean isLastEngagement;
 
     public static EngagementCompleteResDTO of(Boolean isLastActivity) {
         return new EngagementCompleteResDTO(isLastActivity);
