@@ -12,13 +12,18 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
+import software.amazon.awssdk.services.sns.SnsClient;
+import software.amazon.awssdk.services.sns.model.MessageAttributeValue;
+import software.amazon.awssdk.services.sns.model.PublishRequest;
+
+import java.util.Map;
 
 @Slf4j
 @Component
 @ConditionalOnProperty(name = "event", havingValue = "aws")
 @RequiredArgsConstructor
 public class SnsEventPublisher implements EventPublisher {
-    private final SnsTemplate snsTemplate;
+    private final SnsClient snsClient;
     private final ObjectMapper objectMapper;
 
     @Value("${app.sns.match-topic-arn}")
@@ -31,14 +36,18 @@ public class SnsEventPublisher implements EventPublisher {
 
             log.info("SNS 발행 시작 - Topic: {}, Event: {}", topicArn, event.getEventName());
 
-            // Message Attributes를 포함한 Message 객체 생성
-            Message<String> message = MessageBuilder
-                    .withPayload(messagePayload)
-                    .setHeader("Subject", event.getEventName())
-                    .setHeader("eventType", event.getEventName())  // 필터링에 사용할 속성
+            PublishRequest request = PublishRequest.builder()
+                    .topicArn(topicArn)
+                    .message(messagePayload)
+                    .messageAttributes(Map.of(
+                            "eventType", MessageAttributeValue.builder()
+                                    .dataType("String")
+                                    .stringValue(event.getEventName())
+                                    .build()
+                    ))
                     .build();
 
-            snsTemplate.send(topicArn, message);
+            snsClient.publish(request);
 
             log.info("SNS 발행 완료 - Event: {}, 발행 시간: {}", event.getEventName(), event.getOccuredAt());
         } catch (JsonProcessingException e) {
