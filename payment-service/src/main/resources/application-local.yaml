@@ -54,6 +54,14 @@ spring:
       # Redis Port
       port: ${REDIS_PORT:6379}
 
+  cloud:
+    aws:
+      endpoint: http://localhost:4566
+      region:
+        static: ap-northeast-2
+      credentials:
+        access-key: test
+        secret-key: test
   # Flyway 설정
   flyway:
     # Flyway 활성화
@@ -100,6 +108,9 @@ cors:
   allow-credentials: ${CORS_ALLOW_CREDENTIALS:true}
   max-age: ${CORS_MAX_AGE:3600}
 
+app:
+  sqs:
+    payment-queue-url: "${AWS_SQS_QUEUE_URL:http://sqs.ap-northeast-2.localhost.localstack.cloud:4566/000000000000/bebee-local-payment-queue}"
 
 tsid:
   node:
