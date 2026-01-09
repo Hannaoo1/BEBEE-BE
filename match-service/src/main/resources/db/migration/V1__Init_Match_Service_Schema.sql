@@ -42,7 +42,7 @@ CREATE TABLE `member_sync` (
     `address_road`      VARCHAR(255)    NULL COMMENT '도로명 주소',
     `latitude`          DECIMAL(10,7)   NOT NULL COMMENT '위도',
     `longitude`         DECIMAL(10,7)   NOT NULL COMMENT '경도',
-    `legal_dong_code`   VARCHAR(10)     NOT NULL COMMENT '법정동 코드',
+    `legal_dong_code`   VARCHAR(10)     NULL COMMENT '법정동 코드',
     `created_at`        DATETIME(6)     NOT NULL,
     `updated_at`        DATETIME(6)     NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='회원 정보 동기화 테이블';
