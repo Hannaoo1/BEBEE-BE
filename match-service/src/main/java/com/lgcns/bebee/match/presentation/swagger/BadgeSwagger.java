@@ -1,6 +1,5 @@
 package com.lgcns.bebee.match.presentation.swagger;
 
-import com.lgcns.bebee.match.presentation.dto.res.HelperBadgesGetResDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
