@@ -56,7 +56,13 @@ public class ConfirmAgreementUseCase implements UseCase<ConfirmAgreementUseCase.
         );
         Match savedMatch = matchRepository.save(match);
 
-        eventPublisher.publish(new AgreementConfirmedEvent(param.chatRoomId));
+        eventPublisher.publish(new AgreementConfirmedEvent(
+                        param.getChatRoomId(),
+                        match.getDisabledId(),
+                        match.getMatchId(),
+                        match.getAgreement().getUnitHoney()
+                    )
+        );
 
         Engagement engagement = engagementManager.createEngagement(agreement);
         engagementRepository.save(engagement);
