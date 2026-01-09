@@ -16,7 +16,7 @@ public interface MatchRepository {
     /**
      * 특정 날짜에 활동하는 매칭 목록 조회
      */
-    List<Match> findByDateAndMember(Long memberId, LocalDate date, DayOfWeek dayOfWeek, EngagementType type);
+    List<Match> findMatchesByDate(Long memberId, LocalDate date, DayOfWeek dayOfWeek, EngagementType type);
 
     /**
      * 특정 월에 활동하는 매칭 목록 조회 (캘린더용)

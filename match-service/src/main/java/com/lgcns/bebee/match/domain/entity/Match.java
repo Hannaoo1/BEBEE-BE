@@ -31,9 +31,20 @@ public class Match extends BaseTimeEntity {
     @Column(nullable = false)
     private Long chatRoomId;
 
+    @Column(nullable = false)
+    private String imageUrl;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "agreement_id", nullable = false, unique = true)
     private Agreement agreement;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "helper_review_id")
+    private Review helperReview;  // 도우미가 작성한 리뷰
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "disabled_review_id")
+    private Review disabledReview;
 
     public boolean isParticipant(Long memberId) {
         return this.helperId.equals(memberId) || this.disabledId.equals(memberId);
