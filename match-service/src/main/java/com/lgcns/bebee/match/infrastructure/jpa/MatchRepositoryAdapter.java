@@ -25,8 +25,8 @@ public class MatchRepositoryAdapter implements MatchRepository {
     }
 
     @Override
-    public Optional<Match> findById(Long postId) {
-        return matchJpaRepository.findByPostId(postId);
+    public Optional<Match> findById(Long matchId) {
+        return matchJpaRepository.findById(matchId);
     }
 
     @Override

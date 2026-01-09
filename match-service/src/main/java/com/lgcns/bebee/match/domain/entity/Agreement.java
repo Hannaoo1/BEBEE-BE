@@ -6,7 +6,6 @@ import com.lgcns.bebee.match.domain.entity.vo.EngagementType;
 import com.lgcns.bebee.match.presentation.dto.AgreementScheduleDTO;
 import com.lgcns.bebee.match.presentation.dto.DayEngagementTimeDTO;
 import com.lgcns.bebee.match.presentation.dto.TermEngagementTimeDTO;
-import com.lgcns.bebee.match.presentation.dto.res.PostGetResDTO;
 import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -29,7 +28,7 @@ public class Agreement extends BaseTimeEntity {
     @Column(name = "agreement_id")
     private Long id;
 
-    @Column(nullable = false)
+    @Column
     private Long postId;
 
     @Column(nullable = false)
@@ -53,12 +52,6 @@ public class Agreement extends BaseTimeEntity {
     @Column(nullable = false)
     private LocalDate confirmationDate;
 
-    @Column
-    private Boolean isDayComplete = Boolean.FALSE;
-
-    @Column
-    private Boolean isTermComplete = Boolean.FALSE;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AgreementStatus status = AgreementStatus.BEFORE;
@@ -78,7 +71,6 @@ public class Agreement extends BaseTimeEntity {
     private Boolean isVolunteer;
 
     public static Agreement create(
-            Long postId,
             Long disabledId,
             Long helperId,
             EngagementType type,
@@ -96,7 +88,6 @@ public class Agreement extends BaseTimeEntity {
         }
 
         Agreement agreement = new Agreement();
-        agreement.postId = postId;
         agreement.disabledId = disabledId;
         agreement.helperId = helperId;
         agreement.type = type;
@@ -106,8 +97,7 @@ public class Agreement extends BaseTimeEntity {
         agreement.region = region;
         agreement.confirmationDate = LocalDate.now();
         agreement.status = AgreementStatus.BEFORE;
-        agreement.isDayComplete = Boolean.FALSE;
-        agreement.isTermComplete = Boolean.FALSE;
+        agreement.confirmationDate = LocalDate.now();
 
         if (type == EngagementType.DAY && dayTime != null) {
             // DAY 타입: period 생성 및 주입

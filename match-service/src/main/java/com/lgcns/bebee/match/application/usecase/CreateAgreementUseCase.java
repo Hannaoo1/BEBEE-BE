@@ -56,7 +56,6 @@ public class CreateAgreementUseCase implements UseCase<CreateAgreementUseCase.Pa
 
         // 매칭 확인서 생성
         Agreement agreement = Agreement.create(
-                param.getPostId(),
                 param.getHelperId(),
                 param.getDisabledId(),
                 param.getType(),
@@ -161,8 +160,6 @@ public class CreateAgreementUseCase implements UseCase<CreateAgreementUseCase.Pa
         private Integer totalHoney;
         private String region;
         private Object engagementTime;
-        private Boolean isDayComplete;
-        private Boolean isTermComplete;
 
         public static Result from(Agreement agreement) {
             Object engagementTime = null;
@@ -187,9 +184,7 @@ public class CreateAgreementUseCase implements UseCase<CreateAgreementUseCase.Pa
                     agreement.getUnitHoney(),
                     agreement.getTotalHoney(),
                     agreement.getRegion(),
-                    engagementTime,
-                    agreement.getIsDayComplete(),
-                    agreement.getIsTermComplete()
+                    engagementTime
             );
         }
     }

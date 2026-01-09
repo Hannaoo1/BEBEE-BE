@@ -8,10 +8,10 @@
 -- ========================================
 
 -- Agreement 1: Post 1001 (병원 동행) - DAY 타입
-INSERT INTO agreement (agreement_id, post_id, helper_id, disabled_id, unit_honey, total_honey, region, type, confirmation_date, is_day_complete, is_term_complete, status, is_volunteer, created_at, updated_at)
+INSERT INTO agreement (agreement_id, post_id, helper_id, disabled_id, unit_honey, total_honey, region, type, confirmation_date, status, is_volunteer, created_at, updated_at)
 VALUES (
     10001,
-    1001,
+        1001,
     700,  -- HELPER 회원 (강지훈)
     100,  -- DISABLED 회원 (김철수)
     5000,
@@ -19,8 +19,6 @@ VALUES (
     '서울시 강남구 역삼동',
     'DAY',
     CURDATE(),
-    FALSE,
-    FALSE,
     'BEFORE',
     FALSE,
     NOW(),
@@ -30,10 +28,10 @@ VALUES (
     updated_at = NOW();
 
 -- Agreement 2: Post 1003 (문화센터 수업 동행) - TERM 타입
-INSERT INTO agreement (agreement_id, post_id, helper_id, disabled_id, unit_honey, total_honey, region, type, confirmation_date, is_day_complete, is_term_complete, status, is_volunteer, created_at, updated_at)
+INSERT INTO agreement (agreement_id, post_id, helper_id, disabled_id, unit_honey, total_honey, region, type, confirmation_date, status, is_volunteer, created_at, updated_at)
 VALUES (
     10002,
-    1003,
+        1003,
     800,  -- HELPER 회원 (윤서연)
     100,
     4000,
@@ -41,8 +39,6 @@ VALUES (
     '서울시 송파구 잠실동',
     'TERM',
     CURDATE() - INTERVAL 1 DAY,
-    FALSE,
-    FALSE,
     'CONFIRMED',
     FALSE,
     NOW(),
@@ -52,10 +48,10 @@ VALUES (
     updated_at = NOW();
 
 -- Agreement 3: Post 1008 (정기 통원 치료 동행) - TERM 타입, 나눔
-INSERT INTO agreement (agreement_id, post_id, helper_id, disabled_id, unit_honey, total_honey, region, type, confirmation_date, is_day_complete, is_term_complete, status, is_volunteer, created_at, updated_at)
+INSERT INTO agreement (agreement_id, post_id, helper_id, disabled_id, unit_honey, total_honey, region, type, confirmation_date, status, is_volunteer, created_at, updated_at)
 VALUES (
     10003,
-    1008,
+        1008,
     900,  -- HELPER 회원 (임동현)
     200,
     0,      -- 나눔이므로 0
@@ -63,8 +59,6 @@ VALUES (
     '서울시 동대문구 회기동',
     'TERM',
     CURDATE() - INTERVAL 2 DAY,
-    FALSE,
-    FALSE,
     'CONFIRMED',
     TRUE,   -- 나눔
     NOW(),
@@ -74,10 +68,10 @@ VALUES (
     updated_at = NOW();
 
 -- Agreement 4: Post 1011 (주 2회 방문 목욕 서비스) - TERM 타입
-INSERT INTO agreement (agreement_id, post_id, helper_id, disabled_id, unit_honey, total_honey, region, type, confirmation_date, is_day_complete, is_term_complete, status, is_volunteer, created_at, updated_at)
+INSERT INTO agreement (agreement_id, post_id, helper_id, disabled_id, unit_honey, total_honey, region, type, confirmation_date, status, is_volunteer, created_at, updated_at)
 VALUES (
     10004,
-    1011,
+        1011,
     1000,  -- HELPER 회원 (한미래)
     200,
     8000,
@@ -85,8 +79,6 @@ VALUES (
     '서울시 도봉구 쌍문동',
     'TERM',
     CURDATE() - INTERVAL 3 DAY,
-    FALSE,
-    FALSE,
     'CONFIRMED',
     FALSE,
     NOW(),
@@ -96,10 +88,10 @@ VALUES (
     updated_at = NOW();
 
 -- Agreement 5: Post 1021 (당뇨 환자 혈당 체크) - TERM 타입
-INSERT INTO agreement (agreement_id, post_id, helper_id, disabled_id, unit_honey, total_honey, region, type, confirmation_date, is_day_complete, is_term_complete, status, is_volunteer, created_at, updated_at)
+INSERT INTO agreement (agreement_id, post_id, helper_id, disabled_id, unit_honey, total_honey, region, type, confirmation_date, status, is_volunteer, created_at, updated_at)
 VALUES (
     10005,
-    1021,
+        1021,
     700,  -- HELPER 회원 (강지훈)
     100,
     7000,
@@ -107,8 +99,6 @@ VALUES (
     '서울시 동작구 노량진동',
     'TERM',
     CURDATE() - INTERVAL 5 DAY,
-    FALSE,
-    FALSE,
     'CONFIRMED',
     FALSE,
     NOW(),
@@ -303,7 +293,7 @@ ON DUPLICATE KEY UPDATE
 
 -- Match 2: Agreement 10002
 
-INSERT INTO `match` (match_id, helper_id, disabled_id, post_id, title, chat_room_id, agreement_id, image_url, created_at, updated_at)
+INSERT INTO `match` (match_id, helper_id, disabled_id, title, chat_room_id, agreement_id, image_url, created_at, updated_at)
 
 VALUES (
 
@@ -312,8 +302,6 @@ VALUES (
     800,
 
     100,
-
-    1003,
 
     '문화센터 수업 동행',
 
@@ -341,7 +329,7 @@ VALUES (
 
 -- Match 3: Agreement 10003
 
-INSERT INTO `match` (match_id, helper_id, disabled_id, post_id, title, chat_room_id, agreement_id, image_url, created_at, updated_at)
+INSERT INTO `match` (match_id, helper_id, disabled_id, title, chat_room_id, agreement_id, image_url, created_at, updated_at)
 
 VALUES (
 
@@ -350,8 +338,6 @@ VALUES (
     900,
 
     200,
-
-    1008,
 
     '정기 통원 치료 동행',
 
@@ -379,7 +365,7 @@ VALUES (
 
 -- Match 4: Agreement 10004
 
-INSERT INTO `match` (match_id, helper_id, disabled_id, post_id, title, chat_room_id, agreement_id, image_url, created_at, updated_at)
+INSERT INTO `match` (match_id, helper_id, disabled_id, title, chat_room_id, agreement_id, image_url, created_at, updated_at)
 
 VALUES (
 
@@ -388,8 +374,6 @@ VALUES (
     1000,
 
     200,
-
-    1011,
 
     '주 2회 방문 목욕 서비스',
 
@@ -417,7 +401,7 @@ VALUES (
 
 -- Match 5: Agreement 10005
 
-INSERT INTO `match` (match_id, helper_id, disabled_id, post_id, title, chat_room_id, agreement_id, image_url, created_at, updated_at)
+INSERT INTO `match` (match_id, helper_id, disabled_id, title, chat_room_id, agreement_id, image_url, created_at, updated_at)
 
 VALUES (
 
@@ -426,8 +410,6 @@ VALUES (
     700,
 
     100,
-
-    1021,
 
     '당뇨 환자 혈당 체크',
 
