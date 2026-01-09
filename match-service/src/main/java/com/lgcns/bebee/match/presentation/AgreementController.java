@@ -3,6 +3,7 @@ package com.lgcns.bebee.match.presentation;
 import com.lgcns.bebee.common.annotation.CurrentMember;
 import com.lgcns.bebee.match.application.usecase.ConfirmAgreementUseCase;
 import com.lgcns.bebee.match.application.usecase.CreateAgreementUseCase;
+import com.lgcns.bebee.match.application.usecase.GetAgreementUseCase;
 import com.lgcns.bebee.match.application.usecase.RefuseAgreementUseCase;
 import com.lgcns.bebee.match.presentation.dto.req.AgreementCreateReqDTO;
 import com.lgcns.bebee.match.presentation.dto.req.AgreementRefuseReqDTO;
@@ -20,10 +21,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/agreements")
 @RequiredArgsConstructor
 public class AgreementController implements AgreementSwagger {
-
     private final CreateAgreementUseCase createAgreementUseCase;
     private final RefuseAgreementUseCase refuseAgreementUseCase;
     private final ConfirmAgreementUseCase confirmAgreementUseCase;
+    private final GetAgreementUseCase getAgreementUseCase;
 
     @PostMapping
     public ResponseEntity<AgreementCreateResDTO> createAgreement(
@@ -73,8 +74,15 @@ public class AgreementController implements AgreementSwagger {
             @CurrentMember Long memberId,
             @PathVariable String agreementId
     ){
+        GetAgreementUseCase.Param param = new GetAgreementUseCase.Param(
+                memberId,
+                Long.parseLong(agreementId)
+        );
 
+        GetAgreementUseCase.Result result = getAgreementUseCase.execute(param);
 
-        return ResponseEntity.ok(null);
+        AgreementGetResDTO response = AgreementGetResDTO.from(result);
+
+        return ResponseEntity.ok(response);
     }
 }
