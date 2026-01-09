@@ -8,6 +8,7 @@ spring:
 
 jwt:
   secret: ${JWT_SECRET}
+
   issuer: ${JWT_ISSUER:bebee}
   access-token-expires-time-in: ${JWT_ACCESS_TOKEN_EXPIRES_IN:3600}
   refresh-token-expires-time-in: ${JWT_REFRESH_TOKEN_EXPIRES_IN:604800}
@@ -15,10 +16,10 @@ jwt:
 gateway:
   auth:
     exclude-paths:
-      - /auth/login
-      - /auth/signup
-      - /auth/check-*
-      - /documents/**
+      - /member/auth/login
+      - /member/auth/signup
+      - /member/auth/reissue
+      - /member/documents/**
       - /swagger-ui/**
       - /v3/api-docs/**
       - /actuator/**

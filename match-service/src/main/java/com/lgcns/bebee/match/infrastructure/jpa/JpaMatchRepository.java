@@ -9,14 +9,8 @@ import org.springframework.data.repository.query.Param;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 public interface JpaMatchRepository extends JpaRepository<Match, Long> {
-
-    /**
-     * postId로 매칭 조회
-     */
-    Optional<Match> findByPostId(Long postId);
 
     /**
      * 특정 날짜에 활동하는 매칭 목록 조회

@@ -22,9 +22,6 @@ public class Match extends BaseTimeEntity {
     @Column(nullable = false)
     private Long disabledId;
 
-    @Column(name = "post_id", nullable = false)
-    private Long postId;
-
     @Column(nullable = false, length = 100)
     private String title;
 
@@ -38,17 +35,11 @@ public class Match extends BaseTimeEntity {
     @JoinColumn(name = "agreement_id", nullable = false, unique = true)
     private Agreement agreement;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "helper_review_id")
+    @OneToOne(mappedBy = "match")
     private Review helperReview;  // 도우미가 작성한 리뷰
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "disabled_review_id")
+    @OneToOne(mappedBy = "match")
     private Review disabledReview;
-
-    public boolean isParticipant(Long memberId) {
-        return this.helperId.equals(memberId) || this.disabledId.equals(memberId);
-    }
 
     public Long getAgreementId() {
         return agreement != null ? agreement.getId() : null;
@@ -57,16 +48,16 @@ public class Match extends BaseTimeEntity {
     public static Match create(
             Long helperId,
             Long disabledId,
-            Long postId,
             String title,
+            String imageUrl,
             Long chatRoomId,
             Agreement agreement
     ) {
         Match match = new Match();
         match.helperId = helperId;
         match.disabledId = disabledId;
-        match.postId = postId;
         match.title = title;
+        match.imageUrl = imageUrl;
         match.chatRoomId = chatRoomId;
         match.agreement = agreement;
 

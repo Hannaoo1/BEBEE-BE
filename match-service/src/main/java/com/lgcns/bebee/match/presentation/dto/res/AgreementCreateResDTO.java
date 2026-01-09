@@ -39,9 +39,6 @@ public class AgreementCreateResDTO {
     })
     private Object engagementTime;
 
-    private Boolean isDayComplete;
-    private Boolean isTermComplete;
-
     /**
      * UseCase Result -> Response
      */
@@ -57,9 +54,7 @@ public class AgreementCreateResDTO {
                 result.getUnitHoney(),
                 result.getTotalHoney(),
                 result.getRegion(),
-                result.getEngagementTime(),
-                result.getIsDayComplete(),
-                result.getIsTermComplete()
+                result.getEngagementTime()
         );
     }
 }
