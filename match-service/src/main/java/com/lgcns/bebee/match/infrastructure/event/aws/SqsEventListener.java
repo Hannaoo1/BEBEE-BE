@@ -37,11 +37,6 @@ public class SqsEventListener {
             JsonNode attributes = root.get("MessageAttributes");
             String eventType = attributes.get("eventType").get("Value").asText();
 
-            if (eventType.isEmpty()) {
-                log.warn("eventType 없음. 메시지 무시");
-                return;
-            }
-
             String payload = root.get("Message").asText();
 
             log.info("이벤트 타입: {}, 페이로드: {}", eventType, payload);
