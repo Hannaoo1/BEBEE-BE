@@ -62,9 +62,13 @@ public class ConfirmAgreementUseCase implements UseCase<ConfirmAgreementUseCase.
 
         eventPublisher.publish(new AgreementConfirmedEvent(
                         param.getChatRoomId(),
+                        match.getHelperId(),
                         match.getDisabledId(),
                         match.getMatchId(),
-                        match.getAgreement().getUnitHoney()
+                        match.getAgreementId(),
+                        match.getAgreement().getUnitHoney(),
+                        match.getAgreement().getTotalHoney(),
+                        match.getAgreement().getType().name()
                     )
         );
 

@@ -8,9 +8,13 @@ import lombok.RequiredArgsConstructor;
 public class AgreementConfirmedEvent extends DomainEvent{
     private final Long chatroomId;
 
+    private final Long helperId;
     private final Long disabledId;
     private final Long matchId;
-    private final Long useHoney;
+    private final Long agreementId;
+    private final Long unitHoney;
+    private final Long totalHoney;
+    private final String type;
 
     @Override
     public String getEventName() {
