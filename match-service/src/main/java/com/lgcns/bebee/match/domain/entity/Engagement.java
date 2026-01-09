@@ -15,11 +15,15 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Engagement extends BaseTimeEntity {
     @Id
-    @Tsid
-    private Long engagementId;
+    @Tsid @Column(name = "engagement_id")
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "match_id", nullable = false)
+    private Match match;
 
     @Column(nullable = false)
-    private Long agreementId;
+    private LocalDate date;
 
     @Enumerated(EnumType.STRING)
     private EngagementType type;
@@ -33,71 +37,28 @@ public class Engagement extends BaseTimeEntity {
     @Column(nullable = false)
     private Boolean isHelperCheck;
 
-    @Column(nullable = false)
-    private LocalDate activityDate;
-
-    @Column(nullable = false)
-    private Long completedCount;
-
-    public Long getId() {
-        return this.engagementId;
-    }
-
-    public static Engagement create(Long agreementId, EngagementType type, LocalDate activityDate) {
+    public static Engagement create(Match match, EngagementType type, LocalDate date) {
         Engagement engagement = new Engagement();
-        engagement.agreementId = agreementId;
+        engagement.match = match;
         engagement.type = type;
-        engagement.activityDate = activityDate;
-        engagement.status = EngagementStatus.PENDING;
+        engagement.date = date;
+//        engagement.status = EngagementStatus.PENDING;
         engagement.isDisabledCheck = false;
         engagement.isHelperCheck = false;
-        engagement.completedCount = 0L;
         return engagement;
     }
-    
-    // 체크 여부
-    public void setDisabledCheck() {
-        // 이미 체크되어 있으면 무시
-        if (!this.isDisabledCheck) {
-            this.isDisabledCheck = true;
+
+    public void checkHelper(){
+        this.isHelperCheck = true;
+    }
+
+    public void checkDisabled(){
+        this.isDisabledCheck = true;
+    }
+
+    public void complete(){
+        if(this.isDisabledCheck) {
+            this.status = EngagementStatus.COMPLETED;
         }
-    }
-
-    public void setHelperCheck() {
-        if (!this.isHelperCheck) {
-            this.isHelperCheck = true;
-        }
-    }
-
-    // 완료 처리
-    public void complete() {
-        if (this.status == EngagementStatus.COMPLETED) {
-            return; // 또는 예외 발생
-        }
-        this.status = EngagementStatus.COMPLETED;
-        this.completedCount += 1;
-    }
-
-    // 미완료 처리
-    public void incompleted() {
-        this.status = EngagementStatus.INCOMPLETED;
-    }
-
-    public Boolean isHelperCheck() {
-        return isHelperCheck;
-    }
-
-    public Boolean isDisabledCheck() {
-        return isDisabledCheck;
-    }
-
-    public boolean isLastActivity(Agreement agreement) {
-        if (this.type == EngagementType.DAY) {
-
-            // 하루 도움은 항상 마지막 활동
-            return true;
-        }
-
-        return true;
     }
 }

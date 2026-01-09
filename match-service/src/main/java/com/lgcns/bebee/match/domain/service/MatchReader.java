@@ -15,6 +15,6 @@ public class MatchReader {
     @Transactional(readOnly = true)
     public Match getById(Long matchId) {
         return matchRepository.findById(matchId)
-                .orElseThrow(() -> MatchErrors.MATCH_NOT_FOUND.toException());
+                .orElseThrow(MatchErrors.MATCH_NOT_FOUND::toException);
     }
 }
