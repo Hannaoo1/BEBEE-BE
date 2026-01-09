@@ -93,7 +93,7 @@ CREATE TABLE `post` (
     `total_honey`      INT           NOT NULL,
     `region`           VARCHAR(30)   NOT NULL,
     `status`           ENUM('NON_MATCHED','PROCEEDING','MATCHED') NOT NULL DEFAULT 'NON_MATCHED',
-    `legal_dong_code`  VARCHAR(10)   NOT NULL,
+    `legal_dong_code`  VARCHAR(10)   NULL,
     `latitude`         DECIMAL(10,7) NOT NULL,
     `longitude`        DECIMAL(10,7) NOT NULL,
     `applicant_count`  INT           NULL DEFAULT 0,
