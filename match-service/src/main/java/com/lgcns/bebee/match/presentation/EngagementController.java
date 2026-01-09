@@ -4,13 +4,9 @@ import com.lgcns.bebee.common.annotation.CurrentMember;
 import com.lgcns.bebee.match.application.usecase.CompleteEngagementUseCase;
 import com.lgcns.bebee.match.presentation.dto.res.EngagementCompleteResDTO;
 import com.lgcns.bebee.match.presentation.swagger.EngagementSwagger;
-import com.lgcns.bebee.match.presentation.swagger.MatchSwagger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/engagements")
@@ -19,18 +15,16 @@ public class EngagementController implements EngagementSwagger {
 
     private final CompleteEngagementUseCase completeEngagementUseCase;
 
-    // 활동 완료 체크
-
-    @PostMapping("/{agreementId}/complete")
+    @PatchMapping("/{engagementId}/complete")
     public ResponseEntity<EngagementCompleteResDTO> completeEngagement(
             @CurrentMember Long currentMemberId,
-            @PathVariable String agreementId
+            @PathVariable String engagementId
     ) {
 
         // DTO → Param 변환
         CompleteEngagementUseCase.Param param = new CompleteEngagementUseCase.Param(
                 currentMemberId,
-                Long.parseLong(agreementId)
+                Long.parseLong(engagementId)
         );
 
         // UseCase 실행

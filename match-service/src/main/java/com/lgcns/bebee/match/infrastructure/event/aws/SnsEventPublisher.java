@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -25,11 +27,18 @@ public class SnsEventPublisher implements EventPublisher {
     @Override
     public void publish(DomainEvent event) {
         try {
-            String message = objectMapper.writeValueAsString(event);
+            String messagePayload = objectMapper.writeValueAsString(event);
 
             log.info("SNS 발행 시작 - Topic: {}, Event: {}", topicArn, event.getEventName());
 
-            snsTemplate.sendNotification(topicArn, message, event.getEventName());
+            // Message Attributes를 포함한 Message 객체 생성
+            Message<String> message = MessageBuilder
+                    .withPayload(messagePayload)
+                    .setHeader("Subject", event.getEventName())
+                    .setHeader("eventType", event.getEventName())  // 필터링에 사용할 속성
+                    .build();
+
+            snsTemplate.send(topicArn, message);
 
             log.info("SNS 발행 완료 - Event: {}, 발행 시간: {}", event.getEventName(), event.getOccuredAt());
         } catch (JsonProcessingException e) {

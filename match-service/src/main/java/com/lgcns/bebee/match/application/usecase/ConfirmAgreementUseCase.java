@@ -8,12 +8,9 @@ import com.lgcns.bebee.match.application.usecase.client.EventPublisher;
 import com.lgcns.bebee.match.common.exception.MatchInvalidParamErrors;
 import com.lgcns.bebee.common.util.ParamValidator;
 import com.lgcns.bebee.match.domain.entity.Agreement;
-import com.lgcns.bebee.match.domain.entity.Engagement;
 import com.lgcns.bebee.match.domain.entity.Match;
-import com.lgcns.bebee.match.domain.repository.EngagementRepository;
 import com.lgcns.bebee.match.domain.repository.MatchRepository;
 import com.lgcns.bebee.match.domain.service.AgreementReader;
-import com.lgcns.bebee.match.domain.service.EngagementManager;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,8 +25,6 @@ import static com.lgcns.bebee.match.common.exception.MatchErrors.*;
 public class ConfirmAgreementUseCase implements UseCase<ConfirmAgreementUseCase.Param, ConfirmAgreementUseCase.Result>{
     private final AgreementReader agreementReader;
     private final MatchRepository matchRepository;
-    private final EngagementManager engagementManager;
-    private final EngagementRepository engagementRepository;
 
     private final EventPublisher eventPublisher;
 
@@ -63,9 +58,6 @@ public class ConfirmAgreementUseCase implements UseCase<ConfirmAgreementUseCase.
                         match.getAgreement().getUnitHoney()
                     )
         );
-
-        Engagement engagement = engagementManager.createEngagement(agreement);
-        engagementRepository.save(engagement);
 
         return Result.from(savedMatch);
     }
@@ -116,5 +108,4 @@ public class ConfirmAgreementUseCase implements UseCase<ConfirmAgreementUseCase.
             );
         }
     }
-
 }

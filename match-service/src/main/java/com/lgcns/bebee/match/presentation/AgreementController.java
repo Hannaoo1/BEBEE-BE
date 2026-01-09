@@ -3,12 +3,14 @@ package com.lgcns.bebee.match.presentation;
 import com.lgcns.bebee.common.annotation.CurrentMember;
 import com.lgcns.bebee.match.application.usecase.ConfirmAgreementUseCase;
 import com.lgcns.bebee.match.application.usecase.CreateAgreementUseCase;
+import com.lgcns.bebee.match.application.usecase.GetAgreementUseCase;
 import com.lgcns.bebee.match.application.usecase.RefuseAgreementUseCase;
 import com.lgcns.bebee.match.presentation.dto.req.AgreementCreateReqDTO;
 import com.lgcns.bebee.match.presentation.dto.req.AgreementRefuseReqDTO;
 import com.lgcns.bebee.match.presentation.dto.req.AgreementConfirmReqDTO;
 import com.lgcns.bebee.match.presentation.dto.res.AgreementConfirmResDTO;
 import com.lgcns.bebee.match.presentation.dto.res.AgreementCreateResDTO;
+import com.lgcns.bebee.match.presentation.dto.res.AgreementGetResDTO;
 import com.lgcns.bebee.match.presentation.swagger.AgreementSwagger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,10 +21,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/agreements")
 @RequiredArgsConstructor
 public class AgreementController implements AgreementSwagger {
-
     private final CreateAgreementUseCase createAgreementUseCase;
     private final RefuseAgreementUseCase refuseAgreementUseCase;
     private final ConfirmAgreementUseCase confirmAgreementUseCase;
+    private final GetAgreementUseCase getAgreementUseCase;
 
     @PostMapping
     public ResponseEntity<AgreementCreateResDTO> createAgreement(
@@ -63,6 +65,23 @@ public class AgreementController implements AgreementSwagger {
         ConfirmAgreementUseCase.Result result = confirmAgreementUseCase.execute(param);
 
         AgreementConfirmResDTO response = AgreementConfirmResDTO.from(result);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{agreementId}")
+    public ResponseEntity<AgreementGetResDTO> getAgreement(
+            @CurrentMember Long memberId,
+            @PathVariable String agreementId
+    ){
+        GetAgreementUseCase.Param param = new GetAgreementUseCase.Param(
+                memberId,
+                Long.parseLong(agreementId)
+        );
+
+        GetAgreementUseCase.Result result = getAgreementUseCase.execute(param);
+
+        AgreementGetResDTO response = AgreementGetResDTO.from(result);
 
         return ResponseEntity.ok(response);
     }

@@ -31,43 +31,43 @@ public class EngagementWarningScheduler {
     @Scheduled(cron = "0 0 3 * * *")
     @Transactional(readOnly = true)
     public void sendWarningNotifications() {
-        log.info("=== 활동 완료 경고 스케줄러 시작 ===");
-
-        // 2일 전 날짜 계산
-        LocalDate twoDaysAgo = LocalDate.now().minusDays(2);
-
-        // PENDING 상태 활동들 조회
-        List<Engagement> warningTargets = engagementRepository
-                .findByActivityDateAndStatus(twoDaysAgo, EngagementStatus.PENDING);
-
-        log.info("경고 대상 활동 수: {}", warningTargets.size());
-
-        int warningCount = 0;
-
-        // 활동 처리
-        for (Engagement engagement : warningTargets) {
-
-            // 둘 다 체크 안 한 경우만 (케이스 4)
-            if (!engagement.isHelperCheck() && !engagement.isDisabledCheck()) {
-
-                log.info("둘 다 미체크 (경고 발송): engagementId={}, activityDate={}",
-                        engagement.getEngagementId(),
-                        engagement.getActivityDate());
-
-                // 경고 알림 이벤트 발행
-                /*eventPublisher.publish(new WarningNotificationEvent(
-                        engagement.getEngagementId(),
-                        agreement.getId(),
-                        agreement.getHelperId(),
-                        agreement.getDisabledId(),
-                        engagement.getActivityDate()
-                ));
-                */
-
-                warningCount++;
-            }
-        }
-
-        log.info("=== 활동 완료 경고 스케줄러 종료: {}건 경고 발송 ===", warningCount);
+//        log.info("=== 활동 완료 경고 스케줄러 시작 ===");
+//
+//        // 2일 전 날짜 계산
+//        LocalDate twoDaysAgo = LocalDate.now().minusDays(2);
+//
+//        // PENDING 상태 활동들 조회
+//        List<Engagement> warningTargets = null;
+//        // engagementRepository.findByDateAndStatus(twoDaysAgo, EngagementStatus.PENDING);
+//
+//        log.info("경고 대상 활동 수: {}", warningTargets.size());
+//
+//        int warningCount = 0;
+//
+//        // 활동 처리
+//        for (Engagement engagement : warningTargets) {
+//
+//            // 둘 다 체크 안 한 경우만 (케이스 4)
+//            if (!engagement.isHelperCheck() && !engagement.isDisabledCheck()) {
+//
+////                log.info("둘 다 미체크 (경고 발송): engagementId={}, activityDate={}",
+////                        engagement.getEngagementId(),
+////                        engagement.getActivityDate());
+//
+//                // 경고 알림 이벤트 발행
+//                /*eventPublisher.publish(new WarningNotificationEvent(
+//                        engagement.getEngagementId(),
+//                        agreement.getId(),
+//                        agreement.getHelperId(),
+//                        agreement.getDisabledId(),
+//                        engagement.getActivityDate()
+//                ));
+//                */
+//
+//                warningCount++;
+//            }
+//        }
+//
+//        log.info("=== 활동 완료 경고 스케줄러 종료: {}건 경고 발송 ===", warningCount);
     }
 }
