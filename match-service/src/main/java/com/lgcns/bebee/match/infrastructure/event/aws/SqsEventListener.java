@@ -26,13 +26,23 @@ public class SqsEventListener {
         try{
             log.info("SQS 메시지 수신: {}", message);
 
-            JsonNode snsMessage = objectMapper.readTree(message);
-            String eventType = snsMessage.get("Subject").asText();
-            String eventPayload = snsMessage.get("Message").asText();
-            log.info("이벤트 타입: {}, 페이로드: {}", eventType, eventPayload);
+            JsonNode root = objectMapper.readTree(message);
+
+            String snsType = root.path("Type").asText();
+            if (!"Notification".equals(snsType)) {
+                log.info("SNS Notification 아님. 무시합니다. type={}", snsType);
+                return;
+            }
+
+            JsonNode attributes = root.get("MessageAttributes");
+            String eventType = attributes.get("eventType").get("Value").asText();
+
+            String payload = root.get("Message").asText();
+
+            log.info("이벤트 타입: {}, 페이로드: {}", eventType, payload);
 
             EventType type = EventType.from(eventType);
-            DomainEvent event = objectMapper.readValue(eventPayload, type.getEventClass());
+            DomainEvent event = objectMapper.readValue(payload, type.getEventClass());
 
             processEvent(event, type);
         } catch (JsonProcessingException e) {
