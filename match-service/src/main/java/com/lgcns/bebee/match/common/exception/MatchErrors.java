@@ -8,6 +8,7 @@ public enum MatchErrors implements ErrorInfo {
     POST_NOT_FOUND("게시글 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     MATCH_NOT_FOUND("매칭 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     MEMBER_NOT_FOUND("회원 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    ENGAGEMENT_NOT_FOUND("활동 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 
     ONLY_DISABLED_MEMBERS_ALLOWED("장애인 회원에게 주어진 권한입니다.", HttpStatus.FORBIDDEN),
     ONLY_HELPER_MEMBERS_ALLOWED("도우미 회원에게 주어진 권한입니다.", HttpStatus.FORBIDDEN),
@@ -23,7 +24,6 @@ public enum MatchErrors implements ErrorInfo {
     ALREADY_APPLIED("이미 지원한 게시글입니다.", HttpStatus.CONFLICT),
     UNAUTHORIZED_ACCESS("접근 권한이 없습니다.", HttpStatus.FORBIDDEN),
 
-    ENGAGEMENT_NOT_FOUND("활동을 찾을 수 없습니다", HttpStatus.NOT_FOUND),
     ENGAGEMENT_NOT_COMPLETED("완료된 활동만 리뷰를 작성할 수 있습니다", HttpStatus.FORBIDDEN),
 
     ALREADY_REVIEWED("이미 작성한 리뷰입니다", HttpStatus.CONFLICT),

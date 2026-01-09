@@ -302,69 +302,151 @@ ON DUPLICATE KEY UPDATE
 -- ========================================
 
 -- Match 2: Agreement 10002
-INSERT INTO `match` (match_id, helper_id, disabled_id, post_id, title, chat_room_id, agreement_id, created_at, updated_at)
+
+INSERT INTO `match` (match_id, helper_id, disabled_id, post_id, title, chat_room_id, agreement_id, image_url, created_at, updated_at)
+
 VALUES (
+
     40002,
+
     800,
+
     100,
+
     1003,
+
     '문화센터 수업 동행',
+
     50002,
+
     10002,
+
+    'https://example.com/posts/dummy.jpg',
+
     NOW(),
+
     NOW()
+
 ) ON DUPLICATE KEY UPDATE
+
     title = VALUES(title),
+
     chat_room_id = VALUES(chat_room_id),
+
+    image_url = VALUES(image_url),
+
     updated_at = NOW();
+
+
 
 -- Match 3: Agreement 10003
-INSERT INTO `match` (match_id, helper_id, disabled_id, post_id, title, chat_room_id, agreement_id, created_at, updated_at)
+
+INSERT INTO `match` (match_id, helper_id, disabled_id, post_id, title, chat_room_id, agreement_id, image_url, created_at, updated_at)
+
 VALUES (
+
     40003,
+
     900,
+
     200,
+
     1008,
+
     '정기 통원 치료 동행',
+
     50003,
+
     10003,
+
+    'https://example.com/posts/dummy.jpg',
+
     NOW(),
+
     NOW()
+
 ) ON DUPLICATE KEY UPDATE
+
     title = VALUES(title),
+
     chat_room_id = VALUES(chat_room_id),
+
+    image_url = VALUES(image_url),
+
     updated_at = NOW();
+
+
 
 -- Match 4: Agreement 10004
-INSERT INTO `match` (match_id, helper_id, disabled_id, post_id, title, chat_room_id, agreement_id, created_at, updated_at)
+
+INSERT INTO `match` (match_id, helper_id, disabled_id, post_id, title, chat_room_id, agreement_id, image_url, created_at, updated_at)
+
 VALUES (
+
     40004,
+
     1000,
+
     200,
+
     1011,
+
     '주 2회 방문 목욕 서비스',
+
     50004,
+
     10004,
+
+    'https://example.com/posts/dummy.jpg',
+
     NOW(),
+
     NOW()
+
 ) ON DUPLICATE KEY UPDATE
+
     title = VALUES(title),
+
     chat_room_id = VALUES(chat_room_id),
+
+    image_url = VALUES(image_url),
+
     updated_at = NOW();
 
+
+
 -- Match 5: Agreement 10005
-INSERT INTO `match` (match_id, helper_id, disabled_id, post_id, title, chat_room_id, agreement_id, created_at, updated_at)
+
+INSERT INTO `match` (match_id, helper_id, disabled_id, post_id, title, chat_room_id, agreement_id, image_url, created_at, updated_at)
+
 VALUES (
+
     40005,
+
     700,
+
     100,
+
     1021,
+
     '당뇨 환자 혈당 체크',
+
     50005,
+
     10005,
+
+    'https://example.com/posts/dummy.jpg',
+
     NOW(),
+
     NOW()
+
 ) ON DUPLICATE KEY UPDATE
+
     title = VALUES(title),
+
     chat_room_id = VALUES(chat_room_id),
+
+    image_url = VALUES(image_url),
+
     updated_at = NOW();

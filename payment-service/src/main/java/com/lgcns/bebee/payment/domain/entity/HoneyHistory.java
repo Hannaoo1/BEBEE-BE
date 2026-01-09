@@ -17,7 +17,7 @@ public class HoneyHistory extends BaseTimeEntity {
     private Long honeyHistoryId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "honey_wallet_id", nullable = false)
     private HoneyWallet honeyWallet;
 
     @Column(nullable = false)

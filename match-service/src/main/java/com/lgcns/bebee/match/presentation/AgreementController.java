@@ -9,6 +9,7 @@ import com.lgcns.bebee.match.presentation.dto.req.AgreementRefuseReqDTO;
 import com.lgcns.bebee.match.presentation.dto.req.AgreementConfirmReqDTO;
 import com.lgcns.bebee.match.presentation.dto.res.AgreementConfirmResDTO;
 import com.lgcns.bebee.match.presentation.dto.res.AgreementCreateResDTO;
+import com.lgcns.bebee.match.presentation.dto.res.AgreementGetResDTO;
 import com.lgcns.bebee.match.presentation.swagger.AgreementSwagger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -65,5 +66,15 @@ public class AgreementController implements AgreementSwagger {
         AgreementConfirmResDTO response = AgreementConfirmResDTO.from(result);
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{agreementId}")
+    public ResponseEntity<AgreementGetResDTO> getAgreement(
+            @CurrentMember Long memberId,
+            @PathVariable String agreementId
+    ){
+
+
+        return ResponseEntity.ok(null);
     }
 }

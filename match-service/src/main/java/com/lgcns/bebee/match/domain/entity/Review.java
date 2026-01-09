@@ -22,6 +22,10 @@ public class Review extends BaseTimeEntity {
     @Column(name = "review_id")
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "match_id", nullable = false)
+    private Match match;
+
     @Column(nullable = false)
     private Long reviewerId;
 
