@@ -71,6 +71,7 @@ public class Agreement extends BaseTimeEntity {
     private Boolean isVolunteer;
 
     public static Agreement create(
+            Long postId,
             Long disabledId,
             Long helperId,
             EngagementType type,
@@ -88,6 +89,7 @@ public class Agreement extends BaseTimeEntity {
         }
 
         Agreement agreement = new Agreement();
+        agreement.postId = postId;
         agreement.disabledId = disabledId;
         agreement.helperId = helperId;
         agreement.type = type;

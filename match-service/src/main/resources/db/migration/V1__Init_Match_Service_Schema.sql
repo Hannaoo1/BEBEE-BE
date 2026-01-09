@@ -269,7 +269,7 @@ CREATE TABLE `match` (
     `title`              VARCHAR(100) NOT NULL,
     `chat_room_id`       BIGINT       NOT NULL,
     `agreement_id`       BIGINT       NOT NULL UNIQUE,
-    `image_url`          VARCHAR(255) NOT NULL DEFAULT '',
+    `image_url`          VARCHAR(255) NULL,
     `created_at`         TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
     `updated_at`         TIMESTAMP    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
