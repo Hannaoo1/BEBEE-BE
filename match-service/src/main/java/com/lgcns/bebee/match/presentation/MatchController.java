@@ -24,7 +24,7 @@ public class MatchController implements MatchSwagger {
     public ResponseEntity<MatchesByDateResDTO> getMatchesByDate(
             @CurrentMember Long memberId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-            @RequestParam String type
+            @RequestParam(required = false) String type
     ) {
         GetMatchesByDateUseCase.Param param = new GetMatchesByDateUseCase.Param(memberId, date, type);
         GetMatchesByDateUseCase.Result result = getMatchesByDateUseCase.execute(param);

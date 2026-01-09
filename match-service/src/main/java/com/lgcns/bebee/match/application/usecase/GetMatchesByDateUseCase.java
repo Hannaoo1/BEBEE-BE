@@ -30,7 +30,7 @@ public class GetMatchesByDateUseCase implements UseCase<GetMatchesByDateUseCase.
     public Result execute(Param param) {
         MemberSync member = memberManager.findExistingMember(param.currentMemberId);
 
-        EngagementType type = EngagementType.from(param.type);
+        EngagementType type = param.type != null ? EngagementType.from(param.type) : null;
         List<Engagement> engagements = engagementRepository.searchEngagements(EngagementSearchCond.from(type, param.date));
 
         return Result.from(engagements, member, memberManager);
@@ -88,11 +88,6 @@ public class GetMatchesByDateUseCase implements UseCase<GetMatchesByDateUseCase.
 
             MemberSync otherMember = memberManager.findExistingMember(otherId);
 
-            LocalDate date = null;
-
-            if (agreement.getType() == EngagementType.DAY && agreement.getPeriod() != null) {
-                date = agreement.getPeriod().getStartDate();
-            }
             List<String> dayOfWeeks = agreement.getSchedules().stream()
                     .map(AgreementSchedule::getDayOfWeek)
                     .distinct()
@@ -102,7 +97,7 @@ public class GetMatchesByDateUseCase implements UseCase<GetMatchesByDateUseCase.
 
             String status = null;
 
-            if (engagement.getDate().isAfter(date)) {
+            if (engagement.getDate().isAfter(LocalDate.now())) {
                 status = "INACTIVE";
             }else{
                 boolean isHelper = match.getHelperId().equals(member.getId());
@@ -139,12 +134,12 @@ public class GetMatchesByDateUseCase implements UseCase<GetMatchesByDateUseCase.
                     agreement.getId(),
                     otherId,
                     otherMember.getNickname(),
-                    match.getImageUrl(),// thumbnailImageUrl - Post 정보 필요
+                    match.getImageUrl(),
                     match.getTitle(),
                     match.getChatRoomId(),
                     agreement.getRegion(),
                     agreement.getType().name(),
-                    date,
+                    engagement.getDate(),
                     dayOfWeeks,
                     helpCategoryIds,
                     status

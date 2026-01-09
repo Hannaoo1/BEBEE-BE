@@ -104,7 +104,7 @@ public interface MatchSwagger {
                     description = "활동 타입(하루도움 = DAY / 지속도움 = TERM / 전체 = null)",
                     example = "DAY"
             )
-            @RequestParam String type
+            @RequestParam(required = false) String type
     );
 
     @Operation(
