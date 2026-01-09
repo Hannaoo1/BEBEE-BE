@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AgreementConfirmedEvent extends DomainEvent{
     private final Long chatroomId;
+    private final Long matchId;
 
     @Override
     public String getEventName() {

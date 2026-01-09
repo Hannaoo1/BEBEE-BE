@@ -17,23 +17,12 @@ public interface EngagementSwagger {
     @Operation(
             summary = "활동 완료 체크",
             description = """
-            활동 완료 체크를 처리합니다.
-            
             ## 동작 방식
-            - Agreement ID를 기반으로 Engagement를 찾아 완료 처리합니다.
-            - Engagement가 없으면 자동으로 생성됩니다.
-            - 회원 ID는 토큰에서 자동으로 가져옵니다. (헤더에 저장됨)
-            
-            ## 케이스별 처리
-            
-            ### 케이스 1: 장애인 체크
-            - 즉시 완료 (COMPLETED)
-            - is_disabled_check = true
-            
-            ### 케이스 2: 도우미 체크
-            - 대기 (PENDING)
-            - is_helper_check = true
-            - 3일 후 자동 완료
+            - engagementId 로 식별합니다.
+
+            ## 응답
+            - isLastActivity 가 true 이면 리뷰 보내기 버튼 UI
+            - isLastActivity 가 true 이면 활동 완료 끝!
             """
     )
     @ApiResponses({
@@ -44,19 +33,8 @@ public interface EngagementSwagger {
                             mediaType = "application/json",
                             examples = {
                                     @ExampleObject(
-                                            name = "장애인 체크 (즉시 완료)",
                                             value = """
                                             {
-                                              "status": "COMPLETED",
-                                              "isLastActivity": true
-                                            }
-                                            """
-                                    ),
-                                    @ExampleObject(
-                                            name = "도우미 체크 (대기)",
-                                            value = """
-                                            {
-                                              "status": "PENDING",
                                               "isLastActivity": true
                                             }
                                             """
@@ -66,12 +44,26 @@ public interface EngagementSwagger {
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Agreement를 찾을 수 없음"
+                    description = "Engagement 를 찾을 수 없음",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = {
+                                    @ExampleObject(
+                                            value = """
+                                            {
+                                                "code": "ENGAGEMENT_NOT_FOUND",
+                                                "message": "활동을 찾을 수 없습니다.",
+                                                "timestamp": "시간정보"
+                                            }
+                                            """
+                                    )
+                            }
+                    )
             )
     })
     ResponseEntity<EngagementCompleteResDTO> completeEngagement(
-            @Parameter(hidden = true)  //  Swagger에 안 보임!
-            Long currentMemberId,       // 파라미터 이름만 (어노테이션 없음!)
+            @Parameter(hidden = true)
+            Long currentMemberId,
 
             @Parameter(
                     description = "계약 ID",

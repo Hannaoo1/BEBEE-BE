@@ -100,7 +100,7 @@ class GetMatchesByDateUseCaseTest {
             Match dayMatch = createMatch(3001L, 101L, 202L, 404L,
                     "병원 동행 도우미 구해요", 4001L, dayAgreement);
 
-            when(matchRepository.findByDateAndMember(
+            when(matchRepository.findMatchesByDate(
                     eq(memberId),
                     eq(targetDate),
                     eq(DayOfWeek.SUNDAY),
@@ -172,7 +172,7 @@ class GetMatchesByDateUseCaseTest {
             when(memberManager.findExistingMember(204L)).thenReturn(disabled2);
             when(postManager.findSinglePost(505L)).thenReturn(post2);
 
-            when(matchRepository.findByDateAndMember(
+            when(matchRepository.findMatchesByDate(
                     eq(memberId),
                     eq(targetDate),
                     any(DayOfWeek.class),
@@ -208,7 +208,7 @@ class GetMatchesByDateUseCaseTest {
         @DisplayName("해당 날짜에 매칭이 없으면 빈 리스트 반환")
         void shouldReturnEmptyList_whenNoMatchesFound() {
             // Given
-            when(matchRepository.findByDateAndMember(
+            when(matchRepository.findMatchesByDate(
                     eq(memberId),
                     eq(targetDate),
                     any(DayOfWeek.class),
@@ -246,7 +246,7 @@ class GetMatchesByDateUseCaseTest {
             Post post2 = createMockPost(406L, "매칭2", "https://example.com/post2.jpg");
             when(postManager.findSinglePost(406L)).thenReturn(post2);
 
-            when(matchRepository.findByDateAndMember(
+            when(matchRepository.findMatchesByDate(
                     eq(memberId),
                     eq(targetDate),
                     eq(DayOfWeek.SUNDAY),
@@ -280,7 +280,7 @@ class GetMatchesByDateUseCaseTest {
             );
             Match match = createMatch(3001L, 101L, 202L, 404L, "매칭", 4001L, agreement);
 
-            when(matchRepository.findByDateAndMember(
+            when(matchRepository.findMatchesByDate(
                     eq(memberId),
                     eq(targetDate),
                     eq(DayOfWeek.SUNDAY),

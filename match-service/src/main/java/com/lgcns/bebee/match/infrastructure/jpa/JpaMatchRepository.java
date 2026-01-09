@@ -11,7 +11,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-public interface MatchJpaRepository extends JpaRepository<Match, Long> {
+public interface JpaMatchRepository extends JpaRepository<Match, Long> {
 
     /**
      * postId로 매칭 조회
