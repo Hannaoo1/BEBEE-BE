@@ -97,7 +97,7 @@ class UseHoneyUseCaseTest {
             given(mockMatch.getDisabledId()).willReturn(testMemberId);
             given(mockMatch.getHelperId()).willReturn(testHelperId);
             given(honeyEscrowService.existsByMatchId(testMatchId)).willReturn(true);
-            given(honeyWalletService.findByMemberId(testMemberId)).willReturn(mockWallet);
+            given(honeyWalletService.findByMemberIdWithLock(testMemberId)).willReturn(mockWallet);
 
             HoneyEscrow mockEscrow = mock(HoneyEscrow.class);
             given(honeyEscrowRepository.save(any(HoneyEscrow.class))).willReturn(mockEscrow);
@@ -133,7 +133,7 @@ class UseHoneyUseCaseTest {
             given(mockMatch.getDisabledId()).willReturn(testMemberId);
             given(mockMatch.getHelperId()).willReturn(testHelperId);
             given(honeyEscrowService.existsByMatchId(testMatchId)).willReturn(true);
-            given(honeyWalletService.findByMemberId(testMemberId)).willReturn(mockWallet);
+            given(honeyWalletService.findByMemberIdWithLock(testMemberId)).willReturn(mockWallet);
             given(honeyEscrowRepository.save(any(HoneyEscrow.class))).willReturn(mock(HoneyEscrow.class));
             given(honeyHistoryRepository.save(any(HoneyHistory.class))).willReturn(mock(HoneyHistory.class));
 
@@ -324,7 +324,7 @@ class UseHoneyUseCaseTest {
             );
 
             // then
-            assertThat(param.getMemberId()).isEqualTo(testMemberId);
+            assertThat(param.getDisabledId()).isEqualTo(testMemberId);
             assertThat(param.getMatchId()).isEqualTo(testMatchId);
             assertThat(param.getUseHoney()).isEqualTo(testUseHoney);
         }
@@ -350,7 +350,7 @@ class UseHoneyUseCaseTest {
             given(mockMatch.getDisabledId()).willReturn(testMemberId);
             given(mockMatch.getHelperId()).willReturn(testHelperId);
             given(honeyEscrowService.existsByMatchId(testMatchId)).willReturn(true);
-            given(honeyWalletService.findByMemberId(testMemberId)).willReturn(mockWallet);
+            given(honeyWalletService.findByMemberIdWithLock(testMemberId)).willReturn(mockWallet);
             given(honeyEscrowRepository.save(any(HoneyEscrow.class))).willReturn(mock(HoneyEscrow.class));
             given(honeyHistoryRepository.save(any(HoneyHistory.class))).willReturn(mock(HoneyHistory.class));
 
@@ -377,7 +377,7 @@ class UseHoneyUseCaseTest {
             given(mockMatch.getDisabledId()).willReturn(testMemberId);
             given(mockMatch.getHelperId()).willReturn(testHelperId);
             given(honeyEscrowService.existsByMatchId(testMatchId)).willReturn(true);
-            given(honeyWalletService.findByMemberId(testMemberId)).willReturn(mockWallet);
+            given(honeyWalletService.findByMemberIdWithLock(testMemberId)).willReturn(mockWallet);
             given(honeyEscrowRepository.save(any(HoneyEscrow.class))).willReturn(mock(HoneyEscrow.class));
             given(honeyHistoryRepository.save(any(HoneyHistory.class))).willReturn(mock(HoneyHistory.class));
 

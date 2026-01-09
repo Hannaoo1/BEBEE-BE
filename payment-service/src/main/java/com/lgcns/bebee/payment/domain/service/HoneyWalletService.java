@@ -15,9 +15,9 @@ public class HoneyWalletService {
 
     private final HoneyWalletRepository honeyWalletRepository;
 
-    @Transactional(readOnly = true)
-    public HoneyWallet findByMemberId(Long memberId) {
-        return honeyWalletRepository.findByMemberId(memberId)
+    @Transactional
+    public HoneyWallet findByMemberIdWithLock(Long memberId) {
+        return honeyWalletRepository.findByMemberIdWithLock(memberId)
                 .orElseThrow(() -> PaymentErrors.HONEY_WALLET_NOT_FOUND.toException());
     }
 

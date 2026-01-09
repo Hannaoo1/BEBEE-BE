@@ -14,6 +14,7 @@ import com.lgcns.bebee.payment.domain.entity.vo.EscrowStatus;
 import com.lgcns.bebee.payment.domain.entity.vo.HoneyHistoryType;
 import com.lgcns.bebee.payment.domain.repository.HoneyEscrowRepository;
 import com.lgcns.bebee.payment.domain.repository.HoneyHistoryRepository;
+import com.lgcns.bebee.payment.domain.repository.HoneyWalletRepository;
 import com.lgcns.bebee.payment.domain.service.HoneyEscrowService;
 import com.lgcns.bebee.payment.domain.service.HoneyWalletService;
 import com.lgcns.bebee.payment.domain.service.MatchReader;
@@ -31,6 +32,7 @@ public class UseHoneyUseCase implements UseCase<UseHoneyUseCase.Param, Void> {
     private final HoneyEscrowRepository honeyEscrowRepository;
     private final HoneyEscrowService honeyEscrowService;
     private final HoneyHistoryRepository honeyHistoryRepository;
+    private final HoneyWalletRepository honeyWalletRepository;
 
     @Override
     @Transactional
@@ -39,24 +41,20 @@ public class UseHoneyUseCase implements UseCase<UseHoneyUseCase.Param, Void> {
 
         // 1. 에스크로(임시 꿀 보관소)에 꿀 임시 보관
         PaymentMatchSync match = matchReader.findById(param.getMatchId());
-        // 1-1. 해당 매칭에 연관된 장애인, 도우미 확인
-        Long disabledId = match.getDisabledId();
-        Long helperId = match.getHelperId();
-        // 1-2. 장애인 잔액이 부족할 시 예외처리
-        Long currentHoney = honeyWalletService.getCurrentHoney(disabledId);
-        Long needHoney = param.getUseHoney();
-        if (currentHoney < needHoney) {
-            throw PaymentErrors.INSUFFICIENT_HONEY_BALANCE.toException();
+        // 1-1. 해당 활동에 결제해야 하는 사람이 본인이 맞는지 확인
+        if (!match.getDisabledId().equals(param.getDisabledId())) {
+            throw PaymentErrors.PAYMENT_MEMBER_MISMATCH.toException();
         }
-        // 1-3. 중복 에스크로 체크
+        // 1-2. 중복 에스크로 체크
         honeyEscrowService.existsByMatchId(match.getMatchId());
-        // 1-4. 꿀 → 원 단위로 변환
+        // 1-3. 꿀 → 원 단위로 변환
+        Long needHoney = param.getUseHoney();
         Long amount = needHoney * 100;
-        // 1-5. 에스크로 생성
+        // 1-4. 에스크로 생성
         HoneyEscrow escrow = HoneyEscrow.create(
                 match,
-                disabledId,
-                helperId,
+                match.getDisabledId(),
+                match.getHelperId(),
                 amount,
                 EscrowStatus.PENDING,
                 null,
@@ -65,13 +63,14 @@ public class UseHoneyUseCase implements UseCase<UseHoneyUseCase.Param, Void> {
         honeyEscrowRepository.save(escrow);
 
         // 2. 꿀 차감
-        HoneyWallet wallet = honeyWalletService.findByMemberId(disabledId);
+        HoneyWallet wallet = honeyWalletService.findByMemberIdWithLock(param.getDisabledId());
         wallet.withdraw(amount);
+        HoneyWallet savedWallet = honeyWalletRepository.saveAndFlush(wallet);
 
         // 3. 꿀 히스토리 기록
         HoneyHistory history = HoneyHistory.create(
-                wallet,
-                disabledId,
+                savedWallet,
+                param.getDisabledId(),
                 amount,
                 HoneyHistoryType.WITHDRAWL
         );
@@ -83,12 +82,12 @@ public class UseHoneyUseCase implements UseCase<UseHoneyUseCase.Param, Void> {
     @Getter
     @RequiredArgsConstructor
     public static class Param implements Params {
-        private final Long memberId;
+        private final Long disabledId;
         private final Long matchId;
         private final Long useHoney;
 
         public boolean validate() {
-            if (!ParamValidator.isValidId(memberId)) {
+            if (!ParamValidator.isValidId(disabledId)) {
                 throw new InvalidParamException(PaymentInvalidParamErrors.UNAUTHORIZED);
             }
             if (!ParamValidator.isNotNull(useHoney)) {
