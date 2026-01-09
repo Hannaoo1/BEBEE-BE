@@ -19,7 +19,7 @@ public class SqsEventListener {
     private final ObjectMapper objectMapper;
     private final EventHandlerRegistry handlerRegistry;
 
-    @SqsListener("${app.sqs.chat-queue-url}")
+    @SqsListener("${app.sqs.payment-queue-url}")
     public void handleEvent(String message) {
         try{
             log.info("SQS 메시지 수신: {}", message);
@@ -42,7 +42,9 @@ public class SqsEventListener {
     @SuppressWarnings("unchecked")
     private <T extends DomainEvent> void processEvent(DomainEvent event, EventType type) {
         EventHandler<T> handler = (EventHandler<T>) handlerRegistry.getHandler(type);
-        handler.handle((T) event);
+        if(handler != null){
+            handler.handle((T) event);
+        }
     }
 }
 
