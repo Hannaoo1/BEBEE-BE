@@ -1,6 +1,5 @@
 package com.lgcns.bebee.match.domain.entity;
 
-
 import com.lgcns.bebee.common.data.domain.BaseTimeEntity;
 import com.lgcns.bebee.match.domain.entity.vo.ReviewDirection;
 import io.hypersistence.utils.hibernate.id.Tsid;
@@ -22,7 +21,7 @@ public class Review extends BaseTimeEntity {
     @Column(name = "review_id")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "match_id", nullable = false)
     private Match match;
 
@@ -63,11 +62,7 @@ public class Review extends BaseTimeEntity {
         return review;
     }
 
-    // 키워드 추가
-    public void addKeyword(Integer keywordId) {
-        ReviewKeyword reviewKeyword = new ReviewKeyword();
-        reviewKeyword.setKeywordId(keywordId);
-        reviewKeyword.setReview(this);
-        this.keywords.add(reviewKeyword);
+    public void setMatch(Match match) {
+        this.match = match;
     }
 }
