@@ -1,8 +1,11 @@
 package com.lgcns.bebee.match.presentation;
 
 import com.lgcns.bebee.common.annotation.CurrentMember;
+import com.lgcns.bebee.match.application.usecase.CompleteEngagementUseCase;
 import com.lgcns.bebee.match.application.usecase.GetMatchCalendarUseCase;
 import com.lgcns.bebee.match.application.usecase.GetMatchesByDateUseCase;
+import com.lgcns.bebee.match.domain.entity.vo.EngagementType;
+import com.lgcns.bebee.match.presentation.dto.res.EngagementCompleteResDTO;
 import com.lgcns.bebee.match.presentation.dto.res.MatchCalendarGetResDTO;
 import com.lgcns.bebee.match.presentation.dto.res.MatchesByDateResDTO;
 import com.lgcns.bebee.match.presentation.swagger.MatchSwagger;
@@ -36,17 +39,42 @@ public class MatchController implements MatchSwagger {
     public ResponseEntity<MatchCalendarGetResDTO> getActiveDayByMonth(
             @CurrentMember Long memberId,
             @RequestParam Integer year,
-            @RequestParam Integer month
+            @RequestParam Integer month,
+            @RequestParam EngagementType type
     ) {
         GetMatchCalendarUseCase.Param param = new GetMatchCalendarUseCase.Param(
                 memberId,
                 year,
-                month
+                month,
+                type
         );
         GetMatchCalendarUseCase.Result result = getMatchCalendarUseCase.execute(param);
 
         MatchCalendarGetResDTO response = MatchCalendarGetResDTO.from(result);
 
         return ResponseEntity.ok(response);
+    }
+
+    private final CompleteEngagementUseCase completeEngagementUseCase;
+
+    @PatchMapping("/{engagementId}/complete")
+    public ResponseEntity<EngagementCompleteResDTO> completeEngagement(
+            @CurrentMember Long currentMemberId,
+            @PathVariable String engagementId
+    ) {
+
+        // DTO → Param 변환
+        CompleteEngagementUseCase.Param param = new CompleteEngagementUseCase.Param(
+                currentMemberId,
+                Long.parseLong(engagementId)
+        );
+
+        // UseCase 실행
+        CompleteEngagementUseCase.Result result = completeEngagementUseCase.execute(param);
+
+        // Result → ResDTO 변환
+        EngagementCompleteResDTO resDTO = EngagementCompleteResDTO.from(result);
+
+        return ResponseEntity.ok(resDTO);
     }
 }

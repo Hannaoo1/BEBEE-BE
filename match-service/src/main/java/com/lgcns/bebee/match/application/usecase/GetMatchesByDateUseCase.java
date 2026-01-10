@@ -31,7 +31,9 @@ public class GetMatchesByDateUseCase implements UseCase<GetMatchesByDateUseCase.
         MemberSync member = memberManager.findExistingMember(param.currentMemberId);
 
         EngagementType type = param.type != null ? EngagementType.from(param.type) : null;
-        List<Engagement> engagements = engagementRepository.searchEngagements(EngagementSearchCond.from(type, param.date));
+        List<Engagement> engagements = engagementRepository.searchEngagements(
+                EngagementSearchCond.from(param.currentMemberId, type, param.date)
+        );
 
         return Result.from(engagements, member, memberManager);
     }
