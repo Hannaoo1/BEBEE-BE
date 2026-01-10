@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface EngagementSwagger {
 
     @Operation(
-            summary = "활동 완료 체크",
+            summary = "활동 완료",
             description = """
             ## 동작 방식
             - engagementId 로 식별합니다.

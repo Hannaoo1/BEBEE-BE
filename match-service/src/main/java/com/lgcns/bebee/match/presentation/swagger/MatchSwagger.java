@@ -1,6 +1,8 @@
 package com.lgcns.bebee.match.presentation.swagger;
 
 import com.lgcns.bebee.common.annotation.CurrentMember;
+import com.lgcns.bebee.match.domain.entity.vo.EngagementType;
+import com.lgcns.bebee.match.presentation.dto.res.EngagementCompleteResDTO;
 import com.lgcns.bebee.match.presentation.dto.res.MatchCalendarGetResDTO;
 import com.lgcns.bebee.match.presentation.dto.res.MatchesByDateResDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
@@ -121,7 +124,11 @@ public interface MatchSwagger {
                             examples = {
                                     @ExampleObject(
                                             name = "활동일 목록 조회 응답 예시",
-                                            description = "하루도움, 지속도움을 모두 포함해 해당 연도/월에 도움 활동이 존재하는 날을 LocalDate 배열 형식으로 반환",
+                                            description = """
+                                                해당 연도/월에 도움 활동이 존재하는 날을 LocalDate 배열 형식으로 반환
+                                                - 하루도움, 지속도움 필터링 지원
+                                                - 전체는 type을 null로 해서 요청
+                                            """,
                                             value = """
                                                     {
                                                         "activeDates": [
@@ -165,6 +172,70 @@ public interface MatchSwagger {
                     required = true,
                     example = "01"
             )
-            @RequestParam Integer month
+            @RequestParam Integer month,
+
+            @Parameter(
+                    description = "활동 타입",
+                    example = "DAY"
+            )
+            @RequestParam EngagementType type
+    );
+
+    @Operation(
+            summary = "활동 완료",
+            description = """
+            ## 동작 방식
+            - engagementId 로 식별합니다.
+
+            ## 응답
+            - isLastActivity 가 true 이면 리뷰 보내기 버튼 UI
+            - isLastActivity 가 true 이면 활동 완료 끝!
+            """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "활동 완료 체크 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = {
+                                    @ExampleObject(
+                                            value = """
+                                            {
+                                              "isLastEngagement": true
+                                            }
+                                            """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Engagement를 찾을 수 없음",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = {
+                                    @ExampleObject(
+                                            value = """
+                                            {
+                                                "code": "ENGAGEMENT_NOT_FOUND",
+                                                "message": "활동을 찾을 수 없습니다.",
+                                                "timestamp": "시간정보"
+                                            }
+                                            """
+                                    )
+                            }
+                    )
+            )
+    })
+    ResponseEntity<EngagementCompleteResDTO> completeEngagement(
+            @Parameter(hidden = true)
+            @CurrentMember Long currentMemberId,
+
+            @Parameter(
+                    description = "활동 ID",
+                    example = "10001",
+                    required = true
+            ) @PathVariable String engagementId
     );
 }
