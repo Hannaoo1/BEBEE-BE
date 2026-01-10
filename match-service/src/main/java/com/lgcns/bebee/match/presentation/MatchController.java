@@ -40,7 +40,7 @@ public class MatchController implements MatchSwagger {
             @CurrentMember Long memberId,
             @RequestParam Integer year,
             @RequestParam Integer month,
-            @RequestParam EngagementType type
+            @RequestParam(required = false) EngagementType type
     ) {
         GetMatchCalendarUseCase.Param param = new GetMatchCalendarUseCase.Param(
                 memberId,
