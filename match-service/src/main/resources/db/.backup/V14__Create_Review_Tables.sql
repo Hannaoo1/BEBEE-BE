@@ -7,6 +7,7 @@ DROP TABLE IF EXISTS review;
 -- review 테이블 (TSID 사용!)
 CREATE TABLE review (
     review_id BIGINT PRIMARY KEY COMMENT '리뷰 ID (TSID)',
+    match_id BIGINT NOT NULL COMMENT '매칭 ID',
     reviewer_id BIGINT NOT NULL COMMENT '작성자 ID (member_sync)',
     reviewee_id BIGINT NOT NULL COMMENT '대상자 ID (member_sync)',
     review_direction VARCHAR(50) NOT NULL COMMENT '리뷰 방향',
@@ -14,8 +15,12 @@ CREATE TABLE review (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     -- 인덱스
+    INDEX idx_review_match (match_id),
     INDEX idx_review_reviewer (reviewer_id),
     INDEX idx_review_reviewee (reviewee_id)
+
+    CONSTRAINT fk_review_match
+        FOREIGN KEY (match_id) REFERENCES match(match_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='리뷰';
 
 -- review_keyword 매핑 테이블
