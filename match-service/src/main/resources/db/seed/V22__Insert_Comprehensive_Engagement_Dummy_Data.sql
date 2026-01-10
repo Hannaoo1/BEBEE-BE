@@ -100,7 +100,7 @@ VALUES (20009, 10009, '2026-01-06', '2026-01-06', NOW(), NOW())
 ON DUPLICATE KEY UPDATE start_date = VALUES(start_date), end_date = VALUES(end_date), updated_at = NOW();
 
 INSERT INTO agreement_schedule (agreement_schedule_id, agreement_id, day_of_week, start_time, end_time, created_at, updated_at)
-VALUES (30016, 10009, 'MONDAY', '15:00:00', '18:00:00', NOW(), NOW())
+VALUES (30016, 10009, 'TUESDAY', '15:00:00', '18:00:00', NOW(), NOW())
 ON DUPLICATE KEY UPDATE start_time = VALUES(start_time), end_time = VALUES(end_time), updated_at = NOW();
 
 INSERT INTO agreement_help_category (agreement_id, help_category_id, category_name, created_at, updated_at)
