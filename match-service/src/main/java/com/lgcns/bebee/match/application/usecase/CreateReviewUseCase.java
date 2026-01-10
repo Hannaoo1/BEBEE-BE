@@ -5,12 +5,11 @@ import com.lgcns.bebee.common.application.UseCase;
 import com.lgcns.bebee.common.exception.InvalidParamException;
 import com.lgcns.bebee.common.util.ParamValidator;
 import com.lgcns.bebee.match.common.exception.MatchInvalidParamErrors;
-
+import com.lgcns.bebee.match.domain.entity.Review;
 import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
 import com.lgcns.bebee.match.domain.entity.vo.ReviewDirection;
 import com.lgcns.bebee.match.domain.service.MemberManager;
 import com.lgcns.bebee.match.domain.service.ReviewManager;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -21,17 +20,16 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CreateReviewUseCase implements UseCase<CreateReviewUseCase.Param, CreateReviewUseCase.Result> {
 
     private final MemberManager memberManager;
     private final ReviewManager reviewManager;
 
-    @Transactional
     @Override
     public Result execute(Param param) {
         param.validate();
 
-        // 회원 조회
         MemberSync reviewer = memberManager.findExistingMember(param.getReviewerId());
 
         // ReviewDirection 결정
@@ -40,54 +38,66 @@ public class CreateReviewUseCase implements UseCase<CreateReviewUseCase.Param, C
         // 키워드 검증
         reviewManager.validateKeywords(param.getKeywordIds(), direction);
 
-        // 리뷰 생성 & 저장
-        reviewManager.createReview(
+        // 리뷰 생성
+        Review review = reviewManager.createReview(
+                param.getEngagementId(),
                 param.getReviewerId(),
                 param.getRevieweeId(),
                 direction,
                 param.getKeywordIds()
         );
 
-        return Result.success();
+        return Result.from(review);
     }
 
     @Getter
     @RequiredArgsConstructor
     public static class Param implements Params {
+        private final Long engagementId;
         private final Long reviewerId;
         private final Long revieweeId;
         private final List<Integer> keywordIds;
 
         @Override
         public boolean validate() {
+            if (!ParamValidator.isValidId(engagementId)) {
+                throw new InvalidParamException(
+                        MatchInvalidParamErrors.REQUIRED_FIELD,
+                        "engagementId"
+                );
+            }
+
             if (!ParamValidator.isValidId(reviewerId)) {
                 throw new InvalidParamException(
                         MatchInvalidParamErrors.REQUIRED_FIELD,
                         "reviewerId"
                 );
             }
+
             if (!ParamValidator.isValidId(revieweeId)) {
                 throw new InvalidParamException(
                         MatchInvalidParamErrors.REQUIRED_FIELD,
                         "revieweeId"
                 );
             }
+
             if (keywordIds == null || keywordIds.isEmpty()) {
                 throw new InvalidParamException(
                         MatchInvalidParamErrors.REQUIRED_FIELD,
                         "keywordIds"
                 );
             }
+
             return true;
         }
     }
 
     @Getter
-    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @AllArgsConstructor
     public static class Result {
         private final String message;
 
-        public static Result success() {
+        public static Result from(Review review) {
             return new Result("리뷰가 작성되었습니다");
         }
     }
