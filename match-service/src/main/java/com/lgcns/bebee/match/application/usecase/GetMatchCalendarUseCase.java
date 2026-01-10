@@ -3,6 +3,7 @@ package com.lgcns.bebee.match.application.usecase;
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
 import com.lgcns.bebee.match.domain.entity.Match;
+import com.lgcns.bebee.match.domain.entity.vo.EngagementType;
 import com.lgcns.bebee.match.domain.repository.MatchRepository;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -35,6 +36,7 @@ public class GetMatchCalendarUseCase implements UseCase<GetMatchCalendarUseCase.
 
         Set<LocalDate> activeDatesSet = matches.stream()
                 .map(Match::getAgreement)
+                .filter(agreement -> param.getType() == null || agreement.getType() == param.getType())
                 .flatMap(agreement -> agreement.getActiveDatesInRange(monthStart, monthEnd).stream())
                 .collect(Collectors.toSet());
 
@@ -50,6 +52,7 @@ public class GetMatchCalendarUseCase implements UseCase<GetMatchCalendarUseCase.
         private final Long memberId;
         private final Integer year;
         private final Integer month;
+        private final EngagementType type;
     }
 
     @Getter
