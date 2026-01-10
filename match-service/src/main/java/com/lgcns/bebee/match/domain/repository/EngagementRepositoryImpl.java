@@ -32,10 +32,15 @@ public class EngagementRepositoryImpl implements EngagementRepositoryCustom{
                 .leftJoin(match.helperReview, hReview).fetchJoin()
                 .leftJoin(match.disabledReview, dReview).fetchJoin()
                 .where(
+                        memberIdEq(cond.memberId()),
                         typeEq(cond.type()),
                         dateEq(cond.date())
                 )
                 .fetch();
+    }
+
+    private BooleanExpression memberIdEq(Long memberId) {
+        return memberId == null ? null : match.helperId.eq(memberId).or(match.disabledId.eq(memberId));
     }
 
     private BooleanExpression typeEq(EngagementType type) {
