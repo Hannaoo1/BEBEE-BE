@@ -3,11 +3,9 @@ package com.lgcns.bebee.match.domain.repository;
 import com.lgcns.bebee.match.domain.entity.Engagement;
 import com.lgcns.bebee.match.domain.entity.vo.EngagementStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 public interface EngagementRepository extends JpaRepository<Engagement, Long>, EngagementRepositoryCustom {
 
@@ -18,4 +16,6 @@ public interface EngagementRepository extends JpaRepository<Engagement, Long>, E
     );
 
     List<Engagement> findByDate(LocalDate date);
+
+    List<Engagement> findAllByMatch_Id(Long matchId);
 }

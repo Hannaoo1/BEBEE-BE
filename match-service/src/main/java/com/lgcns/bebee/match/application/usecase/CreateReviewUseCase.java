@@ -10,6 +10,7 @@ import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
 import com.lgcns.bebee.match.domain.entity.vo.ReviewDirection;
 import com.lgcns.bebee.match.domain.service.MemberManager;
 import com.lgcns.bebee.match.domain.service.ReviewManager;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -32,13 +33,10 @@ public class CreateReviewUseCase implements UseCase<CreateReviewUseCase.Param, C
 
         MemberSync reviewer = memberManager.findExistingMember(param.getReviewerId());
 
-        // ReviewDirection 결정
         ReviewDirection direction = reviewManager.determineReviewDirection(reviewer);
 
-        // 키워드 검증
         reviewManager.validateKeywords(param.getKeywordIds(), direction);
 
-        // 리뷰 생성
         Review review = reviewManager.createReview(
                 param.getEngagementId(),
                 param.getReviewerId(),
@@ -61,41 +59,25 @@ public class CreateReviewUseCase implements UseCase<CreateReviewUseCase.Param, C
         @Override
         public boolean validate() {
             if (!ParamValidator.isValidId(engagementId)) {
-                throw new InvalidParamException(
-                        MatchInvalidParamErrors.REQUIRED_FIELD,
-                        "engagementId"
-                );
+                throw new InvalidParamException(MatchInvalidParamErrors.REQUIRED_FIELD, "engagementId");
             }
-
             if (!ParamValidator.isValidId(reviewerId)) {
-                throw new InvalidParamException(
-                        MatchInvalidParamErrors.REQUIRED_FIELD,
-                        "reviewerId"
-                );
+                throw new InvalidParamException(MatchInvalidParamErrors.REQUIRED_FIELD, "reviewerId");
             }
-
             if (!ParamValidator.isValidId(revieweeId)) {
-                throw new InvalidParamException(
-                        MatchInvalidParamErrors.REQUIRED_FIELD,
-                        "revieweeId"
-                );
+                throw new InvalidParamException(MatchInvalidParamErrors.REQUIRED_FIELD, "revieweeId");
             }
-
             if (keywordIds == null || keywordIds.isEmpty()) {
-                throw new InvalidParamException(
-                        MatchInvalidParamErrors.REQUIRED_FIELD,
-                        "keywordIds"
-                );
+                throw new InvalidParamException(MatchInvalidParamErrors.REQUIRED_FIELD, "keywordIds");
             }
-
             return true;
         }
     }
 
     @Getter
-    @AllArgsConstructor
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Result {
-        private final String message;
+        private String message;
 
         public static Result from(Review review) {
             return new Result("리뷰가 작성되었습니다");
