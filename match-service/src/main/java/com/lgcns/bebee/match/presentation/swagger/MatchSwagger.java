@@ -176,6 +176,7 @@ public interface MatchSwagger {
 
             @Parameter(
                     description = "활동 타입",
+                    required = false,
                     example = "DAY"
             )
             @RequestParam EngagementType type
