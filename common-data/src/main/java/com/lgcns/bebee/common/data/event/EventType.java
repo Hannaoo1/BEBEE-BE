@@ -11,7 +11,6 @@ public enum EventType {
     AGREEMENT_REFUSED("AgreementRefusedEvent", AgreementRefusedEvent.class),
 
     POST_CREATED("PostCreatedEvent", PostCreatedEvent.class),
-    ACTIVITY_COMPLETED("ActivityCompletedEvent", ActivityCompletedEvent.class)
     ;
 
     private final String eventName;
