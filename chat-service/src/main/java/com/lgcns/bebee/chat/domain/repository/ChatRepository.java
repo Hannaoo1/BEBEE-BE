@@ -5,11 +5,11 @@ import org.springframework.data.domain.Limit;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Chat 엔티티의 MongoDB Repository
  */
 public interface ChatRepository extends MongoRepository<Chat, Long> {
-    
     List<Chat> findByChatroomIdAndIdLessThanOrderByIdDesc(Long chatroomId, Long lastChatId, Limit limit);
 }
