@@ -2,9 +2,11 @@ package com.lgcns.bebee.chat.infrastructure.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.lgcns.bebee.chat.domain.entity.Chat;
+import com.lgcns.bebee.common.data.dto.ScheduleDTO;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.time.LocalTime;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -17,15 +19,17 @@ public record ChatMessageDTO(
         String chatType,
         List<String> attachments,
         Long agreementId,
+        Long disabledId,
+        Long helperId,
+        Boolean isVolunteer,
         String matchType,
         String startDate,
         String endDate,
-        List<String> scheduleDays,
-        List<String> scheduleStartTimes,
-        List<String> scheduleEndTimes,
-        String location,
+        List<ScheduleDTO> schedules,
+        String region,
         Integer unitPoints,
         Integer totalPoints,
+        List<Long> helpCategoryIds,
         String matchStatus,
         LocalDateTime createdAt
 ){
@@ -34,46 +38,50 @@ public record ChatMessageDTO(
 
         // MatchConfirmationContent가 없는 경우 처리
         Long agreementId = null;
+        Long disabledId = null;
+        Long helperId = null;
+        Boolean isVolunteer = null;
         String matchType = null;
         String startDate = null;
         String endDate = null;
-        List<String> scheduleDays = null;
-        List<String> scheduleStartTimes = null;
-        List<String> scheduleEndTimes = null;
-        String location = null;
-        Integer unitPoints = null;
-        Integer totalPoints = null;
+        List<ScheduleDTO> schedules = null;
+        String region = null;
+        Integer unitHoney = null;
+        Integer totalHoney = null;
+        List<Long> helpCategoryIds = null;
         String matchStatus = null;
 
         if (matchConfirmation != null) {
             agreementId = matchConfirmation.getAgreementId();
-            matchType = matchConfirmation.getType().name();
+            disabledId = matchConfirmation.getDisabledId();
+            helperId = matchConfirmation.getHelperId();
+            isVolunteer = matchConfirmation.getIsVolunteer();
+            matchType = matchConfirmation.getType() != null ? matchConfirmation.getType().name() : null;
             startDate = matchConfirmation.getStartDate();
             endDate = matchConfirmation.getEndDate();
-            location = matchConfirmation.getLocation();
+            region = matchConfirmation.getRegion();
+            helpCategoryIds = matchConfirmation.getHelpCategoryIds();
             matchStatus = matchConfirmation.getStatus() != null
                     ? matchConfirmation.getStatus().name()
                     : null;
 
-            // Schedule 리스트 분해
-            List<Chat.Schedule> schedules = matchConfirmation.getSchedule();
-            if (schedules != null && !schedules.isEmpty()) {
-                scheduleDays = new ArrayList<>();
-                scheduleStartTimes = new ArrayList<>();
-                scheduleEndTimes = new ArrayList<>();
-
-                for (Chat.Schedule schedule : schedules) {
-                    scheduleDays.add(schedule.getDay());
-                    scheduleStartTimes.add(schedule.getStartTime());
-                    scheduleEndTimes.add(schedule.getEndTime());
-                }
+            // Schedule 리스트 변환
+            List<Chat.Schedule> chatSchedules = matchConfirmation.getSchedules();
+            if (chatSchedules != null && !chatSchedules.isEmpty()) {
+                schedules = chatSchedules.stream()
+                        .map(s -> new ScheduleDTO(
+                                DayOfWeek.valueOf(s.getDay()),
+                                LocalTime.parse(s.getStartTime()),
+                                LocalTime.parse(s.getEndTime())
+                        ))
+                        .toList();
             }
 
             // Points 분해
             Chat.Points points = matchConfirmation.getPoints();
             if (points != null) {
-                unitPoints = points.getUnitPoints();
-                totalPoints = points.getTotal();
+                unitHoney = points.getUnitHoney();
+                totalHoney = points.getTotalHoney();
             }
         }
 
@@ -86,15 +94,17 @@ public record ChatMessageDTO(
                 chat.getType().name(),
                 chat.getAttachments(),
                 agreementId,
+                disabledId,
+                helperId,
+                isVolunteer,
                 matchType,
                 startDate,
                 endDate,
-                scheduleDays,
-                scheduleStartTimes,
-                scheduleEndTimes,
-                location,
-                unitPoints,
-                totalPoints,
+                schedules,
+                region,
+                unitHoney,
+                totalHoney,
+                helpCategoryIds,
                 matchStatus,
                 chat.getCreatedAt()
         );
