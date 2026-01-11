@@ -10,7 +10,8 @@ public enum EventType {
     AGREEMENT_CONFIRMED("AgreementConfirmedEvent", AgreementConfirmedEvent.class),
     AGREEMENT_REFUSED("AgreementRefusedEvent", AgreementRefusedEvent.class),
 
-    POST_CREATED("PostCreatedEvent", PostCreatedEvent.class)
+    POST_CREATED("PostCreatedEvent", PostCreatedEvent.class),
+    ACTIVITY_COMPLETED("ActivityCompletedEvent", ActivityCompletedEvent.class)
     ;
 
     private final String eventName;
