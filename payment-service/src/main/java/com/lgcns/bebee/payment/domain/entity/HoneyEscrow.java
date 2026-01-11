@@ -33,6 +33,7 @@ public class HoneyEscrow extends BaseTimeEntity {
     @Column(nullable = false)
     private Long amount; // 임시 보관 금액(원 단위)
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EscrowStatus status;
 
