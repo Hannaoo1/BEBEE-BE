@@ -45,12 +45,13 @@ public class SendChatMessageUseCase implements UseCase<SendChatMessageUseCase.Pa
                 param.createdAt
         );
 
+        Chat savedChat = chatRepository.save(chat);
+
+        chatroomManagement.updateLastMessage(chatroom, savedChat);
+
         // Redis를 통해 발신자와 수신자에게 메시지 발행
         messagePublisher.publishToMember(param.senderId, param.receiverId, chat);
 
-        chatRepository.save(chat);
-
-        chatroomManagement.updateLastMessage(chatroom, chat);
 
         return null;
     }

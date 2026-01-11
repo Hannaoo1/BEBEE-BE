@@ -2,111 +2,100 @@ package com.lgcns.bebee.chat.infrastructure.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.lgcns.bebee.chat.domain.entity.Chat;
-import com.lgcns.bebee.common.data.dto.ScheduleDTO;
+import lombok.Builder;
 
-import java.time.DayOfWeek;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
+@Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record ChatMessageDTO(
-        Long id,
-        Long chatroomId,
-        Long senderId,
-        Long receiverId,
+        String id,
+        String senderId,
         String textContent,
-        String chatType,
+        String type,
         List<String> attachments,
-        Long agreementId,
-        Long disabledId,
-        Long helperId,
-        Boolean isVolunteer,
-        String matchType,
-        String startDate,
-        String endDate,
-        List<ScheduleDTO> schedules,
-        String region,
-        Integer unitPoints,
-        Integer totalPoints,
-        List<Long> helpCategoryIds,
-        String matchStatus,
-        LocalDateTime createdAt
-){
+        LocalDateTime createdAt,
+        MatchConfirmationDTO matchData
+) {
     public static ChatMessageDTO from(Long receiverId, Chat chat) {
-        Chat.MatchConfirmationContent matchConfirmation = chat.getMatchConfirmationContent();
+        MatchConfirmationDTO matchConfirmationDTO = null;
 
-        // MatchConfirmationContent가 없는 경우 처리
-        Long agreementId = null;
-        Long disabledId = null;
-        Long helperId = null;
-        Boolean isVolunteer = null;
-        String matchType = null;
-        String startDate = null;
-        String endDate = null;
-        List<ScheduleDTO> schedules = null;
-        String region = null;
-        Integer unitHoney = null;
-        Integer totalHoney = null;
-        List<Long> helpCategoryIds = null;
-        String matchStatus = null;
+        if (chat.getMatchConfirmationContent() != null) {
+            Chat.MatchConfirmationContent content = chat.getMatchConfirmationContent();
+            Chat.Points points = content.getPoints();
 
-        if (matchConfirmation != null) {
-            agreementId = matchConfirmation.getAgreementId();
-            disabledId = matchConfirmation.getDisabledId();
-            helperId = matchConfirmation.getHelperId();
-            isVolunteer = matchConfirmation.getIsVolunteer();
-            matchType = matchConfirmation.getType() != null ? matchConfirmation.getType().name() : null;
-            startDate = matchConfirmation.getStartDate();
-            endDate = matchConfirmation.getEndDate();
-            region = matchConfirmation.getRegion();
-            helpCategoryIds = matchConfirmation.getHelpCategoryIds();
-            matchStatus = matchConfirmation.getStatus() != null
-                    ? matchConfirmation.getStatus().name()
-                    : null;
-
-            // Schedule 리스트 변환
-            List<Chat.Schedule> chatSchedules = matchConfirmation.getSchedules();
-            if (chatSchedules != null && !chatSchedules.isEmpty()) {
-                schedules = chatSchedules.stream()
-                        .map(s -> new ScheduleDTO(
-                                DayOfWeek.valueOf(s.getDay()),
-                                LocalTime.parse(s.getStartTime()),
-                                LocalTime.parse(s.getEndTime())
-                        ))
-                        .toList();
-            }
-
-            // Points 분해
-            Chat.Points points = matchConfirmation.getPoints();
-            if (points != null) {
-                unitHoney = points.getUnitHoney();
-                totalHoney = points.getTotalHoney();
-            }
+            matchConfirmationDTO = new MatchConfirmationDTO(
+                    content.getAgreementId() != null ? String.valueOf(content.getAgreementId()) : null,
+                    content.getType() != null ? content.getType().name() : null,
+                    content.getDisabledId() != null ? String.valueOf(content.getDisabledId()) : null,
+                    content.getHelperId() != null ? String.valueOf(content.getHelperId()) : null,
+                    content.getIsVolunteer(),
+                    points != null ? points.getUnitHoney() : null,
+                    points != null ? points.getTotalHoney() : null,
+                    content.getRegion(),
+                    content.getHelpCategoryIds(),
+                    content.getStatus() != null ? content.getStatus().name() : null,
+                    EngagementTimeDTO.from(content)
+            );
         }
 
-        return new ChatMessageDTO(
-                chat.getId(),
-                chat.getChatroomId(),
-                chat.getSenderId(),
-                receiverId,
-                chat.getTextContent(),
-                chat.getType().name(),
-                chat.getAttachments(),
-                agreementId,
-                disabledId,
-                helperId,
-                isVolunteer,
-                matchType,
-                startDate,
-                endDate,
-                schedules,
-                region,
-                unitHoney,
-                totalHoney,
-                helpCategoryIds,
-                matchStatus,
-                chat.getCreatedAt()
-        );
+        return ChatMessageDTO.builder()
+                .id(chat.getId() != null ? String.valueOf(chat.getId()) : null)
+                .senderId(chat.getSenderId() != null ? String.valueOf(chat.getSenderId()) : null)
+                .textContent(chat.getTextContent())
+                .type(chat.getType() != null ? chat.getType().name() : null)
+                .attachments(chat.getAttachments())
+                .createdAt(chat.getCreatedAt())
+                .matchData(matchConfirmationDTO)
+                .build();
+    }
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public record MatchConfirmationDTO(
+            String agreementId,
+            String type,
+            String receiverId,
+            String helperId,
+            Boolean isVolunteer,
+            Integer unitHoney,
+            Integer totalHoney,
+            String region,
+            List<Long> helpCategoryIds,
+            String status,
+            EngagementTimeDTO engagementTime
+    ) {
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public record EngagementTimeDTO(
+            String date,
+            String startDate,
+            String endDate,
+            ScheduleDTO schedule,
+            List<ScheduleDTO> schedules
+    ) {
+        public static EngagementTimeDTO from(Chat.MatchConfirmationContent content) {
+            List<Chat.Schedule> schedules = content.getSchedules();
+
+            if (content.getType() == Chat.EngagementType.DAY) {
+                Chat.Schedule schedule = schedules.get(0);
+
+                return new EngagementTimeDTO(content.getStartDate(), null, null,
+                        new ScheduleDTO(schedule.getDay(), schedule.getStartTime(), schedule.getEndTime()), null);
+            }
+            return new EngagementTimeDTO(null, content.getStartDate(), content.getEndDate(),
+                    null, schedules.stream()
+                    .map(s -> new ScheduleDTO(s.getDay(), s.getStartTime(), s.getEndTime()))
+                    .toList()
+            );
+        }
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public record ScheduleDTO(
+            String dayOfWeek,
+            String startTime,
+            String endTime
+    ) {
     }
 }
