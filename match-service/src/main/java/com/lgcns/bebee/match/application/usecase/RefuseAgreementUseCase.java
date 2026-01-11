@@ -2,10 +2,9 @@ package com.lgcns.bebee.match.application.usecase;
 
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
-import com.lgcns.bebee.common.data.event.AgreementRefusedEvent;
+import com.lgcns.bebee.common.data.event.match.AgreementRefusedEvent;
 import com.lgcns.bebee.common.exception.InvalidParamException;
 import com.lgcns.bebee.match.application.usecase.client.EventPublisher;
-import com.lgcns.bebee.match.common.exception.MatchErrors;
 import com.lgcns.bebee.match.common.exception.MatchInvalidParamErrors;
 import com.lgcns.bebee.common.util.ParamValidator;
 import com.lgcns.bebee.match.domain.entity.Agreement;
@@ -15,8 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 import static com.lgcns.bebee.match.common.exception.MatchErrors.*;
-import static com.lgcns.bebee.match.common.exception.MatchErrors.AGREEMENT_DISABLED_CANNOT_CONFIRM;
 
 @Service
 @RequiredArgsConstructor
@@ -38,7 +38,13 @@ public class RefuseAgreementUseCase implements UseCase<RefuseAgreementUseCase.Pa
 
         agreement.refuse();
 
-        eventPublisher.publish(new AgreementRefusedEvent(param.chatroomId));
+        eventPublisher.publish(new AgreementRefusedEvent(
+                param.chatroomId,
+                param.chatId,
+                agreement.getDisabledId(),
+                agreement.getHelperId(),
+                param.createdAt
+        ));
         return null;
     }
 
@@ -49,6 +55,8 @@ public class RefuseAgreementUseCase implements UseCase<RefuseAgreementUseCase.Pa
         private final Long disabledId;
         private final Long agreementId;
         private final Long chatroomId;
+        private final Long chatId;
+        private final LocalDateTime createdAt;
 
         @Override
         public boolean validate() {

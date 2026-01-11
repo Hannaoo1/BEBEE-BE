@@ -80,7 +80,8 @@ public interface AgreementSwagger {
                                                             "endTime": "12:00:00"
                                                         }
                                                     },
-                                                    "chatroomId": "1"
+                                                    "chatroomId": "1",
+                                                    "createdAt": "2026-01-15T09:30:00"
                                                 }
                                                 """
                                 ),
@@ -117,7 +118,9 @@ public interface AgreementSwagger {
                                                                  }
                                                              ]
                                                          },
-                                                         "chatroomId": "1"
+                                                         "chatroomId": "1",
+                                                         "chatId":"1",
+                                                         "createdAt":"2026-01-15T09:30:00"
                                                      }
                                                 """
                                     )
@@ -160,7 +163,9 @@ public interface AgreementSwagger {
                                         value = """
                                                 {
                                                   "disabledId":"100",
-                                                  "chatroomId":"1"
+                                                  "chatroomId":"1",
+                                                  "chatId":"1",
+                                                  "createdAt":"2026-01-15T09:30:00"
                                                 }
                                                 """
                                 )
@@ -223,7 +228,9 @@ public interface AgreementSwagger {
                                                     "disabledId": "100",
                                                     "postId": "1001",
                                                     "title": "식사 보조 도우미분 구해요",
-                                                    "chatroomId": "1"
+                                                    "chatroomId": "1",
+                                                    "chatId":"1",
+                                                    "createdAt":"2026-01-15T09:30:00"
                                                 }
                                                 """
                                 )

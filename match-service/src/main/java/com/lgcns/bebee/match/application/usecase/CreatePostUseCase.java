@@ -5,7 +5,7 @@ import com.lgcns.bebee.common.application.UseCase;
 import com.lgcns.bebee.match.application.usecase.client.EventPublisher;
 import com.lgcns.bebee.match.domain.entity.Post;
 import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
-import com.lgcns.bebee.common.data.event.PostCreatedEvent;
+import com.lgcns.bebee.common.data.event.match.PostCreatedEvent;
 import com.lgcns.bebee.match.domain.service.MemberManager;
 import com.lgcns.bebee.match.domain.service.PostManager;
 import lombok.AccessLevel;
