@@ -4,10 +4,14 @@ import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
 import com.lgcns.bebee.common.exception.InvalidParamException;
 import com.lgcns.bebee.common.util.ParamValidator;
+import com.lgcns.bebee.match.common.exception.MatchErrors;
 import com.lgcns.bebee.match.common.exception.MatchInvalidParamErrors;
 import com.lgcns.bebee.match.domain.entity.Badge;
 import com.lgcns.bebee.match.domain.entity.sync.DisabilityCategory;
+import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
+import com.lgcns.bebee.match.domain.entity.sync.Role;
 import com.lgcns.bebee.match.domain.repository.BadgeRepository;
+import com.lgcns.bebee.match.domain.service.MemberManager;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +27,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GetHelperBadgesUseCase implements UseCase<GetHelperBadgesUseCase.Param, GetHelperBadgesUseCase.Result> {
 
+    private final MemberManager memberManager;
     private final BadgeRepository badgeRepository;
 
     @Transactional(readOnly = true)
@@ -31,6 +36,12 @@ public class GetHelperBadgesUseCase implements UseCase<GetHelperBadgesUseCase.Pa
         param.validate();
 
         Long helperId = param.getHelperId();
+
+        // 도우미 역할 검증
+        MemberSync member = memberManager.findExistingMember(helperId);
+        if (member.getRole() != Role.HELPER) {
+            throw MatchErrors.ONLY_HELPER_MEMBERS_ALLOWED.toException();
+        }
 
         // 해당 도우미의 모든 뱃지 조회
         List<Badge> badges = badgeRepository.findAllByHelperId(helperId);
