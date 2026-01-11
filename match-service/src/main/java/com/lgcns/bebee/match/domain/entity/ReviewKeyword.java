@@ -1,9 +1,12 @@
 package com.lgcns.bebee.match.domain.entity;
 
+import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -32,10 +35,14 @@ public class ReviewKeyword {
         return reviewKeyword;
     }
 
-    // Review 설정
+    // Review 설정 (양방향 연관관계)
     public void setReview(Review review) {
         this.review = review;
-        this.reviewId = review.getId();
+    }
+
+    // KeywordId 설정
+    void setKeywordId(Integer keywordId) {
+        this.keywordId = keywordId;
     }
 
     @Getter

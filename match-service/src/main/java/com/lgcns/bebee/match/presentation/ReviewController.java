@@ -11,55 +11,46 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
-import java.util.stream.Collectors;
 
+// 리뷰 API Controller
 @RestController
-@RequestMapping("/reviews")
 @RequiredArgsConstructor
 public class ReviewController implements ReviewSwagger {
 
     private final GetReviewKeywordsListUseCase getReviewKeywordsListUseCase;
     private final CreateReviewUseCase createReviewUseCase;
 
-    @GetMapping("/keywords")
+    // 리뷰 키워드 목록 조회
+    @Override
+    @GetMapping("/reviews/keywords")
     public ResponseEntity<ReviewKeywordResDTO> getReviewKeywordsList(
             @CurrentMember Long currentMemberId
     ) {
-
         GetReviewKeywordsListUseCase.Param param = new GetReviewKeywordsListUseCase.Param(
                 currentMemberId
         );
 
         GetReviewKeywordsListUseCase.Result result = getReviewKeywordsListUseCase.execute(param);
 
-        // Result → ResDTO 변환
         ReviewKeywordResDTO resDTO = ReviewKeywordResDTO.from(result);
 
-        return ResponseEntity.ok(resDTO);
+        return ResponseEntity.ok().body(resDTO);
     }
 
-    @PostMapping
+    // 리뷰 작성
+    @Override
+    @PostMapping("/matches/{matchId}/reviews")
     public ResponseEntity<ReviewCreateResDTO> createReview(
+            @PathVariable Long matchId,
             @CurrentMember Long currentMemberId,
             @Valid @RequestBody ReviewCreateReqDTO reqDTO
     ) {
-        // ReqDTO → Param 변환
-        List<Integer> keywordIdInts = reqDTO.getKeywordIds().stream()
-                .map(Integer::parseInt)
-                .collect(Collectors.toList());
-
-        CreateReviewUseCase.Param param = new CreateReviewUseCase.Param(
-                Long.parseLong(reqDTO.getEngagementId()),
-                currentMemberId,
-                Long.parseLong(reqDTO.getRevieweeId()),
-                keywordIdInts
-        );
+        CreateReviewUseCase.Param param = reqDTO.toParam(matchId, currentMemberId);
 
         CreateReviewUseCase.Result result = createReviewUseCase.execute(param);
 
         ReviewCreateResDTO resDTO = ReviewCreateResDTO.from(result);
 
-        return ResponseEntity.ok(resDTO);
+        return ResponseEntity.ok().body(resDTO);
     }
 }

@@ -5,7 +5,7 @@ import com.lgcns.bebee.common.application.UseCase;
 import com.lgcns.bebee.common.exception.InvalidParamException;
 import com.lgcns.bebee.common.util.ParamValidator;
 import com.lgcns.bebee.match.common.exception.MatchInvalidParamErrors;
-import com.lgcns.bebee.match.domain.entity.Review;
+
 import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
 import com.lgcns.bebee.match.domain.entity.vo.ReviewDirection;
 import com.lgcns.bebee.match.domain.service.MemberManager;
@@ -21,54 +21,62 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class CreateReviewUseCase implements UseCase<CreateReviewUseCase.Param, CreateReviewUseCase.Result> {
 
     private final MemberManager memberManager;
     private final ReviewManager reviewManager;
 
+    @Transactional
     @Override
     public Result execute(Param param) {
         param.validate();
 
+        // 회원 조회
         MemberSync reviewer = memberManager.findExistingMember(param.getReviewerId());
 
+        // ReviewDirection 결정
         ReviewDirection direction = reviewManager.determineReviewDirection(reviewer);
 
+        // 키워드 검증
         reviewManager.validateKeywords(param.getKeywordIds(), direction);
 
-        Review review = reviewManager.createReview(
-                param.getEngagementId(),
+        // 리뷰 생성 & 저장
+        reviewManager.createReview(
+                param.getMatchId(),
                 param.getReviewerId(),
-                param.getRevieweeId(),
                 direction,
                 param.getKeywordIds()
         );
 
-        return Result.from(review);
+        return Result.success();
     }
 
     @Getter
     @RequiredArgsConstructor
     public static class Param implements Params {
-        private final Long engagementId;
+        private final Long matchId;
         private final Long reviewerId;
-        private final Long revieweeId;
         private final List<Integer> keywordIds;
 
         @Override
         public boolean validate() {
-            if (!ParamValidator.isValidId(engagementId)) {
-                throw new InvalidParamException(MatchInvalidParamErrors.REQUIRED_FIELD, "engagementId");
+            if (!ParamValidator.isValidId(matchId)) {
+                throw new InvalidParamException(
+                        MatchInvalidParamErrors.REQUIRED_FIELD,
+                        "matchId"
+                );
             }
             if (!ParamValidator.isValidId(reviewerId)) {
-                throw new InvalidParamException(MatchInvalidParamErrors.REQUIRED_FIELD, "reviewerId");
-            }
-            if (!ParamValidator.isValidId(revieweeId)) {
-                throw new InvalidParamException(MatchInvalidParamErrors.REQUIRED_FIELD, "revieweeId");
+                throw new InvalidParamException(
+                        MatchInvalidParamErrors.REQUIRED_FIELD,
+                        "reviewerId"
+                );
             }
             if (keywordIds == null || keywordIds.isEmpty()) {
-                throw new InvalidParamException(MatchInvalidParamErrors.REQUIRED_FIELD, "keywordIds");
+                throw new InvalidParamException(
+                        MatchInvalidParamErrors.REQUIRED_FIELD,
+                        "keywordIds"
+                );
             }
             return true;
         }
@@ -77,9 +85,9 @@ public class CreateReviewUseCase implements UseCase<CreateReviewUseCase.Param, C
     @Getter
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Result {
-        private String message;
+        private final String message;
 
-        public static Result from(Review review) {
+        public static Result success() {
             return new Result("리뷰가 작성되었습니다");
         }
     }
