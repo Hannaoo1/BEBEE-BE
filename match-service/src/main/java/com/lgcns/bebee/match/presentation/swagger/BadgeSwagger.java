@@ -52,32 +52,32 @@ public interface BadgeSwagger {
                                     {
                                       "badges": [
                                         {
-                                          "disabilityCategoryIds": [1],
+                                          "disabilityCategoryIds": 1,
                                           "completionCount": 5,
                                           "badgeCode": "LEVEL_1"
                                         },
                                         {
-                                          "disabilityCategoryIds": [2],
+                                          "disabilityCategoryIds": 2,
                                           "completionCount": 10,
                                           "badgeCode": "LEVEL_2"
                                         },
                                         {
-                                          "disabilityCategoryIds": [3],
+                                          "disabilityCategoryIds": 3,
                                           "completionCount": 0,
                                           "badgeCode": null
                                         },
                                         {
-                                          "disabilityCategoryIds": [4],
+                                          "disabilityCategoryIds": 4,
                                           "completionCount": 0,
                                           "badgeCode": null
                                         },
                                         {
-                                          "disabilityCategoryIds": [5],
+                                          "disabilityCategoryIds": 5,
                                           "completionCount": 2,
                                           "badgeCode": null
                                         },
                                         {
-                                          "disabilityCategoryIds": [6],
+                                          "disabilityCategoryIds": 6,
                                           "completionCount": 0,
                                           "badgeCode": null
                                         }
