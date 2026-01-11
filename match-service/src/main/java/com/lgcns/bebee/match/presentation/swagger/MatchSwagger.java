@@ -179,7 +179,7 @@ public interface MatchSwagger {
                     required = false,
                     example = "DAY"
             )
-            @RequestParam EngagementType type
+            @RequestParam(required = false) EngagementType type
     );
 
     @Operation(

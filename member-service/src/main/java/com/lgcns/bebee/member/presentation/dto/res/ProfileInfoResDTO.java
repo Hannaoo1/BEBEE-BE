@@ -1,0 +1,98 @@
+package com.lgcns.bebee.member.presentation.dto.res;
+
+import com.lgcns.bebee.member.application.usecase.GetProfileInfoUseCase;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+import java.util.List;
+
+@Getter
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Schema(description = "프로필 정보 응답 DTO")
+public class ProfileInfoResDTO {
+    @Schema(description = "닉네임", example = "꿀벌123")
+    private String nickname;
+
+    @Schema(description = "이메일", example = "test@example.com")
+    private String email;
+
+    @Schema(description = "회원 역할 (DISABLED: 장애인, HELPER: 도우미)", example = "HELPER")
+    private String role;
+
+    @Schema(description = "프로필 이미지 URL", example = "https://example.com/profile.jpg")
+    private String profileImageUrl;
+
+    @Schema(description = "성별 (MALE: 남성, FEMALE: 여성, NONE: 미설정)", example = "MALE")
+    private String gender;
+
+    @Schema(description = "연령대", example = "30")
+    private Integer ageGroup;
+
+    @Schema(description = "도로명 주소", example = "서울시 강서구 마곡중앙8로")
+    private String address;
+
+    @Schema(description = "도움 카테고리 목록", example = "[\"SMARTPHONE\", \"KIOSK\"]")
+    private List<String> helpCategories;
+
+    @Schema(description = "자기소개", example = "안녕하세요, 잘 부탁드립니다.")
+    private String introduction;
+
+    @Schema(description = "꿀 포인트", example = "0")
+    private Long honey;
+
+    @Schema(description = "받은 후기")
+    private List<ReviewKeywordDTO> reviews;
+
+    // 도우미 전용 정보
+    @Schema(description = "제출한 경력 관련 서류 목록 (도우미 전용)")
+    private List<DocumentVerificationResDTO> documents;
+
+    @Schema(description = "뱃지 정보 (추후 구현)")
+    private Object badges;
+
+    // 장애인 전용 정보
+    @Schema(description = "장애 유형 (장애인 전용)", example = "시각장애")
+    private String disabilityType;
+
+    @Schema(description = "장애 상세 설명 (장애인 전용)", example = "시각 장애 1급입니다.")
+    private String disabilityDescription;
+
+    public static ProfileInfoResDTO from(GetProfileInfoUseCase.Result result) {
+        return new ProfileInfoResDTO(
+                result.getNickname(),
+                result.getEmail(),
+                result.getRole() != null ? result.getRole().name() : null,
+                result.getProfileImageUrl(),
+                result.getGender() != null ? result.getGender().name() : null,
+                result.getAgeGroup(),
+                result.getAddress(),
+                result.getHelpCategories(),
+                result.getIntroduction(),
+                result.getHoney(),
+                result.getReviews() != null ?
+                        result.getReviews().stream()
+                                .map(r -> new ReviewKeywordDTO(r.keywordId(), r.count()))
+                                .toList() : null,
+                result.getDocuments() != null ?
+                        result.getDocuments().stream()
+                                .map(DocumentVerificationResDTO::from)
+                                .toList() : null,
+                result.getBadges(),
+                result.getDisabilityType(),
+                result.getDisabilityDescription()
+        );
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @Schema(description = "리뷰 키워드 개수 정보")
+    public static class ReviewKeywordDTO {
+        @Schema(description = "키워드 ID", example = "1")
+        private Integer keywordId;
+
+        @Schema(description = "해당 키워드를 받은 횟수", example = "5")
+        private Long count;
+    }
+}
