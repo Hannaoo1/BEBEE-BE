@@ -1,6 +1,6 @@
 package com.lgcns.bebee.match.infrastructure.event;
 
-import com.lgcns.bebee.common.data.event.AgreementConfirmedEvent;
+import com.lgcns.bebee.common.data.event.match.AgreementConfirmedEvent;
 import com.lgcns.bebee.common.data.event.EventHandler;
 import com.lgcns.bebee.common.data.event.EventType;
 import com.lgcns.bebee.match.application.usecase.CreateAgreementEngagementsUseCase;
