@@ -26,7 +26,7 @@ public class BadgeController implements BadgeSwagger {
         GetHelperBadgesUseCase.Param param = new GetHelperBadgesUseCase.Param(currentMemberId);
         GetHelperBadgesUseCase.Result result = getHelperBadgesUseCase.execute(param);
 
-        HelperBadgesGetResDTO response = HelperBadgesGetResDTO.from(result.getBadges());
+        HelperBadgesGetResDTO response = HelperBadgesGetResDTO.from(result);
 
         return ResponseEntity.ok(response);
     }

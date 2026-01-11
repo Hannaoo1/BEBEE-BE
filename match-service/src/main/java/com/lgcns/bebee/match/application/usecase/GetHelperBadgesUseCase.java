@@ -8,8 +8,6 @@ import com.lgcns.bebee.match.common.exception.MatchInvalidParamErrors;
 import com.lgcns.bebee.match.domain.entity.Badge;
 import com.lgcns.bebee.match.domain.entity.sync.DisabilityCategory;
 import com.lgcns.bebee.match.domain.repository.BadgeRepository;
-import com.lgcns.bebee.match.presentation.dto.res.BadgeStatusDTO;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -41,18 +39,20 @@ public class GetHelperBadgesUseCase implements UseCase<GetHelperBadgesUseCase.Pa
         Map<Long, Badge> badgeMap = badges.stream()
                 .collect(Collectors.toMap(Badge::getDisabilityCategoryId, badge -> badge));
 
-        // 6개 장애유형에 대해 뱃지 정보 생성 (없으면 빈 뱃지)
-        List<BadgeStatusDTO> badgeStatuses = new ArrayList<>();
+        // 존재하는 뱃지와 없는 카테고리 ID 분리
+        List<Badge> existingBadges = new ArrayList<>();
+        List<Long> missingCategoryIds = new ArrayList<>();
+
         for (DisabilityCategory category : DisabilityCategory.values()) {
             Badge badge = badgeMap.get(category.getId());
             if (badge != null) {
-                badgeStatuses.add(BadgeStatusDTO.from(badge));
+                existingBadges.add(badge);
             } else {
-                badgeStatuses.add(BadgeStatusDTO.ofEmpty(category.getId()));
+                missingCategoryIds.add(category.getId());
             }
         }
 
-        return Result.from(badgeStatuses);
+        return new Result(existingBadges, missingCategoryIds);
     }
 
     @Getter
@@ -73,12 +73,9 @@ public class GetHelperBadgesUseCase implements UseCase<GetHelperBadgesUseCase.Pa
     }
 
     @Getter
-    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @AllArgsConstructor
     public static class Result {
-        private final List<BadgeStatusDTO> badges;
-
-        public static Result from(List<BadgeStatusDTO> badges) {
-            return new Result(badges);
-        }
+        private final List<Badge> existingBadges;
+        private final List<Long> missingCategoryIds;
     }
 }
