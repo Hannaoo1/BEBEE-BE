@@ -4,21 +4,24 @@ import com.lgcns.bebee.chat.application.client.MessagePublisher;
 import com.lgcns.bebee.chat.domain.entity.Chat;
 import com.lgcns.bebee.chat.domain.entity.Chatroom;
 import com.lgcns.bebee.chat.domain.entity.MemberSync;
+import com.lgcns.bebee.chat.domain.entity.vo.MatchStatus;
 import com.lgcns.bebee.chat.domain.repository.ChatRepository;
 import com.lgcns.bebee.chat.domain.service.ChatroomManagement;
 import com.lgcns.bebee.chat.domain.service.MemberManagement;
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
+import com.lgcns.bebee.common.data.dto.ScheduleDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class SendChatMessageUseCase implements UseCase<SendChatMessageUseCase.Param, Void> {
+public class ProcessAgreementCreatedUseCase implements UseCase<ProcessAgreementCreatedUseCase.Param, Void>{
     private final MessagePublisher messagePublisher;
 
     private final ChatroomManagement chatroomManagement;
@@ -28,27 +31,26 @@ public class SendChatMessageUseCase implements UseCase<SendChatMessageUseCase.Pa
     @Override
     @Transactional
     public Void execute(Param param) {
-        MemberSync sender = memberManagement.getExistingMember(param.senderId);
-        MemberSync receiver = memberManagement.getExistingMember(param.receiverId);
+        MemberSync sender = memberManagement.getExistingMember(param.disabledId);
+        MemberSync receiver = memberManagement.getExistingMember(param.helperId);
 
         Chatroom chatroom = chatroomManagement.getExistingChatroom(param.chatroomId);
 
         Chat chat = Chat.create(
                 chatroom.getId(),
-                param.senderId,
-                param.receiverId,
-                param.textContent,
-                param.chatType,
-                param.attachments,
-                null, null, null, null, null,
-                null, null, null, null,null, null,
+                sender.getId(), receiver.getId(),
+                null, "MATCH_CONFIRMATION", null,
+                param.agreementId, param.engagementType, param.isVolunteer,
+                param.startDate, param.endDate, param.schedules,
+                param.location, param.unitHoney, param.totalHoney,
+                param.helpCategoryIds, MatchStatus.PROCEEDING,
                 param.createdAt
         );
 
-        // Redis를 통해 발신자와 수신자에게 메시지 발행
-        messagePublisher.publishToMember(param.senderId, param.receiverId, chat);
-
         chatRepository.save(chat);
+        chatroom.updateMatchStatus(MatchStatus.PROCEEDING);
+
+        messagePublisher.publishToMember(sender.getId(), receiver.getId(), chat);
 
         chatroomManagement.updateLastMessage(chatroom, chat);
 
@@ -58,11 +60,18 @@ public class SendChatMessageUseCase implements UseCase<SendChatMessageUseCase.Pa
     @RequiredArgsConstructor
     public static class Param implements Params {
         private final Long chatroomId;
-        private final Long senderId;
-        private final Long receiverId;
-        private final String textContent;
-        private final String chatType;
-        private final List<String> attachments;
+        private final Long agreementId;
+        private final Long disabledId;
+        private final Long helperId;
+        private final String engagementType;
+        private final Boolean isVolunteer;
+        private final LocalDate startDate;
+        private final LocalDate endDate;
+        private final List<ScheduleDTO> schedules;
+        private final String location;
+        private final Integer unitHoney;
+        private final Integer totalHoney;
+        private final List<Long> helpCategoryIds;
         private final LocalDateTime createdAt;
     }
 }

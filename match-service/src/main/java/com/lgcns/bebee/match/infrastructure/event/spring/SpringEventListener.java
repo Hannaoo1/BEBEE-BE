@@ -1,7 +1,7 @@
 package com.lgcns.bebee.match.infrastructure.event.spring;
 
 import com.lgcns.bebee.match.application.usecase.UpdatePostLegalDongCodeUseCase;
-import com.lgcns.bebee.common.data.event.PostCreatedEvent;
+import com.lgcns.bebee.common.data.event.match.PostCreatedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Async;

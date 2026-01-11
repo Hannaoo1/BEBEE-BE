@@ -5,8 +5,6 @@ import com.lgcns.bebee.chat.domain.entity.Chat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Builder
@@ -53,109 +51,122 @@ public record ChatMessagesGetResDTO(
             @Schema(description = "첨부 파일 URL 목록", example = "[\"https://example.com/image1.jpg\", \"https://example.com/image2.jpg\"]", nullable = true)
             List<String> attachments,
 
-            @Schema(description = "매칭 확인서 ID (매칭 확인서 메시지인 경우)", example = "5001", nullable = true)
-            String agreementId,
-
-            @Schema(description = "매칭 타입 (매칭 확인서 메시지인 경우)", example = "TERM", allowableValues = {"DAY", "TERM"}, nullable = true)
-            String matchType,
-
-            @Schema(description = "매칭 시작일 (매칭 확인서 메시지인 경우)", example = "2024-01-15", nullable = true)
-            String startDate,
-
-            @Schema(description = "매칭 종료일 (매칭 확인서 메시지인 경우)", example = "2024-06-30", nullable = true)
-            String endDate,
-
-            @Schema(description = "일정 요일 목록 (매칭 확인서 메시지인 경우)", example = "[\"월\", \"수\", \"금\"]", nullable = true)
-            List<String> scheduleDays,
-
-            @Schema(description = "일정 시작 시간 목록 (매칭 확인서 메시지인 경우)", example = "[\"09:00\", \"09:00\", \"14:00\"]", nullable = true)
-            List<String> scheduleStartTimes,
-
-            @Schema(description = "일정 종료 시간 목록 (매칭 확인서 메시지인 경우)", example = "[\"12:00\", \"12:00\", \"17:00\"]", nullable = true)
-            List<String> scheduleEndTimes,
-
-            @Schema(description = "매칭 장소 (매칭 확인서 메시지인 경우)", example = "서울시 강남구", nullable = true)
-            String location,
-
-            @Schema(description = "단위 포인트 (매칭 확인서 메시지인 경우)", example = "1000", nullable = true)
-            Integer unitPoints,
-
-            @Schema(description = "총 포인트 (매칭 확인서 메시지인 경우)", example = "30000", nullable = true)
-            Integer totalPoints,
-
-            @Schema(description = "매칭 상태 (매칭 확인서 메시지인 경우)", example = "PENDING", allowableValues = {"PENDING", "ACCEPTED", "REJECTED"}, nullable = true)
-            String matchStatus,
-
-            @Schema(description = "메시지 생성 일시", example = "2024-01-15T10:30:00")
-            LocalDateTime createdAt
+            MatchConfirmationDTO matchData
     ) {
         public static ChatMessageDTO from(Chat chat) {
-            Chat.MatchConfirmationContent matchConfirmation = chat.getMatchConfirmationContent();
+            MatchConfirmationDTO matchConfirmationDTO = null;
 
-            // MatchConfirmationContent가 없는 경우 처리
-            String agreementId = null;
-            String matchType = null;
-            String startDate = null;
-            String endDate = null;
-            List<String> scheduleDays = null;
-            List<String> scheduleStartTimes = null;
-            List<String> scheduleEndTimes = null;
-            String location = null;
-            Integer unitPoints = null;
-            Integer totalPoints = null;
-            String matchStatus = null;
+            if (chat.getMatchConfirmationContent() != null) {
+                Chat.MatchConfirmationContent content = chat.getMatchConfirmationContent();
+                Chat.Points points = content.getPoints();
 
-            if (matchConfirmation != null) {
-                agreementId = String.valueOf(matchConfirmation.getAgreementId());
-                matchType = matchConfirmation.getType().name();
-                startDate = matchConfirmation.getStartDate();
-                endDate = matchConfirmation.getEndDate();
-                location = matchConfirmation.getLocation();
-                matchStatus = matchConfirmation.getStatus() != null
-                        ? matchConfirmation.getStatus().name()
-                        : null;
-
-                // Schedule 리스트 분해
-                List<Chat.Schedule> schedules = matchConfirmation.getSchedule();
-                if (schedules != null && !schedules.isEmpty()) {
-                    scheduleDays = new ArrayList<>();
-                    scheduleStartTimes = new ArrayList<>();
-                    scheduleEndTimes = new ArrayList<>();
-
-                    for (Chat.Schedule schedule : schedules) {
-                        scheduleDays.add(schedule.getDay());
-                        scheduleStartTimes.add(schedule.getStartTime());
-                        scheduleEndTimes.add(schedule.getEndTime());
-                    }
-                }
-
-                // Points 분해
-                Chat.Points points = matchConfirmation.getPoints();
-                if (points != null) {
-                    unitPoints = points.getUnitPoints();
-                    totalPoints = points.getTotal();
-                }
+                matchConfirmationDTO = new MatchConfirmationDTO(
+                        content.getAgreementId() != null ? String.valueOf(content.getAgreementId()) : null,
+                        content.getType() != null ? content.getType().name() : null,
+                        content.getDisabledId() != null ? String.valueOf(content.getDisabledId()) : null,
+                        content.getHelperId() != null ? String.valueOf(content.getHelperId()) : null,
+                        content.getIsVolunteer(),
+                        points != null ? points.getUnitHoney() : null,
+                        points != null ? points.getTotalHoney() : null,
+                        content.getRegion(),
+                        content.getHelpCategoryIds(),
+                        content.getStatus() != null ? content.getStatus().name() : null,
+                        EngagementTimeDTO.from(content)
+                );
             }
 
             return ChatMessageDTO.builder()
-                    .id(String.valueOf(chat.getId()))
-                    .senderId(String.valueOf(chat.getSenderId()))
+                    .id(chat.getId() != null ? String.valueOf(chat.getId()) : null)
+                    .senderId(chat.getSenderId() != null ? String.valueOf(chat.getSenderId()) : null)
                     .textContent(chat.getTextContent())
-                    .type(chat.getType().name())
+                    .type(chat.getType() != null ? chat.getType().name() : null)
                     .attachments(chat.getAttachments())
-                    .agreementId(agreementId)
-                    .matchType(matchType)
-                    .startDate(startDate)
-                    .endDate(endDate)
-                    .scheduleDays(scheduleDays)
-                    .scheduleStartTimes(scheduleStartTimes)
-                    .scheduleEndTimes(scheduleEndTimes)
-                    .location(location)
-                    .unitPoints(unitPoints)
-                    .totalPoints(totalPoints)
-                    .matchStatus(matchStatus)
-                    .createdAt(chat.getCreatedAt())
+                    .matchData(matchConfirmationDTO)
                     .build();
         }
+    }
+
+    @Schema(description = "매칭 확인서 정보 (type이 MATCH_CONFIRMATION인 경우에만 존재)")
+    public record MatchConfirmationDTO(
+            @Schema(description = "매칭 확인서 ID", example = "5001", nullable = true)
+            String agreementId,
+
+            @Schema(description = "매칭 타입", example = "TERM", allowableValues = {"DAY", "TERM"}, nullable = true)
+            String type,
+
+            @Schema(description = "도움 요청자 ID", example = "100", nullable = true)
+            String receiverId,
+
+            @Schema(description = "도우미 ID", example = "700", nullable = true)
+            String helperId,
+
+            @Schema(description = "나눔 여부 (true: 봉사, false: 유료)", example = "false", nullable = true)
+            Boolean isVolunteer,
+
+            @Schema(description = "단위 포인트 (시간당 허니)", example = "1000", nullable = true)
+            Integer unitHoney,
+
+            @Schema(description = "총 포인트 (총 허니)", example = "5000", nullable = true)
+            Integer totalHoney,
+
+            @Schema(description = "만남 장소", example = "서울시 강남구 역삼동", nullable = true)
+            String region,
+
+            @Schema(description = "도움 카테고리 ID 목록", example = "[1, 2, 3]", nullable = true)
+            List<Long> helpCategoryIds,
+
+            @Schema(description = "매칭 상태", example = "PROCEEDING", allowableValues = {"PROCEEDING", "MATCHED", "NON_MATCHED"}, nullable = true)
+            String status,
+
+            @Schema(description = "활동 일정 정보", nullable = true)
+            EngagementTimeDTO engagementTime
+    ){
+    }
+
+    @Schema(description = "활동 일정 정보")
+    public record EngagementTimeDTO(
+            @Schema(description = "활동 날짜 (DAY 타입인 경우)", example = "2024-01-15", nullable = true)
+            String date,
+
+            @Schema(description = "활동 시작일 (TERM 타입인 경우)", example = "2024-01-15", nullable = true)
+            String startDate,
+
+            @Schema(description = "활동 종료일 (TERM 타입인 경우)", example = "2024-02-15", nullable = true)
+            String endDate,
+
+            @Schema(description = "단일 스케줄 (DAY 타입인 경우)", nullable = true)
+            ScheduleDTO schedule,
+
+            @Schema(description = "스케줄 목록 (TERM 타입인 경우)", nullable = true)
+            List<ScheduleDTO> schedules
+    ){
+        public static EngagementTimeDTO from(Chat.MatchConfirmationContent content) {
+            List<Chat.Schedule> schedules = content.getSchedules();
+
+            if(content.getType() == Chat.EngagementType.DAY){
+                Chat.Schedule schedule = schedules.get(0);
+
+                return new EngagementTimeDTO(content.getStartDate(), null, null,
+                        new ScheduleDTO(schedule.getDay(), schedule.getStartTime(), schedule.getEndTime()), null);
+            }
+            return new EngagementTimeDTO(null, content.getStartDate(), content.getEndDate(),
+                    null, schedules.stream()
+                    .map(s -> new ScheduleDTO(s.getDay(), s.getStartTime(), s.getEndTime()))
+                    .toList()
+            );
+        }
+    }
+
+    @Schema(description = "스케줄 정보")
+    public record ScheduleDTO(
+            @Schema(description = "요일", example = "MONDAY", allowableValues = {"MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"})
+            String dayOfWeek,
+
+            @Schema(description = "시작 시간", example = "09:00")
+            String startTime,
+
+            @Schema(description = "종료 시간", example = "18:00")
+            String endTime
+    ){
     }
 }

@@ -5,7 +5,10 @@ import com.lgcns.bebee.common.exception.ErrorInfo;
 
 public enum ChatErrors implements ErrorInfo {
     CHATROOM_NOT_FOUND("해당 채팅방을 찾을 수 없습니다."),
-    MEMBER_NOT_FOUND("해당 회원을 찾을 수 없습니다.");
+    MEMBER_NOT_FOUND("해당 회원을 찾을 수 없습니다."),
+    CHAT_NOT_FOUND("해당 채팅을 찾을 수 없습니다.")
+    ;
+
 
     private final String desc;
 

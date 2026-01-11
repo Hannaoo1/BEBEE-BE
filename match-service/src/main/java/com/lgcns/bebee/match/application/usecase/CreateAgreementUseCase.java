@@ -2,6 +2,7 @@ package com.lgcns.bebee.match.application.usecase;
 
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
+import com.lgcns.bebee.common.data.dto.ScheduleDTO;
 import com.lgcns.bebee.common.exception.InvalidParamException;
 import com.lgcns.bebee.match.application.usecase.client.EventPublisher;
 import com.lgcns.bebee.match.common.exception.MatchErrors;
@@ -10,7 +11,7 @@ import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
 import com.lgcns.bebee.match.domain.entity.sync.Role;
 import com.lgcns.bebee.common.util.ParamValidator;
 import com.lgcns.bebee.match.domain.entity.Agreement;
-import com.lgcns.bebee.common.data.event.AgreementCreatedEvent;
+import com.lgcns.bebee.common.data.event.match.AgreementCreatedEvent;
 import com.lgcns.bebee.match.domain.repository.AgreementRepository;
 import com.lgcns.bebee.match.domain.entity.vo.AgreementStatus;
 import com.lgcns.bebee.match.domain.entity.vo.EngagementType;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -80,10 +82,45 @@ public class CreateAgreementUseCase implements UseCase<CreateAgreementUseCase.Pa
             savedAgreement.getSchedules().size(); // 초기화
         }
 
-        eventPublisher.publish(new AgreementCreatedEvent(param.chatroomId));
+        eventPublisher.publish(buildEvent(param.chatroomId, savedAgreement, param.createdAt));
 
         return Result.from(savedAgreement);
     }
+
+    private AgreementCreatedEvent buildEvent(Long chatroomId, Agreement agreement, LocalDateTime createdAt){
+        LocalDate startDate = agreement.getPeriod() != null ? agreement.getPeriod().getStartDate() : null;
+        LocalDate endDate = agreement.getPeriod() != null ? agreement.getPeriod().getEndDate() : null;
+
+        List<ScheduleDTO> schedules = agreement.getSchedules().stream()
+                .map(schedule -> new ScheduleDTO(
+                        schedule.getDayOfWeek(),
+                        schedule.getStartTime(),
+                        schedule.getEndTime()
+                ))
+                .toList();
+
+        List<Long> helpCategoryIds = agreement.getHelpCategories().stream()
+                .map(ahc -> ahc.getId().getHelpCategoryId())
+                .toList();
+
+        return new AgreementCreatedEvent(
+                chatroomId,
+                agreement.getId(),
+                agreement.getDisabledId(),
+                agreement.getHelperId(),
+                agreement.getType().name(),
+                agreement.getIsVolunteer(),
+                startDate,
+                endDate,
+                schedules,
+                agreement.getRegion(),
+                agreement.getUnitHoney().intValue(),
+                agreement.getTotalHoney().intValue(),
+                helpCategoryIds,
+                createdAt
+        );
+    }
+
 
     @Getter
     @RequiredArgsConstructor
@@ -100,6 +137,7 @@ public class CreateAgreementUseCase implements UseCase<CreateAgreementUseCase.Pa
         private final TermEngagementTimeDTO termEngagementTime;
         private final List<Long> helpCategoryIds;
         private final Long chatroomId;
+        private final LocalDateTime createdAt;
 
         @Override
         public boolean validate() {

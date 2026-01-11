@@ -2,7 +2,7 @@ package com.lgcns.bebee.match.application.usecase;
 
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
-import com.lgcns.bebee.common.data.event.AgreementConfirmedEvent;
+import com.lgcns.bebee.common.data.event.match.AgreementConfirmedEvent;
 import com.lgcns.bebee.common.exception.InvalidParamException;
 import com.lgcns.bebee.match.application.usecase.client.EventPublisher;
 import com.lgcns.bebee.match.common.exception.MatchInvalidParamErrors;
@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.lgcns.bebee.match.common.exception.MatchErrors.*;
@@ -61,9 +62,11 @@ public class ConfirmAgreementUseCase implements UseCase<ConfirmAgreementUseCase.
         Match savedMatch = matchRepository.save(match);
 
         eventPublisher.publish(new AgreementConfirmedEvent(
-                        param.getChatRoomId(),
-                        match.getHelperId(),
+                        param.chatRoomId,
+                        param.chatId,
                         match.getDisabledId(),
+                        match.getHelperId(),
+                        param.createdAt,
                         match.getMatchId(),
                         match.getAgreementId(),
                         match.getAgreement().getUnitHoney(),
@@ -83,7 +86,9 @@ public class ConfirmAgreementUseCase implements UseCase<ConfirmAgreementUseCase.
         private final Long postId;
         private final String title;
         private final Long chatRoomId;
+        private final Long chatId;
         private final Long agreementId;
+        private final LocalDateTime createdAt;
 
         @Override
         public boolean validate() {
