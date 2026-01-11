@@ -62,15 +62,11 @@ public class ConfirmAgreementUseCase implements UseCase<ConfirmAgreementUseCase.
         Match savedMatch = matchRepository.save(match);
 
         eventPublisher.publish(new AgreementConfirmedEvent(
-<<<<<<< HEAD
                         param.chatRoomId,
                         param.chatId,
-=======
                         param.getChatRoomId(),
                         match.getHelperId(),
->>>>>>> 8e0a30f (feat: AgreementConfirmed 이벤트 처리 및 Payment sync 로직 구현)
                         match.getDisabledId(),
-                        match.getHelperId(),
                         param.createdAt,
                         match.getMatchId(),
                         match.getAgreementId(),
