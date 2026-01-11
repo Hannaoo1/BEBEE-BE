@@ -1,6 +1,8 @@
 package com.lgcns.bebee.chat.domain.entity;
 
 import com.lgcns.bebee.chat.core.exception.ChatInvalidParamErrors;
+import com.lgcns.bebee.chat.domain.entity.vo.MatchStatus;
+import com.lgcns.bebee.common.data.dto.ScheduleDTO;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -8,7 +10,10 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Getter
@@ -39,14 +44,17 @@ public class Chat{
 
     @Getter
     public static class MatchConfirmationContent {
-        private MatchType type;
-        private Long agreementId;
+        private EngagementType type;
+        @Field("agreement_id") private Long agreementId;
+        @Field("disabled_id") private Long disabledId;
+        @Field("helper_id") private Long helperId;
+        @Field("is_volunteer") private Boolean isVolunteer;
         @Field("start_date") private String startDate;
         @Field("end_date") private String endDate;
-        private List<Schedule> schedule;
-        private String location;
+        private List<Schedule> schedules;
+        private String region;
         private Points points;
-        @Field("help_categories") private List<String> helpCategories;
+        @Field("help_category_ids") private List<Long> helpCategoryIds;
         private MatchStatus status;
     }
 
@@ -59,14 +67,14 @@ public class Chat{
 
     @Getter
     public static class Points{
-        @Field("unit_points") private Integer unitPoints;
-        @Field("total") private Integer total;
+        @Field("unit_honey") private Integer unitHoney;
+        @Field("total_honey") private Integer totalHoney;
     }
 
     public enum ChatType {
         TEXT, IMAGE, MATCH_SUCCESS, MATCH_FAILURE, MATCH_CONFIRMATION;
 
-        private static ChatType from(String type){
+        public static ChatType from(String type){
             try{
                 return valueOf(type.toUpperCase());
             }catch(IllegalArgumentException e){
@@ -75,26 +83,14 @@ public class Chat{
         }
     }
 
-    public enum MatchType{
+    public enum EngagementType {
         DAY, TERM;
 
-        private static MatchType from(String type){
+        private static EngagementType from(String type){
             try{
                 return valueOf(type.toUpperCase());
             }catch(IllegalArgumentException e){
                 throw ChatInvalidParamErrors.INVALID_CHAT_TYPE.toException();
-            }
-        }
-    }
-
-    public enum MatchStatus{
-        PENDING, REJECTED, ACCEPTED;
-
-        private static MatchStatus from(String status){
-            try{
-                return valueOf(status.toUpperCase());
-            }catch(IllegalArgumentException e){
-                throw ChatInvalidParamErrors.INVALID_MATCH_STATUS.toException();
             }
         }
     }
@@ -111,33 +107,32 @@ public class Chat{
      * @param matchType 매칭 타입 (String)
      * @param startDate 일정 시작일 (YYYY.MM.DD 형식)
      * @param endDate 일정 종료일 (YYYY.MM.DD 형식)
-     * @param scheduleDays 일정 요일 목록
-     * @param scheduleStartTimes 일정 시작 시간 목록 (HH:mm 형식)
-     * @param scheduleEndTimes 일정 종료 시간 목록 (HH:mm 형식)
-     * @param location 만남 장소
+     * @param schedules 일정에 대한 요일, 시작 시간, 종료 시간
+     * @param region 만남 장소
      * @param unitPoints 단위 포인트
      * @param totalPoints 총 포인트
-     * @param matchStatus 매칭 상태 (String)
+     * @param status 매칭 상태
      * @param createdAt 채팅 생성 시간
      * @return 생성된 Chat 엔티티
      */
     public static Chat create(
             Long chatroomId,
             Long senderId,
+            Long receiverId,
             String textContent,
             String chatType,
             List<String> attachments,
             Long agreementId,
             String matchType,
-            String startDate,
-            String endDate,
-            List<String> scheduleDays,
-            List<String> scheduleStartTimes,
-            List<String> scheduleEndTimes,
-            String location,
+            Boolean isVolunteer,
+            LocalDate startDate,
+            LocalDate endDate,
+            List<ScheduleDTO> schedules,
+            String region,
             Integer unitPoints,
             Integer totalPoints,
-            String matchStatus,
+            List<Long> helpCategoryIds,
+            MatchStatus status,
             LocalDateTime createdAt
     ) {
         Chat chat = new Chat();
@@ -151,13 +146,17 @@ public class Chat{
         if (agreementId != null){
             MatchConfirmationContent content = new MatchConfirmationContent();
             content.agreementId = agreementId;
-            content.type = MatchType.from(matchType);
-            content.startDate = startDate;
-            content.endDate = endDate;
-            content.schedule = (scheduleDays != null && !scheduleDays.isEmpty()) ? createSchedules(scheduleDays, scheduleStartTimes, scheduleEndTimes) : null;
-            content.location = location;
+            content.disabledId = senderId;
+            content.helperId = receiverId;
+            content.type = EngagementType.from(matchType);
+            content.isVolunteer = isVolunteer != null && isVolunteer;
+            content.startDate = startDate.toString();
+            content.endDate = endDate.toString();
+            content.schedules = schedules.stream().map(s -> createSchedule(s.dayOfWeek(), s.startTime(), s.endTime())).toList();
+            content.region = region;
             content.points = unitPoints != null ? createPoints(unitPoints, totalPoints) : null;
-            content.status = matchStatus != null ? MatchStatus.from(matchStatus) : null;
+            content.status = status;
+            content.helpCategoryIds = helpCategoryIds;
             chat.matchConfirmationContent = content;
         }
 
@@ -165,22 +164,26 @@ public class Chat{
         return chat;
     }
 
-    private static List<Schedule> createSchedules(List<String> days, List<String> startTimes, List<String> endTimes) {
-        List<Schedule> schedules = new java.util.ArrayList<>();
-        for (int i = 0; i < days.size(); i++) {
-            Schedule schedule = new Schedule();
-            schedule.day = days.get(i);
-            schedule.startTime = startTimes.get(i);
-            schedule.endTime = endTimes.get(i);
-            schedules.add(schedule);
-        }
-        return schedules;
+    public void updateMatchStatus(MatchStatus status){
+        this.matchConfirmationContent.status = status;
     }
 
-    private static Points createPoints(Integer unitPoints, Integer totalPoints) {
+
+    private static Schedule createSchedule(DayOfWeek dayOfWeek, LocalTime startTime, LocalTime endTime) {
+        Schedule schedule = new Schedule();
+        schedule.day = dayOfWeek.name();
+        schedule.startTime = startTime.toString();
+        schedule.endTime = endTime.toString();
+        return schedule;
+    }
+
+
+    private static Points createPoints(Integer unitHoney, Integer totalHoney) {
         Points points = new Points();
-        points.unitPoints = unitPoints;
-        points.total = totalPoints;
+        points.unitHoney = unitHoney;
+        points.totalHoney = totalHoney;
         return points;
     }
+
+
 }
