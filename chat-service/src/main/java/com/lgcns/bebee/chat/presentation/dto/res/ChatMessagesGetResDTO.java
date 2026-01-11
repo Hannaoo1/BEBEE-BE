@@ -5,6 +5,7 @@ import com.lgcns.bebee.chat.domain.entity.Chat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
@@ -51,6 +52,10 @@ public record ChatMessagesGetResDTO(
             @Schema(description = "첨부 파일 URL 목록", example = "[\"https://example.com/image1.jpg\", \"https://example.com/image2.jpg\"]", nullable = true)
             List<String> attachments,
 
+            @Schema(description = "메시지 생성 시간", example = "2024-01-15T09:30:00")
+            LocalDateTime createdAt,
+
+            @Schema(description = "매칭 확인서 정보 (type이 MATCH_CONFIRMATION인 경우에만 존재)", nullable = true)
             MatchConfirmationDTO matchData
     ) {
         public static ChatMessageDTO from(Chat chat) {
@@ -81,6 +86,7 @@ public record ChatMessagesGetResDTO(
                     .textContent(chat.getTextContent())
                     .type(chat.getType() != null ? chat.getType().name() : null)
                     .attachments(chat.getAttachments())
+                    .createdAt(chat.getCreatedAt())
                     .matchData(matchConfirmationDTO)
                     .build();
         }
