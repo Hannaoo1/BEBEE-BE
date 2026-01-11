@@ -8,7 +8,7 @@ import com.lgcns.bebee.match.common.exception.MatchInvalidParamErrors;
 import com.lgcns.bebee.match.domain.entity.Agreement;
 import com.lgcns.bebee.match.domain.entity.Badge;
 import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
-import com.lgcns.bebee.match.domain.repository.dto.BadgeRepository;
+import com.lgcns.bebee.match.domain.repository.BadgeRepository;
 import com.lgcns.bebee.match.domain.service.AgreementReader;
 import com.lgcns.bebee.match.domain.service.MemberManager;
 import lombok.AccessLevel;
