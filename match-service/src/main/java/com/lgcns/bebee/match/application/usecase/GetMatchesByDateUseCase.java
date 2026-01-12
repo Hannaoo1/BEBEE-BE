@@ -103,25 +103,48 @@ public class GetMatchesByDateUseCase implements UseCase<GetMatchesByDateUseCase.
                 status = "INACTIVE";
             }else{
                 boolean isHelper = match.getHelperId().equals(member.getId());
-                boolean isChecked = isHelper ? engagement.getIsHelperCheck() : engagement.getIsDisabledCheck();
-                boolean hasReview = isHelper
-                        ? match.getHelperReview() != null
-                        : match.getDisabledReview() != null;
+                boolean isDisabledChecked = engagement.getIsDisabledCheck();
+                boolean isHelperChecked = engagement.getIsHelperCheck();
+                LocalDate endDate = agreement.getPeriod().getEndDate();
+                boolean isLastDay = engagement.getDate().equals(endDate);
 
-                if(!isChecked){
-                    status = "ACTIVE";
-                }else{
-                    LocalDate endDate = agreement.getPeriod().getEndDate();
-
-                    if (engagement.getDate().equals(endDate)) {
-                        status = "COMPLETED";
-                    }else{
-
-                        if (hasReview) {
-                            status = "REVIEW_COMPLETED";
-                        }else{
-                            status = "REVIEW_ACTIVE";
+                if (isHelper) {
+                    // 도우미인 경우
+                    if (isDisabledChecked) {
+                        // 장애인이 체크한 경우
+                        if (isLastDay) {
+                            // 마지막 날이면 리뷰 단계
+                            boolean hasReview = match.getHelperReview() != null;
+                            status = hasReview ? "REVIEW_COMPLETED" : "REVIEW_ACTIVE";
+                        } else {
+                            // 마지막 날이 아니면 COMPLETED
+                            status = "COMPLETED";
                         }
+                    } else {
+                        // 장애인이 체크 안한 경우
+                        if (isHelperChecked) {
+                            // 본인이 체크한 경우 무조건 COMPLETED (마지막 날이어도)
+                            status = "COMPLETED";
+                        } else {
+                            // 아무도 체크 안한 경우
+                            status = "ACTIVE";
+                        }
+                    }
+                } else {
+                    // 장애인인 경우
+                    if (isDisabledChecked) {
+                        // 본인이 체크한 경우
+                        if (isLastDay) {
+                            // 마지막 날이면 리뷰 단계
+                            boolean hasReview = match.getDisabledReview() != null;
+                            status = hasReview ? "REVIEW_COMPLETED" : "REVIEW_ACTIVE";
+                        } else {
+                            // 마지막 날이 아니면 COMPLETED
+                            status = "COMPLETED";
+                        }
+                    } else {
+                        // 본인이 체크 안한 경우
+                        status = "ACTIVE";
                     }
                 }
             }
