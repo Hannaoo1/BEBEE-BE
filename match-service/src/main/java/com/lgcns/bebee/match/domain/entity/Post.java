@@ -120,4 +120,8 @@ public class Post extends BaseTimeEntity {
     public void updateLegalDongCode(String legalDongCode){
         this.legalDongCode = legalDongCode;
     }
+
+    public void updateStatus(PostStatus status) {
+        this.status = status;
+    }
 }
