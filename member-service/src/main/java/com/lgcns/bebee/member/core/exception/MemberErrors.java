@@ -9,7 +9,9 @@ public enum MemberErrors implements ErrorInfo {
     INVALID_PASSWORD("비밀번호가 올바르지 않습니다."),
     MEMBER_STATUS_PENDING("승인 대기 중인 계정입니다."),
     MEMBER_STATUS_REJECTED("승인 거절된 계정입니다."),
-    MEMBER_STATUS_WITHDRAWN("탈퇴 처리된 계정입니다.");
+    MEMBER_STATUS_WITHDRAWN("탈퇴 처리된 계정입니다."),
+    ONLY_HELPER_MEMBERS_ALLOWED("도우미 회원만 접근 가능합니다."),
+    AGREEMENT_NOT_FOUND("해당 Agreement를 찾을 수 없습니다.");
 
     private final String desc;
 
