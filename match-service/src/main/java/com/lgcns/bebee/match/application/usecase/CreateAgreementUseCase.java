@@ -7,15 +7,18 @@ import com.lgcns.bebee.common.exception.InvalidParamException;
 import com.lgcns.bebee.match.application.usecase.client.EventPublisher;
 import com.lgcns.bebee.match.common.exception.MatchErrors;
 import com.lgcns.bebee.match.common.exception.MatchInvalidParamErrors;
+import com.lgcns.bebee.match.domain.entity.Post;
 import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
 import com.lgcns.bebee.match.domain.entity.sync.Role;
 import com.lgcns.bebee.common.util.ParamValidator;
 import com.lgcns.bebee.match.domain.entity.Agreement;
 import com.lgcns.bebee.common.data.event.match.AgreementCreatedEvent;
+import com.lgcns.bebee.match.domain.entity.vo.PostStatus;
 import com.lgcns.bebee.match.domain.repository.AgreementRepository;
 import com.lgcns.bebee.match.domain.entity.vo.AgreementStatus;
 import com.lgcns.bebee.match.domain.entity.vo.EngagementType;
 import com.lgcns.bebee.match.domain.service.MemberManager;
+import com.lgcns.bebee.match.domain.service.PostManager;
 import com.lgcns.bebee.match.presentation.dto.DayEngagementTimeDTO;
 import com.lgcns.bebee.match.presentation.dto.TermEngagementTimeDTO;
 import com.lgcns.bebee.match.presentation.dto.res.AgreementHelpCategoryDTO;
@@ -36,6 +39,7 @@ public class CreateAgreementUseCase implements UseCase<CreateAgreementUseCase.Pa
 
     private final AgreementRepository agreementRepository;
     private final MemberManager memberManager;
+    private final PostManager postManager;
 
     private final EventPublisher eventPublisher;
 
@@ -81,6 +85,9 @@ public class CreateAgreementUseCase implements UseCase<CreateAgreementUseCase.Pa
         if (!savedAgreement.getSchedules().isEmpty()) {
             savedAgreement.getSchedules().size(); // 초기화
         }
+
+        Post post = postManager.findSinglePost(savedAgreement.getPostId());
+        post.updateStatus(PostStatus.PROCEEDING);
 
         eventPublisher.publish(buildEvent(param.chatroomId, savedAgreement, param.createdAt));
 
