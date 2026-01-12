@@ -22,7 +22,7 @@ gateway:
       - /member/auth/check-nickname
       - /member/auth/reissue
       - /member/documents/**
-      - /file/files/signup/presigned-url
+      - /file/**
       - /swagger-ui/**
       - /v3/api-docs/**
       - /actuator/**
