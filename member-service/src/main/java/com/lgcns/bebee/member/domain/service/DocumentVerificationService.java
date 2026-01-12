@@ -3,7 +3,6 @@ package com.lgcns.bebee.member.domain.service;
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.exif.ExifIFD0Directory;
-import com.lgcns.bebee.common.util.SimilarityUtil;
 import com.lgcns.bebee.member.application.client.OcrClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,16 +25,30 @@ public class DocumentVerificationService {
     private final OcrClient ocrClient;
 
     /**
-     * 업로드된 파일을 분석하고, 위변조 관련 점수와 플래그를 계산
+     * S3 URL의 이미지 파일을 분석 (신규 방식)
      * 
-     * @param file 분석할 파일
-     * @param role 사용자 역할 (HELPER 또는 DISABLED)
+     * @param fileUrl 분석할 S3 파일 URL
+     * @param role    사용자 역할
      * @return 분석 결과
      */
-    public AnalysisResult analyze(MultipartFile file, String role, String expectedName, LocalDate expectedBirthDate) {
+    public AnalysisResult analyze(String fileUrl, String role) {
+        log.info("문서 URL 분석 시작: {}", fileUrl);
+
+        int exifScore = calcExifScore(fileUrl);
+        int ocrScore = calcOcrScore(fileUrl, role);
+        int forgeryScore = calcForgeryScore(100, exifScore, ocrScore);
+        String systemFlag = decideSystemFlag(forgeryScore);
+
+        return new AnalysisResult(exifScore, ocrScore, forgeryScore, systemFlag);
+    }
+
+    /**
+     * 업로드된 파일을 직접 분석 (레거시 방식 - 파일 전송)
+     */
+    public AnalysisResult analyze(MultipartFile file, String role) {
         int baseScore = calcBaseScore(file);
         int exifScore = calcExifScore(file);
-        int ocrScore = calcOcrScore(file, role, expectedName, expectedBirthDate);
+        int ocrScore = calcOcrScore(file, role);
         int forgeryScore = calcForgeryScore(baseScore, exifScore, ocrScore);
         String systemFlag = decideSystemFlag(forgeryScore);
 
@@ -75,110 +88,88 @@ public class DocumentVerificationService {
     }
 
     /**
-     * EXIF 메타데이터 기반 점수 계산
-     * - 카메라 제조사, 모델명, 소프트웨어 정보 등을 분석
-     * - 메타데이터가 전혀 없으면(스크린샷 등) 감점
+     * EXIF 메타데이터 기반 점수 계산 (URL 방식)
+     */
+    private int calcExifScore(String fileUrl) {
+        try (InputStream is = new java.net.URL(fileUrl).openStream()) {
+            return extractExifScore(is);
+        } catch (Exception e) {
+            log.error("URL 기반 EXIF 분석 중 오류 발생: {}", e.getMessage());
+            return 50;
+        }
+    }
+
+    /**
+     * EXIF 메타데이터 기반 점수 계산 (파일 방식)
      */
     private int calcExifScore(MultipartFile file) {
-        int score = 0;
         try (InputStream is = file.getInputStream()) {
+            return extractExifScore(is);
+        } catch (Exception e) {
+            log.error("파일 기반 EXIF 분석 중 오류 발생: {}", e.getMessage());
+            return 50;
+        }
+    }
+
+    private int extractExifScore(InputStream is) {
+        int score = 0;
+        try {
             Metadata metadata = ImageMetadataReader.readMetadata(is);
             ExifIFD0Directory directory = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
 
             if (directory != null) {
-                // 1. 제조사(Make) 또는 모델(Model) 정보가 있는가? (실제 촬영 기기 증거)
                 if (directory.containsTag(ExifIFD0Directory.TAG_MAKE) ||
                         directory.containsTag(ExifIFD0Directory.TAG_MODEL)) {
                     score += 60;
                 }
 
-                // 2. 소프트웨어(Software) 정보가 'Adobe' 등 편집 툴인가? (위조 의심)
                 String software = directory.getString(ExifIFD0Directory.TAG_SOFTWARE);
                 if (software != null) {
                     String lower = software.toLowerCase();
                     if (lower.contains("adobe") || lower.contains("photoshop") || lower.contains("edit")) {
-                        score -= 30; // 편집 흔적 감점
+                        score -= 30;
                     } else {
-                        score += 20; // 일반적인 폰 소프트웨어 점수 가점
+                        score += 20;
                     }
                 }
-
-                // 3. 메타데이터가 존재한다는 자체로 기본 점수 부여
                 score += 20;
             } else {
-                // EXIF 정보가 아예 없는 경우 (카카오톡 전송 등으로 손실되었거나 스크린샷일 확률 높음)
-                log.warn("파일에 EXIF 메타데이터가 없습니다. (스크린샷 또는 원본 훼손 의심)");
+                log.warn("파일에 EXIF 메타데이터가 없습니다.");
                 score = 30;
             }
         } catch (Exception e) {
-            log.error("EXIF 분석 중 오류 발생: {}", e.getMessage());
-            // 분석 실패 시 보수적으로 접근
+            log.error("EXIF 추출 중 오류: {}", e.getMessage());
             return 50;
         }
-
-        log.info("EXIF 분석 완료 - 산출 점수: {}", score);
         return clamp(score);
     }
 
     /**
-     * OCR 텍스트 인식 기반 점수 계산
-     * - 외부 OCR 클라이언트의 신뢰도(confidence)를 0~100 점수로 변환
-     * - 키워드가 존재하지 않으면 소폭 감점
+     * OCR 텍스트 인식 기반 점수 계산 (URL 방식)
      */
-    private int calcOcrScore(MultipartFile file, String role, String expectedName, LocalDate expectedBirthDate) {
-        if (ocrClient == null) {
-            return 75;
-        }
+    private int calcOcrScore(String fileUrl, String role) {
+        OcrClient.OcrResult result = ocrClient.extract(fileUrl, role);
+        return processOcrResult(result);
+    }
 
+    /**
+     * OCR 텍스트 인식 기반 점수 계산 (파일 방식)
+     */
+    private int calcOcrScore(MultipartFile file, String role) {
         OcrClient.OcrResult result = ocrClient.analyze(file, role);
+        return processOcrResult(result);
+    }
+
+    private int processOcrResult(OcrClient.OcrResult result) {
         if (result == null || result.confidence() == null) {
             return 50;
         }
 
         int score = (int) Math.round(result.confidence() * 100);
 
-        // 1. 키워드 존재 여부 확인
+        // 신분증 관련 키워드가 전혀 없으면 감점
         if (result.keywords() == null || result.keywords().isEmpty()) {
             score -= 10;
-        }
-
-        // 2. 이름 일치 여부 확인 (유사도 알고리즘 도입)
-        if (result.fields() != null && expectedName != null) {
-            String extractedName = result.fields().get("name");
-            if (extractedName != null && !extractedName.trim().isEmpty()) {
-                double nameSimilarity = SimilarityUtil.calculateSimilarity(expectedName, extractedName);
-                log.info("OCR 이름 유사도 분석: 기대값={}, 추출값={}, 유사도={}", expectedName, extractedName, nameSimilarity);
-
-                if (nameSimilarity < 0.9) { // 90% 미만일 때만 감점 시작
-                    if (nameSimilarity < 0.6) {
-                        score -= 60; // 60% 미만: 완전 불일치 (도용 의심)
-                    } else {
-                        score -= 25; // 60%~90%: 미세 불일치 (OCR 인식 오류 가능성, MID 유도)
-                    }
-                }
-            } else {
-                score -= 30; // 이름이 추출되지 않음
-            }
-        }
-
-        // 3. 생년월일 일치 여부 확인 (유사도 알고리즘 도입)
-        if (result.fields() != null && expectedBirthDate != null) {
-            String extractedBirth = result.fields().get("birth");
-            if (extractedBirth != null && !extractedBirth.trim().isEmpty()) {
-                String expectedStr = expectedBirthDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-                String cleanExtracted = extractedBirth.replaceAll("[^0-9]", "");
-
-                double birthSimilarity = SimilarityUtil.calculateSimilarity(expectedStr, cleanExtracted);
-                log.info("OCR 생년월일 유사도 분석: 기대값={}, 추출값={}, 유사도={}", expectedStr, cleanExtracted, birthSimilarity);
-
-                if (birthSimilarity < 0.9) {
-                    if (birthSimilarity < 0.6) {
-                        score -= 40; // 완전 불일치
-                    } else {
-                        score -= 15; // 미세 불일치
-                    }
-                }
-            }
         }
 
         return clamp(score);

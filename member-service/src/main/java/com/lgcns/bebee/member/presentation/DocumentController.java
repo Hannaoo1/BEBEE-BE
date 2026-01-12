@@ -1,5 +1,6 @@
 package com.lgcns.bebee.member.presentation;
 
+import com.lgcns.bebee.member.application.usecase.AnalyzeDocumentUseCase;
 import com.lgcns.bebee.member.application.usecase.ApproveDocumentUseCase;
 import com.lgcns.bebee.member.application.usecase.RejectDocumentUseCase;
 import com.lgcns.bebee.member.application.usecase.UploadDocumentUseCase;
@@ -27,26 +28,43 @@ import java.util.List;
 public class DocumentController implements DocumentSwagger {
 
         private final UploadDocumentUseCase uploadDocumentUseCase;
+        private final AnalyzeDocumentUseCase analyzeDocumentUseCase;
         private final ApproveDocumentUseCase approveDocumentUseCase;
         private final RejectDocumentUseCase rejectDocumentUseCase;
         private final DocumentManagement documentManagement;
         private final com.lgcns.bebee.member.application.client.OcrClient ocrClient;
 
         /**
-         * 문서 업로드
+         * 문서 업로드 및 분석
          * 
-         * @param memberId   회원 ID
-         * @param documentId 문서 유형 ID
+         * @param memberId   회원 ID (optional - 없으면 분석만 수행)
+         * @param documentId 문서 유형 ID (optional - memberId 없으면 불필요)
          * @param file       업로드 파일 (로컬 환경용, optional)
          * @param fileUrl    S3 파일 URL (S3 환경용, optional)
-         * @return 업로드 결과
+         * @param role       사용자 역할 (HELPER/DISABLED - memberId 없을 때 필수)
+         * @return 업로드 결과 또는 분석 결과
          */
         @PostMapping("/upload")
-        public ResponseEntity<DocumentUploadResDTO> uploadDocument(
-                        @RequestParam Long memberId,
-                        @RequestParam Long documentId,
+        public ResponseEntity<?> uploadDocument(
+                        @RequestParam(required = false) Long memberId,
+                        @RequestParam(required = false) Long documentId,
                         @RequestPart(required = false) MultipartFile file,
-                        @RequestParam(required = false) String fileUrl) {
+                        @RequestParam(required = false) String fileUrl,
+                        @RequestParam(required = false) String role) {
+                
+                // memberId 없으면 → 분석만 수행 (5단계: 회원가입 전 문서 검증)
+                if (memberId == null) {
+                        log.info("문서 분석 요청 (회원가입 전): fileUrl={}, role={}", fileUrl, role);
+                        
+                        // UseCase 호출 (검증은 UseCase 내부 Param.validate()에서 수행)
+                        AnalyzeDocumentUseCase.Param param = new AnalyzeDocumentUseCase.Param(fileUrl, role);
+                        AnalyzeDocumentUseCase.Result result = analyzeDocumentUseCase.execute(param);
+                        
+                        log.info("문서 분석 완료: systemFlag={}", result.systemFlag());
+                        return ResponseEntity.ok(result);
+                }
+                
+                // memberId 있으면 → 기존 로직 (분석 + DB 저장)
                 log.info("문서 업로드 처리 시작: memberId={}, documentId={}, fileUrl={}, hasFile={}",
                                 memberId, documentId, fileUrl, file != null && !file.isEmpty());
                 try {
@@ -134,14 +152,24 @@ public class DocumentController implements DocumentSwagger {
         /**
          * OCR 분석 (단순 텍스트 추출)
          * 
-         * @param file 분석할 이미지 파일
-         * @param role 사용자 역할
+         * @param file    분석할 이미지 파일 (optional)
+         * @param fileUrl 분석할 S3 파일 URL (optional)
+         * @param role    사용자 역할
          * @return OCR 분석 결과
          */
         @PostMapping("/ocr-extract")
         public ResponseEntity<com.lgcns.bebee.member.application.client.OcrClient.OcrResult> extractOcr(
-                        @RequestPart MultipartFile file,
+                        @RequestPart(required = false) MultipartFile file,
+                        @RequestParam(required = false) String fileUrl,
                         @RequestParam(required = false) String role) {
+
+                if (fileUrl != null && !fileUrl.isBlank()) {
+                        log.info("URL 기반 OCR 추출 요청: {}", fileUrl);
+                        return ResponseEntity.ok(ocrClient.extract(fileUrl, role));
+                }
+
+                log.info("파일 기반 OCR 추출 요청: {}", file != null ? file.getOriginalFilename() : "null");
                 return ResponseEntity.ok(ocrClient.analyze(file, role));
         }
+
 }

@@ -38,15 +38,13 @@ public class HttpOcrClientImpl implements OcrClient {
     @Override
     public OcrResult analyze(MultipartFile file, String role) {
         try {
-            log.debug("OCR 분석 요청: {}, role: {}", file.getOriginalFilename(), role);
+            log.debug("OCR 분석 요청 (파일): {}, role: {}", file.getOriginalFilename(), role);
 
-            // MultipartFile을 Resource로 변환하여 MultiValueMap에 추가
             Resource resource = file.getResource();
             MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
             parts.add("file", resource);
             parts.add("role", role);
 
-            // OCR 서비스 호출
             OcrResponse response = ocrWebClient.post()
                     .uri("/api/ocr/analyze")
                     .contentType(MediaType.MULTIPART_FORM_DATA)
@@ -55,19 +53,7 @@ public class HttpOcrClientImpl implements OcrClient {
                     .bodyToMono(OcrResponse.class)
                     .block();
 
-            if (response == null) {
-                throw DocumentErrors.OCR_FAILED.toException();
-            }
-
-            log.debug("OCR 분석 완료: confidence={}, keywords={}, names={}, fields={}",
-                    response.getConfidence(), response.getKeywords(), response.getNames(), response.getFields());
-
-            return new OcrResult(
-                    response.getExtractedText(),
-                    response.getConfidence(),
-                    response.getKeywords(),
-                    response.getNames(),
-                    response.getFields());
+            return toOcrResult(response);
 
         } catch (WebClientResponseException e) {
             log.error("OCR 서비스 호출 실패: status={}, body={}",
@@ -77,6 +63,52 @@ public class HttpOcrClientImpl implements OcrClient {
             log.error("OCR 분석 중 예외 발생", e);
             throw DocumentErrors.OCR_FAILED.toException();
         }
+    }
+
+    @Override
+    public OcrResult extract(String fileUrl, String role) {
+        try {
+            log.debug("OCR 추출 요청 (URL): {}, role: {}", fileUrl, role);
+
+            // S3 이미지 URL과 사용자 역할을 JSON 바디로 전송
+            Map<String, String> requestBody = Map.of(
+                    "fileUrl", fileUrl,
+                    "role", role != null ? role : "");
+
+            OcrResponse response = ocrWebClient.post()
+                    .uri("/api/ocr/extract") // 파이썬 서비스의 새로운 엔드포인트
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(requestBody)
+                    .retrieve()
+                    .bodyToMono(OcrResponse.class)
+                    .block();
+
+            return toOcrResult(response);
+
+        } catch (WebClientResponseException e) {
+            log.error("OCR 서비스 호출 실패 (URL): status={}, body={}",
+                    e.getStatusCode(), e.getResponseBodyAsString(), e);
+            throw DocumentErrors.OCR_FAILED.toException();
+        } catch (Exception e) {
+            log.error("OCR 추출 중 예외 발생 (URL)", e);
+            throw DocumentErrors.OCR_FAILED.toException();
+        }
+    }
+
+    private OcrResult toOcrResult(OcrResponse response) {
+        if (response == null) {
+            throw DocumentErrors.OCR_FAILED.toException();
+        }
+
+        log.debug("OCR 처리 완료: confidence={}, keywords={}, names={}, fields={}",
+                response.getConfidence(), response.getKeywords(), response.getNames(), response.getFields());
+
+        return new OcrResult(
+                response.getExtractedText(),
+                response.getConfidence(),
+                response.getKeywords(),
+                response.getNames(),
+                response.getFields());
     }
 
     /**

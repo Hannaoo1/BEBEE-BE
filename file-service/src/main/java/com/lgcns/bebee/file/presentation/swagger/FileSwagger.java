@@ -81,8 +81,12 @@ public interface FileSwagger {
                 
                 **보안 사항:**
                 - 이 API는 인증(JWT) 없이 호출 가능하도록 설정되지만, 
-                - 업로드 경로는 내부적으로 무조건 **'documents/signup'**으로 고정됩니다.
+                - 업로드 경로는 내부적으로 무조건 **'documents'**로 고정됩니다.
                 - 따라서 미인증 유저가 다른 디렉토리에 접근하는 것을 원천 차단합니다.
+                
+                **파일 경로 형식:**
+                - documents/{timestamp}_{email}.{확장자}
+                - 예: documents/20260112143021_test@example.com.jpg
                 """
     )
     @ApiResponses({

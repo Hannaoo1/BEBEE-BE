@@ -10,13 +10,22 @@ import java.util.List;
 public interface OcrClient {
 
     /**
-     * 이미지 파일에서 텍스트를 추출하고 분석
+     * 이미지 파일에서 텍스트를 추출하고 분석 (레거시: 직접 파일 전송)
      * 
      * @param file 분석할 이미지 파일
      * @param role 사용자 역할 (HELPER 또는 DISABLED, null 가능)
      * @return OCR 분석 결과
      */
     OcrResult analyze(MultipartFile file, String role);
+
+    /**
+     * S3 URL의 이미지에서 텍스트를 추출 (신규: URL 기반 방식)
+     *
+     * @param fileUrl 분석할 S3 이미지 URL
+     * @param role    사용자 역할
+     * @return OCR 분석 결과
+     */
+    OcrResult extract(String fileUrl, String role);
 
     /**
      * OCR 분석 결과

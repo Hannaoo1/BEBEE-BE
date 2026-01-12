@@ -31,9 +31,9 @@ public class FileController implements FileSwagger {
     @PostMapping("/signup/presigned-url")
     public ResponseEntity<PresignedUrlResDTO> generateSignupPresignedUrl(
             @RequestBody SignupPresignedUrlReqDTO reqDTO) {
-        // 회원가입 시 문서 업로드를 위해 directory를 'documents/signup'으로 강제 고정
+        // 회원가입 시 문서 업로드를 위해 directory를 'documents'로 고정 (다른 파일들과 동일한 구조)
         GeneratePresignedUrlUseCase.Param param = new GeneratePresignedUrlUseCase.Param(
-                "documents/signup",
+                "documents",
                 reqDTO.email(),
                 reqDTO.originFileName(),
                 reqDTO.contentType());

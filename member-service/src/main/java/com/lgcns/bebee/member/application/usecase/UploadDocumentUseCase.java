@@ -51,42 +51,25 @@ public class UploadDocumentUseCase implements UseCase<UploadDocumentUseCase.Para
 
         log.info("문서 업로드 처리 중... memberName={}, role={}", member.getName(), member.getRole());
 
-        // 1. 파일 준비 (S3 URL이 있으면 다운로드, 없으면 기존 파일 사용)
-        MultipartFile fileToAnalyze;
+        // 1. 파일 URL 준비 (S3 URL이 있으면 그대로 사용, 없으면 업로드 후 URL 획득)
         String fileUrl;
+        DocumentVerificationService.AnalysisResult analysis;
 
         if (param.getFileUrl() != null && !param.getFileUrl().isBlank()) {
-            // S3 URL이 있는 경우: S3에서 다운로드
-            try {
-                java.net.URI uri = new java.net.URI(param.getFileUrl());
-                String path = uri.getPath();
-                String fileName = path.substring(path.lastIndexOf('/') + 1);
-                log.info("S3 파일 다운로드 시도: {}", fileName);
-            } catch (Exception e) {
-                log.info("S3 파일 다운로드 시도 (파일명 추출 실패): {}", param.getFileUrl());
-            }
-
-            fileToAnalyze = fileStorageClient.download(param.getFileUrl());
-            if (fileToAnalyze == null) {
-                throw DocumentErrors.FILE_UPLOAD_FAILED.toException();
-            }
+            // S3 URL이 있는 경우: 즉시 분석 (다운로드 없음)
+            log.info("S3 URL 기반 분석 시작: {}", param.getFileUrl());
             fileUrl = param.getFileUrl();
+            analysis = verificationService.analyze(fileUrl, member.getRole().name());
         } else {
-            // 로컬 파일인 경우: 업로드 후 URL 받기
-            log.info("로컬 파일 업로드 중...");
+            // 로컬 파일인 경우: 업로드 후 얻은 URL로 분석
+            log.info("로컬 파일 업로드 및 분석 중...");
             fileUrl = fileStorageClient.upload(param.getFile(), "documents");
             if (fileUrl == null || fileUrl.isBlank()) {
                 throw DocumentErrors.FILE_UPLOAD_FAILED.toException();
             }
-            fileToAnalyze = param.getFile();
+            // 업로드된 파일(MultipartFile)을 사용하여 분석
+            analysis = verificationService.analyze(param.getFile(), member.getRole().name());
         }
-
-        // 2. 위변조 분석 (Domain Service) - 실제 회원 정보 전달
-        DocumentVerificationService.AnalysisResult analysis = verificationService.analyze(
-                fileToAnalyze,
-                member.getRole().name(),
-                member.getName(),
-                member.getBirthDate());
 
         // 3. Document 조회 및 소유권 처리 (Domain Service)
         // 만약 프론트에서 보낸 documentId가 없거나, 소유자가 다르면 현재 회원의 전용 문서를 찾거나 생성함
