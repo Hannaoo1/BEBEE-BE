@@ -92,7 +92,7 @@ public class SignUpUseCase implements UseCase<SignUpUseCase.Param, SignUpUseCase
             MemberDisabilityCategory memberDisabilityCategory = MemberDisabilityCategory.create(
                     savedMember,
                     disabilityCategory,
-                    "1", // 기본 등급 (TODO: 프론트에서 받아오도록 수정 필요)
+                    params.getDisabilityGrade() != null ? params.getDisabilityGrade() : "1",
                     params.getDisabilityDescription() != null ? params.getDisabilityDescription() : "");
             memberDisabilityCategoryRepository.save(memberDisabilityCategory);
         }
@@ -142,8 +142,9 @@ public class SignUpUseCase implements UseCase<SignUpUseCase.Param, SignUpUseCase
         // HELPER용: 도움 유형 목록
         private final java.util.List<String> helpTypes;
 
-        // DISABLED용: 장애 유형 및 설명
+        // DISABLED용: 장애 유형, 등급 및 설명
         private final String disabilityType;
+        private final String disabilityGrade;       // "1" = 중증, "2" = 경증
         private final String disabilityDescription;
 
         // 문서 관련 (Step 5에서 업로드 및 분석 완료)

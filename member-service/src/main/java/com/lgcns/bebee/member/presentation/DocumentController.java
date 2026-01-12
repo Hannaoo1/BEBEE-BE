@@ -57,6 +57,10 @@ public class DocumentController implements DocumentSwagger {
                 
                 // memberId 없으면 → 분석만 수행 (5단계: 회원가입 전 문서 검증)
                 if (memberId == null) {
+                        // role 검증: 회원가입 전 문서 검증 시 필수
+                        if (role == null || role.isBlank()) {
+                                throw new IllegalArgumentException("회원가입 전 문서 검증 시 role은 필수입니다.");
+                        }
                         // SSRF 방지: S3 URL 패턴만 허용 (일관된 검증)
                         validateS3Url(fileUrl);
                         log.info("문서 분석 요청 (회원가입 전): fileUrl={}, role={}", maskUrl(fileUrl), role);
