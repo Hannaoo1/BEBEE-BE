@@ -77,11 +77,7 @@ public class ProfileInfoResDTO {
                                 .toList() : null,
                 result.getBadges() != null ?
                         result.getBadges().stream()
-                                .map(b -> new BadgeStatusDTO(
-                                        b.getDisabilityCategoryId(),
-                                        b.getCount(),
-                                        b.getBadgeCode()
-                                ))
+                                .map(BadgeStatusDTO::from)
                                 .toList() : null,
                 result.getDocuments() != null ?
                         result.getDocuments().stream()

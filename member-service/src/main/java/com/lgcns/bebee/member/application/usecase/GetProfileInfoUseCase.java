@@ -3,16 +3,17 @@ package com.lgcns.bebee.member.application.usecase;
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
 import com.lgcns.bebee.common.util.AgeGroupCalculator;
-import com.lgcns.bebee.member.domain.entity.Badge;
 import com.lgcns.bebee.member.domain.entity.DocumentVerification;
 import com.lgcns.bebee.member.domain.entity.Member;
 import com.lgcns.bebee.member.domain.entity.MemberDisabilityCategory;
 import com.lgcns.bebee.member.domain.entity.sync.MemberHoneyWalletSync;
-import com.lgcns.bebee.member.domain.entity.vo.DisabilityCategoryType;
 import com.lgcns.bebee.member.domain.entity.vo.Gender;
 import com.lgcns.bebee.member.domain.entity.vo.ReviewKeywordCount;
 import com.lgcns.bebee.member.domain.entity.vo.Role;
-import com.lgcns.bebee.member.domain.repository.*;
+import com.lgcns.bebee.member.domain.repository.DocumentVerificationRepository;
+import com.lgcns.bebee.member.domain.repository.MemberDisabilityCategoryRepository;
+import com.lgcns.bebee.member.domain.repository.MemberHelpCategoryRepository;
+import com.lgcns.bebee.member.domain.service.BadgeReader;
 import com.lgcns.bebee.member.domain.service.HoneyWalletReader;
 import com.lgcns.bebee.member.domain.service.MemberManagement;
 import com.lgcns.bebee.member.domain.service.ReviewReader;
@@ -23,9 +24,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,7 +35,7 @@ public class GetProfileInfoUseCase implements UseCase<GetProfileInfoUseCase.Para
     private final MemberHelpCategoryRepository memberHelpCategoryRepository;
     private final MemberDisabilityCategoryRepository memberDisabilityCategoryRepository;
     private final DocumentVerificationRepository documentVerificationRepository;
-    private final BadgeRepository badgeRepository;
+    private final BadgeReader badgeReader;
     private final HoneyWalletReader honeyWalletReader;
     private final ReviewReader reviewReader;
 
@@ -49,7 +48,7 @@ public class GetProfileInfoUseCase implements UseCase<GetProfileInfoUseCase.Para
         Long honey = null;
         List<ReviewKeywordCount> reviews = null;
 
-        List<BadgeStatusInfo> badges = null;
+        List<BadgeReader.BadgeStatusInfo> badges = null;
         List<DocumentVerification> documents = null;
 
         String disabilityType = null;
@@ -67,7 +66,7 @@ public class GetProfileInfoUseCase implements UseCase<GetProfileInfoUseCase.Para
 
         if (member.getRole().equals(Role.HELPER)) {
             // 도우미: badges, documents 조회
-            badges = getBadgeStatusList(member.getId());
+            badges = badgeReader.getBadgeStatusList(member.getId());
             documents = documentVerificationRepository.findByMemberId(member.getId());
 
         } else if (member.getRole().equals(Role.DISABLED)) {
@@ -94,47 +93,10 @@ public class GetProfileInfoUseCase implements UseCase<GetProfileInfoUseCase.Para
         );
     }
 
-    // 도우미의 장애유형별 뱃지 상태 조회
-    private List<BadgeStatusInfo> getBadgeStatusList(Long helperId) {
-        List<Badge> badges = badgeRepository.findByHelperId(helperId);
-
-        Map<Long, Badge> badgeMap = badges.stream()
-                .collect(Collectors.toMap(Badge::getDisabilityCategoryId, badge -> badge));
-
-        List<BadgeStatusInfo> badgeStatusList = new ArrayList<>();
-
-        for (DisabilityCategoryType category : DisabilityCategoryType.values()) {
-            Badge badge = badgeMap.get(category.getId());
-            if (badge != null) {
-                badgeStatusList.add(new BadgeStatusInfo(
-                        badge.getDisabilityCategoryId(),
-                        badge.getCompletionCount(),
-                        badge.getBadgeCode()
-                ));
-            } else {
-                badgeStatusList.add(new BadgeStatusInfo(
-                        category.getId(),
-                        0,
-                        null
-                ));
-            }
-        }
-
-        return badgeStatusList;
-    }
-
     @Getter
     @RequiredArgsConstructor
     public static class Param implements Params {
         private final Long memberId;
-    }
-
-    @Getter
-    @AllArgsConstructor
-    public static class BadgeStatusInfo {
-        private final Long disabilityCategoryId;
-        private final Integer count;
-        private final String badgeCode;
     }
 
     @Getter
@@ -152,7 +114,7 @@ public class GetProfileInfoUseCase implements UseCase<GetProfileInfoUseCase.Para
         private Long honey;
         private List<ReviewKeywordCount> reviews;
         /* 도우미 전용 정보 */
-        private List<BadgeStatusInfo> badges;
+        private List<BadgeReader.BadgeStatusInfo> badges;
         private List<DocumentVerification> documents;
         /* 장애인 전용 정보 */
         private String disabilityType;
@@ -163,7 +125,7 @@ public class GetProfileInfoUseCase implements UseCase<GetProfileInfoUseCase.Para
                 Long honey,
                 List<String> helpCategories,
                 List<ReviewKeywordCount> reviews,
-                List<BadgeStatusInfo> badges,
+                List<BadgeReader.BadgeStatusInfo> badges,
                 List<DocumentVerification> documents,
                 String disabilityType,
                 String disabilityDescription
