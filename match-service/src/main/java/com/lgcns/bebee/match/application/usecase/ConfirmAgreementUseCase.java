@@ -11,6 +11,7 @@ import com.lgcns.bebee.match.domain.entity.Agreement;
 import com.lgcns.bebee.match.domain.entity.Match;
 import com.lgcns.bebee.match.domain.entity.Post;
 import com.lgcns.bebee.match.domain.entity.PostImage;
+import com.lgcns.bebee.match.domain.entity.vo.PostStatus;
 import com.lgcns.bebee.match.domain.repository.MatchRepository;
 import com.lgcns.bebee.match.domain.service.AgreementReader;
 import com.lgcns.bebee.match.domain.service.PostManager;
@@ -60,6 +61,8 @@ public class ConfirmAgreementUseCase implements UseCase<ConfirmAgreementUseCase.
                 agreement
         );
         Match savedMatch = matchRepository.save(match);
+
+        post.updateStatus(PostStatus.MATCHED);
 
         eventPublisher.publish(new AgreementConfirmedEvent(
                         param.chatRoomId,
