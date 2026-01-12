@@ -52,20 +52,29 @@ public class GetHelperBadgesUseCase implements UseCase<GetHelperBadgesUseCase.Pa
         Map<Long, Badge> badgeMap = badges.stream()
                 .collect(Collectors.toMap(Badge::getDisabilityCategoryId, badge -> badge));
 
-        // 존재하는 뱃지와 없는 카테고리 ID 분리
-        List<Badge> existingBadges = new ArrayList<>();
-        List<Long> missingCategoryIds = new ArrayList<>();
+        // 각 카테고리별 뱃지 상태 생성
+        List<BadgeStatusInfo> badgeStatusList = new ArrayList<>();
 
         for (DisabilityCategoryType category : DisabilityCategoryType.values()) {
             Badge badge = badgeMap.get(category.getId());
             if (badge != null) {
-                existingBadges.add(badge);
+                // 뱃지가 있는 경우
+                badgeStatusList.add(new BadgeStatusInfo(
+                        badge.getDisabilityCategoryId(),
+                        badge.getCompletionCount(),
+                        badge.getBadgeCode()
+                ));
             } else {
-                missingCategoryIds.add(category.getId());
+                // 뱃지가 없는 경우 (count=0, badgeCode=null)
+                badgeStatusList.add(new BadgeStatusInfo(
+                        category.getId(),
+                        0,
+                        null
+                ));
             }
         }
 
-        return new Result(existingBadges, missingCategoryIds);
+        return new Result(badgeStatusList);
     }
 
     @Getter
@@ -87,8 +96,15 @@ public class GetHelperBadgesUseCase implements UseCase<GetHelperBadgesUseCase.Pa
 
     @Getter
     @AllArgsConstructor
+    public static class BadgeStatusInfo {
+        private final Long disabilityCategoryId;
+        private final Integer count;
+        private final String badgeCode;
+    }
+
+    @Getter
+    @AllArgsConstructor
     public static class Result {
-        private final List<Badge> existingBadges;
-        private final List<Long> missingCategoryIds;
+        private final List<BadgeStatusInfo> badgeStatusList;
     }
 }
