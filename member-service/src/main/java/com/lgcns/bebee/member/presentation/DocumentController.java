@@ -61,6 +61,9 @@ public class DocumentController implements DocumentSwagger {
                         if (role == null || role.isBlank()) {
                                 throw new IllegalArgumentException("회원가입 전 문서 검증 시 role은 필수입니다.");
                         }
+                        if (!java.util.Set.of("HELPER", "DISABLED").contains(role.toUpperCase())) {
+                                throw new IllegalArgumentException("role은 HELPER 또는 DISABLED만 허용됩니다.");
+                        }
                         // SSRF 방지: S3 URL 패턴만 허용 (일관된 검증)
                         validateS3Url(fileUrl);
                         log.info("문서 분석 요청 (회원가입 전): fileUrl={}, role={}", maskUrl(fileUrl), role);

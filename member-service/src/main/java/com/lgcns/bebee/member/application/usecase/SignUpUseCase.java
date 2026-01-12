@@ -99,10 +99,15 @@ public class SignUpUseCase implements UseCase<SignUpUseCase.Param, SignUpUseCase
 
         // 문서 검증 정보 저장 (Step 5에서 이미 분석 완료됨)
         if (params.getFileUrl() != null && !params.getFileUrl().isBlank()) {
+            // role 검증
+            if (!java.util.Set.of("HELPER", "DISABLED").contains(params.getRole())) {
+                throw new IllegalArgumentException("문서 저장 시 유효한 role이 필요합니다: " + params.getRole());
+            }
+            
             log.info("문서 검증 정보 저장 시작: fileUrl={}, systemFlag={}", params.getFileUrl(), params.getSystemFlag());
             
             // Document 생성
-            String docCode = "DOC_" + System.currentTimeMillis();
+            String docCode = "DOC_" + java.util.UUID.randomUUID().toString().substring(0, 8);
             String docNameKo = "HELPER".equals(params.getRole()) ? "활동지원사 교육 이수증" : "장애인 복지카드";
             Document document = Document.create(
                     params.getRole(),
