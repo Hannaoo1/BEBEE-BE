@@ -46,11 +46,11 @@ public class ProfileInfoResDTO {
     private List<ReviewKeywordDTO> reviews;
 
     // 도우미 전용 정보
+    @Schema(description = "뱃지 정보 (도우미 전용)")
+    private List<BadgeStatusDTO> badges;
+
     @Schema(description = "제출한 경력 관련 서류 목록 (도우미 전용)")
     private List<DocumentVerificationResDTO> documents;
-
-    @Schema(description = "뱃지 정보 (추후 구현)")
-    private Object badges;
 
     // 장애인 전용 정보
     @Schema(description = "장애 유형 (장애인 전용)", example = "시각장애")
@@ -75,11 +75,18 @@ public class ProfileInfoResDTO {
                         result.getReviews().stream()
                                 .map(r -> new ReviewKeywordDTO(r.keywordId(), r.count()))
                                 .toList() : null,
+                result.getBadges() != null ?
+                        result.getBadges().stream()
+                                .map(b -> new BadgeStatusDTO(
+                                        b.getDisabilityCategoryId(),
+                                        b.getCount(),
+                                        b.getBadgeCode()
+                                ))
+                                .toList() : null,
                 result.getDocuments() != null ?
                         result.getDocuments().stream()
                                 .map(DocumentVerificationResDTO::from)
                                 .toList() : null,
-                result.getBadges(),
                 result.getDisabilityType(),
                 result.getDisabilityDescription()
         );

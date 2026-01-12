@@ -8,7 +8,7 @@ import lombok.Getter;
 
 // 뱃지 상태 DTO
 @Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 @Schema(description = "뱃지 상태 DTO")
 public class BadgeStatusDTO {
 
