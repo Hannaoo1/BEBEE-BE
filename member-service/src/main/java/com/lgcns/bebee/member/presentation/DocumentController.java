@@ -16,7 +16,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 문서 검증 API 컨트롤러
@@ -54,7 +57,7 @@ public class DocumentController implements DocumentSwagger {
                 
                 // memberId 없으면 → 분석만 수행 (5단계: 회원가입 전 문서 검증)
                 if (memberId == null) {
-                        log.info("문서 분석 요청 (회원가입 전): fileUrl={}, role={}", fileUrl, role);
+                        log.info("문서 분석 요청 (회원가입 전): fileUrl={}, role={}", maskUrl(fileUrl), role);
                         
                         // UseCase 호출 (검증은 UseCase 내부 Param.validate()에서 수행)
                         AnalyzeDocumentUseCase.Param param = new AnalyzeDocumentUseCase.Param(fileUrl, role);
@@ -179,13 +182,45 @@ public class DocumentController implements DocumentSwagger {
         }
 
         /**
-         * S3 URL 유효성 검증 (SSRF 방지)
+         * 허용된 호스트 패턴 목록
+         */
+        private static final Set<String> ALLOWED_HOST_SUFFIXES = Set.of(
+                ".s3.amazonaws.com",
+                ".s3.ap-northeast-2.amazonaws.com",
+                ".cloudfront.net"
+        );
+        private static final Set<String> ALLOWED_EXACT_HOSTS = Set.of(
+                "images.be-bee.link"
+        );
+
+        /**
+         * S3 URL 유효성 검증 (SSRF 방지) - 호스트 기반 검증
          */
         private void validateS3Url(String url) {
-                if (!url.startsWith("https://") ||
-                        (!url.contains(".s3.") && !url.contains("s3.amazonaws.com") &&
-                         !url.contains("cloudfront.net") && !url.contains("images.be-bee.link"))) {
+                if (url == null || !url.startsWith("https://")) {
                         log.warn("허용되지 않은 URL: {}", maskUrl(url));
+                        throw new IllegalArgumentException("허용되지 않은 URL 형식입니다.");
+                }
+
+                try {
+                        URL parsedUrl = new URL(url);
+                        String host = parsedUrl.getHost().toLowerCase();
+
+                        // 정확히 일치하는 호스트 확인
+                        if (ALLOWED_EXACT_HOSTS.contains(host)) {
+                                return;
+                        }
+
+                        // suffix 패턴 확인 (호스트가 해당 suffix로 끝나는지)
+                        boolean isAllowed = ALLOWED_HOST_SUFFIXES.stream()
+                                .anyMatch(host::endsWith);
+
+                        if (!isAllowed) {
+                                log.warn("허용되지 않은 호스트: {}", host);
+                                throw new IllegalArgumentException("허용되지 않은 URL 형식입니다.");
+                        }
+                } catch (MalformedURLException e) {
+                        log.warn("잘못된 URL 형식: {}", maskUrl(url));
                         throw new IllegalArgumentException("허용되지 않은 URL 형식입니다.");
                 }
         }
