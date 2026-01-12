@@ -4,6 +4,7 @@ import com.lgcns.bebee.common.data.event.match.AgreementConfirmedEvent;
 import com.lgcns.bebee.common.data.event.match.AgreementCreatedEvent;
 import com.lgcns.bebee.common.data.event.match.AgreementRefusedEvent;
 import com.lgcns.bebee.common.data.event.match.PostCreatedEvent;
+import com.lgcns.bebee.common.data.event.EngagementCompletedEvent;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -15,6 +16,7 @@ public enum EventType {
     AGREEMENT_REFUSED("AgreementRefusedEvent", AgreementRefusedEvent.class),
 
     POST_CREATED("PostCreatedEvent", PostCreatedEvent.class),
+    ENGAGEMENT_COMPLETED("EngagementCompletedEvent", EngagementCompletedEvent.class),
     ;
 
     private final String eventName;

@@ -1,12 +1,12 @@
 -- ========================================
--- V23: Badge 더미 데이터
+-- V12: Badge 더미 데이터
 -- ========================================
 -- 뱃지 레벨 기준:
 -- 0~4회: NULL (뱃지 없음)
 -- 5~9회: LEVEL_1 (숙련자)
 -- 10회 이상: LEVEL_2 (전문가)
 --
--- 기존 도우미 (member_sync):
+-- 기존 도우미 (member):
 -- 700: 강지훈, 800: 윤서연, 900: 임동현, 1000: 한미래
 
 INSERT INTO badge (badge_id, helper_id, disability_category_id, completion_count, badge_code, created_at, updated_at)

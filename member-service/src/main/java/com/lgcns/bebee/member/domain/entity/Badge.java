@@ -1,4 +1,4 @@
-package com.lgcns.bebee.match.domain.entity;
+package com.lgcns.bebee.member.domain.entity;
 
 import com.lgcns.bebee.common.data.domain.BaseTimeEntity;
 import io.hypersistence.utils.hibernate.id.Tsid;
@@ -45,7 +45,7 @@ public class Badge extends BaseTimeEntity {
         badge.badgeCode = null;
         return badge;
     }
-    
+
     public void incrementCompletionCount() {
         this.completionCount++;
         this.updateBadgeCode();
@@ -62,6 +62,3 @@ public class Badge extends BaseTimeEntity {
         }
     }
 }
-
-
-
