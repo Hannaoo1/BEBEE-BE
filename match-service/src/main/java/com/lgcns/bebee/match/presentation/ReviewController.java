@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 // 리뷰 API Controller
 @RestController
+@RequestMapping("/reviews")
 @RequiredArgsConstructor
 public class ReviewController implements ReviewSwagger {
 
@@ -22,7 +23,7 @@ public class ReviewController implements ReviewSwagger {
 
     // 리뷰 키워드 목록 조회
     @Override
-    @GetMapping("/reviews/keywords")
+    @GetMapping("/keywords")
     public ResponseEntity<ReviewKeywordResDTO> getReviewKeywordsList(
             @CurrentMember Long currentMemberId
     ) {
@@ -39,13 +40,13 @@ public class ReviewController implements ReviewSwagger {
 
     // 리뷰 작성
     @Override
-    @PostMapping("/matches/{matchId}/reviews")
+    @PostMapping("/{matchId}")
     public ResponseEntity<ReviewCreateResDTO> createReview(
-            @PathVariable Long matchId,
+            @PathVariable String matchId,
             @CurrentMember Long currentMemberId,
             @Valid @RequestBody ReviewCreateReqDTO reqDTO
     ) {
-        CreateReviewUseCase.Param param = reqDTO.toParam(matchId, currentMemberId);
+        CreateReviewUseCase.Param param = reqDTO.toParam(Long.parseLong(matchId), currentMemberId);
 
         CreateReviewUseCase.Result result = createReviewUseCase.execute(param);
 
