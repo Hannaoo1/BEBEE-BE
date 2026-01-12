@@ -68,7 +68,7 @@ public class HttpOcrClientImpl implements OcrClient {
     @Override
     public OcrResult extract(String fileUrl, String role) {
         try {
-            log.debug("OCR 추출 요청 (URL): {}, role: {}", fileUrl, role);
+            log.debug("OCR 추출 요청 (URL): {}, role: {}", maskUrl(fileUrl), role);
 
             // S3 이미지 URL과 사용자 역할을 JSON 바디로 전송
             Map<String, String> requestBody = Map.of(
@@ -93,6 +93,15 @@ public class HttpOcrClientImpl implements OcrClient {
             log.error("OCR 추출 중 예외 발생 (URL)", e);
             throw DocumentErrors.OCR_FAILED.toException();
         }
+    }
+
+    /**
+     * URL 마스킹 (presigned URL의 민감 정보 로깅 방지)
+     */
+    private String maskUrl(String url) {
+        if (url == null) return null;
+        int queryIndex = url.indexOf('?');
+        return queryIndex > 0 ? url.substring(0, queryIndex) + "?[MASKED]" : url;
     }
 
     private OcrResult toOcrResult(OcrResponse response) {

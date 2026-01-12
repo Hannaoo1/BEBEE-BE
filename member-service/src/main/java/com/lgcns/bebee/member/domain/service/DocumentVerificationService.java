@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -32,11 +34,12 @@ public class DocumentVerificationService {
      * @return 분석 결과
      */
     public AnalysisResult analyze(String fileUrl, String role) {
-        log.info("문서 URL 분석 시작: {}", fileUrl);
+        log.info("문서 URL 분석 시작: {}", maskUrl(fileUrl));
 
+        int baseScore = calcBaseScoreFromUrl(fileUrl);
         int exifScore = calcExifScore(fileUrl);
         int ocrScore = calcOcrScore(fileUrl, role);
-        int forgeryScore = calcForgeryScore(100, exifScore, ocrScore);
+        int forgeryScore = calcForgeryScore(baseScore, exifScore, ocrScore);
         String systemFlag = decideSystemFlag(forgeryScore);
 
         return new AnalysisResult(exifScore, ocrScore, forgeryScore, systemFlag);
@@ -88,14 +91,74 @@ public class DocumentVerificationService {
     }
 
     /**
+     * URL에서 확장자 검증하여 기본 점수 계산
+     */
+    private int calcBaseScoreFromUrl(String fileUrl) {
+        int score = 100;
+
+        // URL에서 확장자 검증
+        String lower = fileUrl.toLowerCase();
+        // 쿼리스트링 제거 후 확장자 확인
+        int queryIndex = lower.indexOf('?');
+        String pathPart = queryIndex > 0 ? lower.substring(0, queryIndex) : lower;
+
+        if (!(pathPart.endsWith(".jpg") || pathPart.endsWith(".jpeg")
+                || pathPart.endsWith(".png") || pathPart.endsWith(".pdf"))) {
+            score -= 40;
+        }
+
+        return clamp(score);
+    }
+
+    /**
+     * S3 URL 유효성 검증 (SSRF 방지)
+     */
+    private boolean isValidS3Url(String url) {
+        if (url == null || url.isBlank()) {
+            return false;
+        }
+        // S3 버킷 URL 또는 CloudFront URL 패턴만 허용
+        return url.matches("^https://[\\w.-]+\\.s3\\.[\\w-]+\\.amazonaws\\.com/.*$")
+                || url.matches("^https://[\\w.-]+\\.cloudfront\\.net/.*$")
+                || url.matches("^https://images\\.be-bee\\.link/.*$");
+    }
+
+    /**
+     * URL 마스킹 (민감 정보 로깅 방지)
+     */
+    private String maskUrl(String url) {
+        if (url == null) return null;
+        int queryIndex = url.indexOf('?');
+        return queryIndex > 0 ? url.substring(0, queryIndex) + "?[MASKED]" : url;
+    }
+
+    /**
      * EXIF 메타데이터 기반 점수 계산 (URL 방식)
      */
     private int calcExifScore(String fileUrl) {
-        try (InputStream is = new java.net.URL(fileUrl).openStream()) {
-            return extractExifScore(is);
+        // SSRF 방지: S3 URL 패턴만 허용
+        if (!isValidS3Url(fileUrl)) {
+            log.warn("유효하지 않은 S3 URL: {}", maskUrl(fileUrl));
+            return 50;
+        }
+
+        HttpURLConnection conn = null;
+        try {
+            conn = (HttpURLConnection) new URI(fileUrl).toURL().openConnection();
+            conn.setConnectTimeout(5000);  // 연결 타임아웃 5초
+            conn.setReadTimeout(10000);    // 읽기 타임아웃 10초
+            conn.setRequestMethod("GET");
+
+            try (InputStream is = conn.getInputStream()) {
+                return extractExifScore(is);
+            }
         } catch (Exception e) {
             log.error("URL 기반 EXIF 분석 중 오류 발생: {}", e.getMessage());
             return 50;
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
         }
     }
 
