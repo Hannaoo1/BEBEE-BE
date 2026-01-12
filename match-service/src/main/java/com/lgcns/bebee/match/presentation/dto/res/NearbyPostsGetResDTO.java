@@ -14,6 +14,7 @@ public record NearbyPostsGetResDTO(
                 .stream()
                 .map(postDTO -> new NearbyPostDTO(
                         postDTO.getPostId(),
+                        postDTO.getType(),
                         postDTO.getTitle(),
                         postDTO.getLegalDongName(),
                         postDTO.getHelpCategoryIds(),
@@ -29,6 +30,7 @@ public record NearbyPostsGetResDTO(
 
     public record NearbyPostDTO(
             Long postId,
+            String type,
             String title,
             String legalDongName,
             List<Long> helpCategories,
