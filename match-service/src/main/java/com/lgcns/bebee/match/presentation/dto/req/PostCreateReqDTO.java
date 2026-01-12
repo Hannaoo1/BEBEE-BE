@@ -79,14 +79,14 @@ public record PostCreateReqDTO(
                 example = "15000",
                 requiredMode = Schema.RequiredMode.REQUIRED
         )
-        Integer unitHoney,
+        Long unitHoney,
 
         @Schema(
                 description = "총 꿀 (전체 보상 금액)",
                 example = "150000",
                 requiredMode = Schema.RequiredMode.REQUIRED
         )
-        Integer totalHoney,
+        Long totalHoney,
 
         @Schema(
                 description = "지역명",

@@ -1,5 +1,6 @@
 package com.lgcns.bebee.match.presentation.swagger;
 
+import com.lgcns.bebee.common.annotation.CurrentMember;
 import com.lgcns.bebee.match.presentation.dto.req.HelperApplyReqDTO;
 import com.lgcns.bebee.match.presentation.dto.res.HelperApplicantsByPostGetResDTO;
 import com.lgcns.bebee.match.presentation.dto.res.HelperApplicationPostsGetResDTO;
@@ -31,7 +32,6 @@ public interface HelperApplicationSwagger {
                                             description = "나눔으로 지원할 경우 isVolunteer = true 로 설정",
                                             value = """
                                                 {
-                                                  "memberId": "101",
                                                   "postId": "1001",
                                                   "isVolunteer": false
                                                 }
@@ -48,7 +48,11 @@ public interface HelperApplicationSwagger {
             @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음"
             )
     })
-    ResponseEntity<Void> apply(HelperApplyReqDTO request);
+    ResponseEntity<Void> apply(
+            @Parameter(hidden = true)
+            @CurrentMember Long memberId,
+            HelperApplyReqDTO request
+    );
 
     @Operation(
             summary = "본인 작성 게시글 목록 조회",
@@ -99,13 +103,9 @@ public interface HelperApplicationSwagger {
             @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음")
     })
     ResponseEntity<HelperApplicationPostsGetResDTO> getHelperApplicationPosts(
-            @Parameter(
-                    description = "현재 로그인한 회원 ID(임시, 나중에 토큰으로 처리)",
-                    required = true,
-                    example = "100"
-            )
-            String memberId
-    );
+            @Parameter(hidden = true)
+            @CurrentMember Long memberId
+            );
 
     @Operation(
             summary = "특정 게시글의 지원자 목록 조회",
@@ -156,11 +156,7 @@ public interface HelperApplicationSwagger {
                     example = "1001"
             )
             String postId,
-            @Parameter(
-                    description = "현재 로그인한 회원 ID(임시, 나중에 토큰으로 처리)",
-                    required = true,
-                    example = "100"
-            )
-            String memberId
+            @Parameter(hidden = true)
+            @CurrentMember Long memberId
     );
 }

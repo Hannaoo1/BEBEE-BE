@@ -1,12 +1,15 @@
 package com.lgcns.bebee.member.presentation;
 
 import com.lgcns.bebee.common.annotation.CurrentMember;
+import com.lgcns.bebee.member.application.usecase.GetProfileInfoUseCase;
 import com.lgcns.bebee.member.application.usecase.ReadMemberProfileUseCase;
 import com.lgcns.bebee.member.presentation.dto.res.MemberInfoResDTO;
+import com.lgcns.bebee.member.presentation.dto.res.ProfileInfoResDTO;
 import com.lgcns.bebee.member.presentation.swagger.MemberSwagger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController implements MemberSwagger {
 
     private final ReadMemberProfileUseCase readMemberProfileUseCase;
+    private final GetProfileInfoUseCase getProfileInfoUseCase;
 
     @Override
     @GetMapping("/me")
@@ -31,6 +35,8 @@ public class MemberController implements MemberSwagger {
                 .role(result.getMember().getRole().name())
                 .phoneNumber(result.getMember().getPhoneNumber())
                 .introduction(result.getMember().getIntroduction() != null ? result.getMember().getIntroduction() : "")
+                .latitude(result.getMember().getLatitude())
+                .longitude(result.getMember().getLongitude())
                 .profileImageUrl(
                         result.getMember().getProfileImageUrl() != null ? result.getMember().getProfileImageUrl() : "")
                 .sweetness(result.getMember().getSweetness())
@@ -56,5 +62,26 @@ public class MemberController implements MemberSwagger {
         }
 
         return ResponseEntity.ok(builder.build());
+    }
+
+    @Override
+    @GetMapping("/profile/me")
+    public ResponseEntity<ProfileInfoResDTO> getMyProfile(@CurrentMember Long memberId) {
+        GetProfileInfoUseCase.Param param = new GetProfileInfoUseCase.Param(memberId);
+        GetProfileInfoUseCase.Result result = getProfileInfoUseCase.execute(param);
+
+        return ResponseEntity.ok(ProfileInfoResDTO.from(result));
+    }
+
+    @Override
+    @GetMapping("/profile/{memberId}")
+    public ResponseEntity<ProfileInfoResDTO> getMemberProfile(
+            @CurrentMember Long currentMemberId,
+            @PathVariable Long memberId
+    ) {
+        GetProfileInfoUseCase.Param param = new GetProfileInfoUseCase.Param(memberId);
+        GetProfileInfoUseCase.Result result = getProfileInfoUseCase.execute(param);
+
+        return ResponseEntity.ok(ProfileInfoResDTO.from(result));
     }
 }

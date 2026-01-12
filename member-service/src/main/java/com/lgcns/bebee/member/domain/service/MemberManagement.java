@@ -61,7 +61,7 @@ public class MemberManagement {
             BigDecimal latitude,
             BigDecimal longitude,
             String districtCode) {
-        passwordPolicyValidator.validate(rawPassword);
+//        passwordPolicyValidator.validate(rawPassword);
         String encodedPassword = passwordEncoder.encode(rawPassword);
 
         return Member.create(

@@ -6,6 +6,7 @@ import com.lgcns.bebee.match.presentation.dto.req.AgreementRefuseReqDTO;
 import com.lgcns.bebee.match.presentation.dto.req.AgreementConfirmReqDTO;
 import com.lgcns.bebee.match.presentation.dto.res.AgreementConfirmResDTO;
 import com.lgcns.bebee.match.presentation.dto.res.AgreementCreateResDTO;
+import com.lgcns.bebee.match.presentation.dto.res.AgreementGetResDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -79,7 +80,8 @@ public interface AgreementSwagger {
                                                             "endTime": "12:00:00"
                                                         }
                                                     },
-                                                    "chatroomId": "1"
+                                                    "chatroomId": "1",
+                                                    "createdAt": "2026-01-15T09:30:00"
                                                 }
                                                 """
                                 ),
@@ -116,7 +118,9 @@ public interface AgreementSwagger {
                                                                  }
                                                              ]
                                                          },
-                                                         "chatroomId": "1"
+                                                         "chatroomId": "1",
+                                                         "chatId":"1",
+                                                         "createdAt":"2026-01-15T09:30:00"
                                                      }
                                                 """
                                     )
@@ -159,7 +163,9 @@ public interface AgreementSwagger {
                                         value = """
                                                 {
                                                   "disabledId":"100",
-                                                  "chatroomId":"1"
+                                                  "chatroomId":"1",
+                                                  "chatId":"1",
+                                                  "createdAt":"2026-01-15T09:30:00"
                                                 }
                                                 """
                                 )
@@ -222,7 +228,9 @@ public interface AgreementSwagger {
                                                     "disabledId": "100",
                                                     "postId": "1001",
                                                     "title": "식사 보조 도우미분 구해요",
-                                                    "chatroomId": "1"
+                                                    "chatroomId": "1",
+                                                    "chatId":"1",
+                                                    "createdAt":"2026-01-15T09:30:00"
                                                 }
                                                 """
                                 )
@@ -230,5 +238,102 @@ public interface AgreementSwagger {
                     )
             )
             AgreementConfirmReqDTO request
+    );
+
+    @Operation(
+            summary = "매칭 확인서 조회",
+            description = "매칭 확인서의 상세 정보를 조회합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "매칭 확인서 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = AgreementGetResDTO.class),
+                            examples = {
+                                @ExampleObject(
+                                        name = "하루도움 매칭 확인서 조회 응답 예시",
+                                        description = "DAY 타입의 매칭 확인서 조회 결과",
+                                        value = """
+                                                {
+                                                    "agreementId": "791168241386394999",
+                                                    "helpType": "DAY",
+                                                    "date": "2025-12-28",
+                                                    "startDate": null,
+                                                    "endDate": null,
+                                                    "schedules": [
+                                                        {
+                                                            "dayOfWeek": "SUNDAY",
+                                                            "startTime": "10:00:00",
+                                                            "endTime": "12:00:00"
+                                                        }
+                                                    ],
+                                                    "unitHoney": 200,
+                                                    "totalHoney": 200,
+                                                    "otherId": "700",
+                                                    "otherProfileImageUrl": "https://example.com/profile/700.jpg",
+                                                    "otherNickname": "도움이",
+                                                    "otherGender": "MALE",
+                                                    "otherAgeGroup": 20
+                                                }
+                                                """
+                                ),
+                                @ExampleObject(
+                                        name = "지속도움 매칭 확인서 조회 응답 예시",
+                                        description = "TERM 타입의 매칭 확인서 조회 결과",
+                                        value = """
+                                                {
+                                                    "agreementId": "791168241386394999",
+                                                    "helpType": "TERM",
+                                                    "date": null,
+                                                    "startDate": "2026-01-01",
+                                                    "endDate": "2026-01-31",
+                                                    "schedules": [
+                                                        {
+                                                            "dayOfWeek": "MONDAY",
+                                                            "startTime": "09:00:00",
+                                                            "endTime": "11:00:00"
+                                                        },
+                                                        {
+                                                            "dayOfWeek": "WEDNESDAY",
+                                                            "startTime": "14:00:00",
+                                                            "endTime": "16:00:00"
+                                                        }
+                                                    ],
+                                                    "unitHoney": 200,
+                                                    "totalHoney": 1200,
+                                                    "otherId": "100",
+                                                    "otherProfileImageUrl": "https://example.com/profile/100.jpg",
+                                                    "otherNickname": "받는이",
+                                                    "otherGender": "FEMALE",
+                                                    "otherAgeGroup": 30
+                                                }
+                                                """
+                                )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "잘못된 요청",
+                    content = @Content(mediaType = "application/json")
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "리소스를 찾을 수 없음",
+                    content = @Content(mediaType = "application/json")
+            )
+    })
+    ResponseEntity<AgreementGetResDTO> getAgreement(
+            @Parameter(hidden = true)
+            @CurrentMember Long memberId,
+
+            @Parameter(
+                    description = "조회할 매칭 확인서 ID",
+                    required = true,
+                    example = "791168241386394999"
+            )
+            String agreementId
     );
 }

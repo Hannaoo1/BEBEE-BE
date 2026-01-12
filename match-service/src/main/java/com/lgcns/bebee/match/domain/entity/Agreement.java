@@ -14,10 +14,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.lgcns.bebee.match.common.exception.MatchErrors.ALREADY_CONFIRMED_AGREEMENT;
@@ -31,7 +28,7 @@ public class Agreement extends BaseTimeEntity {
     @Column(name = "agreement_id")
     private Long id;
 
-    @Column(nullable = false)
+    @Column
     private Long postId;
 
     @Column(nullable = false)
@@ -41,10 +38,10 @@ public class Agreement extends BaseTimeEntity {
     private Long helperId;
 
     @Column(nullable = false)
-    private Integer unitHoney;
+    private Long unitHoney;
 
     @Column(nullable = false)
-    private Integer totalHoney;
+    private Long totalHoney;
 
     @Column(nullable = false, length = 50)
     private String region;
@@ -55,12 +52,6 @@ public class Agreement extends BaseTimeEntity {
     @Column(nullable = false)
     private LocalDate confirmationDate;
 
-    @Column
-    private Boolean isDayComplete = Boolean.FALSE;
-
-    @Column
-    private Boolean isTermComplete = Boolean.FALSE;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AgreementStatus status = AgreementStatus.BEFORE;
@@ -69,7 +60,7 @@ public class Agreement extends BaseTimeEntity {
     @org.hibernate.annotations.BatchSize(size = 10)
     private List<AgreementHelpCategory> helpCategories= new ArrayList<>();
 
-    @OneToOne(mappedBy = "agreement", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "agreement", cascade = CascadeType.ALL)
     private AgreementPeriod period;
 
     @OneToMany(mappedBy = "agreement", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -85,16 +76,16 @@ public class Agreement extends BaseTimeEntity {
             Long helperId,
             EngagementType type,
             Boolean isVolunteer,
-            Integer unitHoney,
-            Integer totalHoney,
+            Long unitHoney,
+            Long totalHoney,
             String region,
             DayEngagementTimeDTO dayTime,
             TermEngagementTimeDTO termTime,
             List<Long> helpCategoryIds
     ) {
         if (isVolunteer) {
-            unitHoney = 0;
-            totalHoney = 0;
+            unitHoney = 0L;
+            totalHoney = 0L;
         }
 
         Agreement agreement = new Agreement();
@@ -108,8 +99,7 @@ public class Agreement extends BaseTimeEntity {
         agreement.region = region;
         agreement.confirmationDate = LocalDate.now();
         agreement.status = AgreementStatus.BEFORE;
-        agreement.isDayComplete = Boolean.FALSE;
-        agreement.isTermComplete = Boolean.FALSE;
+        agreement.confirmationDate = LocalDate.now();
 
         if (type == EngagementType.DAY && dayTime != null) {
             // DAY 타입: period 생성 및 주입
@@ -213,5 +203,46 @@ public class Agreement extends BaseTimeEntity {
         }
 
         return activeDates;
+    }
+
+    /**
+     * Agreement의 전체 기간에 대한 활동 날짜들을 반환
+     * <p>
+     * DAY 타입: 활동 날짜 하나만 반환
+     * TERM 타입: 시작~끝 날짜 사이에서 활동 요일에 해당하는 모든 날짜들을 반환
+     *
+     * @return 활동이 있는 날짜들의 List (정렬됨)
+     */
+    public List<LocalDate> getEngagementDates(){
+        if (this.period == null) {
+            return new ArrayList<>();
+        }
+
+        List<LocalDate> engagetmentDates = new ArrayList<>();
+
+        if (this.type == EngagementType.DAY) {
+            // DAY 타입: 활동 날짜 하나만 추가
+            engagetmentDates.add(this.period.getStartDate());
+        } else if (this.type == EngagementType.TERM) {
+            // TERM 타입: 시작~끝 날짜 사이에서 활동 요일에 해당하는 모든 날짜 추출
+            LocalDate startDate = this.period.getStartDate();
+            LocalDate endDate = this.period.getEndDate();
+
+            // schedules에서 활동 요일들 추출
+            Set<DayOfWeek> activityDays = this.schedules.stream()
+                    .map(AgreementSchedule::getDayOfWeek)
+                    .collect(Collectors.toSet());
+
+            // 시작 날짜부터 끝 날짜까지 순회하며 활동 요일에 해당하는 날짜들 수집
+            LocalDate currentDate = startDate;
+            while (!currentDate.isAfter(endDate)) {
+                if (activityDays.contains(currentDate.getDayOfWeek())) {
+                    engagetmentDates.add(currentDate);
+                }
+                currentDate = currentDate.plusDays(1);
+            }
+        }
+
+        return engagetmentDates;
     }
 }

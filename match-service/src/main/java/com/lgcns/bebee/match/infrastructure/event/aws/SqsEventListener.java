@@ -11,6 +11,8 @@ import io.awspring.cloud.sqs.annotation.SqsListener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -22,21 +24,16 @@ public class SqsEventListener {
     private final EventHandlerRegistry handlerRegistry;
 
     @SqsListener("${app.sqs.match-queue-url}")
-    public void handleEvent(String message) {
+    public void handleEvent(@Payload String payload, @Header("eventType") String eventType) {
         try{
-            log.info("SQS 메시지 수신: {}", message);
-
-            JsonNode snsMessage = objectMapper.readTree(message);
-            String eventType = snsMessage.get("Subject").asText();
-            String eventPayload = snsMessage.get("Message").asText();
-            log.info("이벤트 타입: {}, 페이로드: {}", eventType, eventPayload);
+            log.info("SQS 이벤트 수신 - 타입: {}, 페이로드: {}", eventType, payload);
 
             EventType type = EventType.from(eventType);
-            DomainEvent event = objectMapper.readValue(eventPayload, type.getEventClass());
+            DomainEvent event = objectMapper.readValue(payload, type.getEventClass());
 
             processEvent(event, type);
         } catch (JsonProcessingException e) {
-            log.error("SQS 메시지 처리 실패: {}", message, e);
+            log.error("SQS 메시지 처리 실패: {}", payload, e);
             throw new RuntimeException(e);
         }
     }

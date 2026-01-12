@@ -24,8 +24,8 @@ public class AgreementCreateResDTO {
     private EngagementType type;
     private Boolean isVolunteer;
     private List<AgreementHelpCategoryDTO> helpCategories;
-    private Integer unitHoney;
-    private Integer totalHoney;
+    private Long unitHoney;
+    private Long totalHoney;
     private String region;
 
     @JsonTypeInfo(
@@ -38,9 +38,6 @@ public class AgreementCreateResDTO {
             @JsonSubTypes.Type(value = TermEngagementTimeDTO.class, name = "TERM")
     })
     private Object engagementTime;
-
-    private Boolean isDayComplete;
-    private Boolean isTermComplete;
 
     /**
      * UseCase Result -> Response
@@ -57,9 +54,7 @@ public class AgreementCreateResDTO {
                 result.getUnitHoney(),
                 result.getTotalHoney(),
                 result.getRegion(),
-                result.getEngagementTime(),
-                result.getIsDayComplete(),
-                result.getIsTermComplete()
+                result.getEngagementTime()
         );
     }
 }

@@ -15,6 +15,11 @@ dependencies {
 	implementation project(":common")
 	implementation project(":common-data")
 
+	// JWT - JSON Web Token 파싱 및 검증
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
 	// MySQL Connector - MySQL 데이터베이스 연결
 	runtimeOnly 'com.mysql:mysql-connector-j:9.5.0'
 

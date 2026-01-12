@@ -10,9 +10,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class HoneyUseReqDTO {
+    private Long memberId;
+    private String matchId;
     private Long useHoney;
 
     public static UseHoneyUseCase.Param toParam(Long memberId, HoneyUseReqDTO request) {
-        return new UseHoneyUseCase.Param(memberId, request.getUseHoney());
+        return new UseHoneyUseCase.Param(
+                memberId,
+                Long.parseLong(request.getMatchId()),
+                request.getUseHoney()
+        );
     }
 }

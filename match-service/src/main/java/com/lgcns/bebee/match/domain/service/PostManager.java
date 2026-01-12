@@ -38,8 +38,8 @@ public class PostManager {
             List<DayOfWeek> daysOfWeek,
             List<LocalTime> startTimes,
             List<LocalTime> endTimes,
-            Integer unitHoney,
-            Integer totalHoney,
+            Long unitHoney,
+            Long totalHoney,
             String region,
             Double latitude,
             Double longitude

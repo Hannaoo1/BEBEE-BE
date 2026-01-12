@@ -84,8 +84,8 @@ public class GetPostsUseCase implements UseCase<GetPostsUseCase.Param, GetPostsU
         private final List<String> legalDongCodes;
         private final List<Long> helpCategoryIds;
         private final String gender;
-        private final Integer minHoney;
-        private final Integer maxHoney;
+        private final Long minHoney;
+        private final Long maxHoney;
         private final List<Long> disabilityCategoryIds;
         private final List<String> days;
         private final Long lastPostId;
@@ -113,8 +113,8 @@ public class GetPostsUseCase implements UseCase<GetPostsUseCase.Param, GetPostsU
             private final Long postId;
             private final String title;
             private final Boolean isCompleted;
-            private final Integer unitHoney;
-            private final Integer totalHoney;
+            private final Long unitHoney;
+            private final Long totalHoney;
             private final String legalDongName;
             private final List<Long> helpCategories;
             private final String helpType;

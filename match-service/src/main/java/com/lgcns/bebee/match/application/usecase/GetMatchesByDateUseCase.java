@@ -5,14 +5,9 @@ import com.lgcns.bebee.common.application.UseCase;
 import com.lgcns.bebee.match.domain.entity.*;
 import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
 import com.lgcns.bebee.match.domain.entity.vo.EngagementType;
-import com.lgcns.bebee.match.domain.repository.MatchRepository;
-
+import com.lgcns.bebee.match.domain.repository.EngagementRepository;
+import com.lgcns.bebee.match.domain.repository.dto.EngagementSearchCond;
 import com.lgcns.bebee.match.domain.service.MemberManager;
-import com.lgcns.bebee.match.domain.service.PostManager;
-import com.lgcns.bebee.match.presentation.dto.DayEngagementTimeDTO;
-import com.lgcns.bebee.match.presentation.dto.MemberInfoDTO;
-import com.lgcns.bebee.match.presentation.dto.TermEngagementTimeDTO;
-import com.lgcns.bebee.match.presentation.dto.res.AgreementHelpCategoryDTO;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,132 +15,138 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class GetMatchesByDateUseCase implements UseCase<GetMatchesByDateUseCase.Param, GetMatchesByDateUseCase.Result> {
-
-    private final MatchRepository matchRepository;
     private final MemberManager memberManager;
-    private final PostManager postManager;
+    private final EngagementRepository engagementRepository;
 
-    @Transactional(readOnly = true)
     @Override
     public Result execute(Param param) {
-        DayOfWeek dayOfWeek = param.getDate().getDayOfWeek();
+        MemberSync member = memberManager.findExistingMember(param.currentMemberId);
 
-        // Match + Agreement를 한 번에 조회 (JOIN FETCH)
-        List<Match> matches = matchRepository.findByDateAndMember(
-                param.getMemberId(),
-                param.getDate(),
-                dayOfWeek,
-                param.getEngagementType()
+        EngagementType type = param.type != null ? EngagementType.from(param.type) : null;
+        List<Engagement> engagements = engagementRepository.searchEngagements(
+                EngagementSearchCond.from(param.currentMemberId, type, param.date)
         );
 
-        return Result.from(matches, memberManager, postManager);
+        return Result.from(engagements, member, memberManager);
     }
 
     @Getter
     @RequiredArgsConstructor
     public static class Param implements Params {
-        private final Long memberId;
+        private final Long currentMemberId;
         private final LocalDate date;
-        private final EngagementType engagementType;
+        private final String type;
     }
 
     @Getter
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Result {
-        private List<MatchInfo> matchInfos;
+        private List<MatchDTO> matches;
 
-        public static Result from(
-                List<Match> matches,
-                MemberManager memberManager,
-                PostManager postManager
-        ) {
-            List<MatchInfo> matchInfos = matches.stream()
-                    .map(match -> {
-                        // Match에서 Agreement 가져오기 (이미 JOIN FETCH로 로드됨!)
-                        Agreement agreement = match.getAgreement();
+        public static Result from(List<Engagement> engagements, MemberSync currentMember, MemberManager memberManager) {
+            List<MatchDTO> engagementDTOs = engagements.stream()
+                    .map(engagement -> MatchDTO.from(engagement, currentMember, memberManager))
+                    .collect(Collectors.toList());
 
-                        MemberSync helper = memberManager.findExistingMember(agreement.getHelperId());
-                        MemberSync disabled = memberManager.findExistingMember(agreement.getDisabledId());
-
-                        String title = match.getTitle();
-                        Long chatRoomId = match.getChatRoomId();
-
-                        String thumbnailImageUrl = null;
-                        Post post = postManager.findSinglePost(agreement.getPostId());
-                        List<PostImage> postImages = post.getImages();
-                        if (postImages != null && !postImages.isEmpty()) {
-                            thumbnailImageUrl = postImages.get(0).getImageUrl();
-                        }
-
-                        List<AgreementHelpCategoryDTO> categoryDTOs = agreement.getHelpCategories().stream()
-                                .map(AgreementHelpCategoryDTO::from)
-                                .toList();
-
-                        Object engagementTime = null;
-                        if (agreement.getType() == EngagementType.DAY) {
-                            engagementTime = DayEngagementTimeDTO.from(
-                                    agreement.getPeriod(),
-                                    agreement.getSchedules().get(0)
-                            );
-                        } else if (agreement.getType() == EngagementType.TERM) {
-                            engagementTime = TermEngagementTimeDTO.from(
-                                    agreement.getPeriod(),
-                                    agreement.getSchedules()
-                            );
-                        }
-
-                        return new MatchInfo(
-                                String.valueOf(agreement.getId()),
-                                String.valueOf(agreement.getPostId()),
-                                title,
-                                thumbnailImageUrl,
-                                MemberInfoDTO.from(helper),
-                                MemberInfoDTO.from(disabled),
-                                agreement.getConfirmationDate(),
-                                agreement.getType(),
-                                categoryDTOs,
-                                agreement.getIsVolunteer(),
-                                agreement.getUnitHoney(),
-                                agreement.getTotalHoney(),
-                                agreement.getRegion(),
-                                engagementTime,
-                                agreement.getIsDayComplete(),
-                                agreement.getIsTermComplete(),
-                                String.valueOf(chatRoomId)
-                        );
-                    }).toList();
-
-            return new Result(matchInfos);
+            return new Result(engagementDTOs);
         }
     }
 
     @Getter
-    @AllArgsConstructor
-    public static class MatchInfo {
-        private String agreementId;
-        private String postId;
-        private String title;
-        private String thumbnailImageUrl;
-        private MemberInfoDTO helper;
-        private MemberInfoDTO disabled;
-        private LocalDate confirmationDate;
-        private EngagementType type;
-        private List<AgreementHelpCategoryDTO> helpCategories;
-        private Boolean isVolunteer;
-        private Integer unitHoney;
-        private Integer totalHoney;
-        private String region;
-        private Object engagementTime;
-        private Boolean isDayComplete;
-        private Boolean isTermComplete;
-        private String chatRoomId;
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class MatchDTO {
+        private final Long engagementId;
+        private final Long matchId;
+        private final Long agreementId;
+        private final Long otherId;
+        private final String otherNickname;
+        private final String thumbnailImageUrl;
+        private final String title;
+        private final Long chatRoomId;
+        private final String region;
+        private final String helpType;
+        private final LocalDate date;  // DAY 타입일 때만 값 있음
+        private final List<String> dayOfWeeks;
+        private final List<Long> helpCategoryIds;
+
+        private final String status;
+
+        public static MatchDTO from(Engagement engagement, MemberSync member, MemberManager memberManager) {
+            Match match = engagement.getMatch();
+            Agreement agreement = match.getAgreement();
+
+            // currentMemberId와 비교하여 otherId 결정
+            Long otherId = match.getHelperId().equals(member.getId())
+                    ? match.getDisabledId()
+                    : match.getHelperId();
+
+            MemberSync otherMember = memberManager.findExistingMember(otherId);
+
+            List<String> dayOfWeeks = agreement.getSchedules().stream()
+                    .map(AgreementSchedule::getDayOfWeek)
+                    .distinct()
+                    .sorted()
+                    .map(Enum::name)
+                    .toList();
+
+            String status = null;
+
+            if (engagement.getDate().isAfter(LocalDate.now())) {
+                status = "INACTIVE";
+            }else{
+                boolean isHelper = match.getHelperId().equals(member.getId());
+                boolean isChecked = isHelper ? engagement.getIsHelperCheck() : engagement.getIsDisabledCheck();
+                boolean hasReview = isHelper
+                        ? match.getHelperReview() != null
+                        : match.getDisabledReview() != null;
+
+                if(!isChecked){
+                    status = "ACTIVE";
+                }else{
+                    LocalDate endDate = agreement.getPeriod().getEndDate();
+
+                    if (engagement.getDate().equals(endDate)) {
+                        status = "COMPLETED";
+                    }else{
+
+                        if (hasReview) {
+                            status = "REVIEW_COMPLETED";
+                        }else{
+                            status = "REVIEW_ACTIVE";
+                        }
+                    }
+                }
+            }
+
+            List<Long> helpCategoryIds = agreement.getHelpCategories().stream()
+                    .map(category -> category.getId().getHelpCategoryId())
+                    .toList();
+
+            return new MatchDTO(
+                    engagement.getId(),
+                    match.getMatchId(),
+                    agreement.getId(),
+                    otherId,
+                    otherMember.getNickname(),
+                    match.getImageUrl(),
+                    match.getTitle(),
+                    match.getChatRoomId(),
+                    agreement.getRegion(),
+                    agreement.getType().name(),
+                    engagement.getDate(),
+                    dayOfWeeks,
+                    helpCategoryIds,
+                    status
+            );
+        }
     }
 }
 

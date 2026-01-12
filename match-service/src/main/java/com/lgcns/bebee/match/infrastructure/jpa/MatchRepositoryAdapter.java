@@ -3,6 +3,7 @@ package com.lgcns.bebee.match.infrastructure.jpa;
 import com.lgcns.bebee.match.domain.entity.Match;
 import com.lgcns.bebee.match.domain.entity.vo.EngagementType;
 import com.lgcns.bebee.match.domain.repository.MatchRepository;
+import com.lgcns.bebee.match.infrastructure.jpa.dto.MatchSearchCond;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -15,7 +16,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MatchRepositoryAdapter implements MatchRepository {
 
-    private final MatchJpaRepository matchJpaRepository;
+    private final JpaMatchRepository matchJpaRepository;
+    private final QuerydslMatchRepository querydslMatchRepository;
 
     @Override
     public Match save(Match match) {
@@ -23,13 +25,14 @@ public class MatchRepositoryAdapter implements MatchRepository {
     }
 
     @Override
-    public Optional<Match> findById(Long postId) {
-        return matchJpaRepository.findByPostId(postId);
+    public Optional<Match> findById(Long matchId) {
+        return matchJpaRepository.findById(matchId);
     }
 
     @Override
-    public List<Match> findByDateAndMember(Long memberId, LocalDate date, DayOfWeek dayOfWeek, EngagementType type) {
-        return matchJpaRepository.findByDateAndMember(memberId, date, dayOfWeek, type);
+    public List<Match> findMatchesByDate(Long memberId, LocalDate date, DayOfWeek dayOfWeek, EngagementType type) {
+        MatchSearchCond cond = MatchSearchCond.from(memberId, date, dayOfWeek, type);
+        return querydslMatchRepository.searchMatches(cond);
     }
 
     @Override

@@ -77,7 +77,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 : null;
     }
 
-    private BooleanExpression betweenHoney(Integer minHoney, Integer maxHoney) {
+    private BooleanExpression betweenHoney(Long minHoney, Long maxHoney) {
         if (minHoney != null && maxHoney != null) {
             return post.totalHoney.between(minHoney, maxHoney);
         } else if (minHoney != null) {

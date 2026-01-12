@@ -48,13 +48,13 @@ public record PostsGetReqDTO(
                 description = "최소 꿀 금액 (선택) - 단위: 원",
                 example = "5000"
         )
-        Integer minHoney,
+        Long minHoney,
 
         @Schema(
                 description = "최대 꿀 금액 (선택) - 단위: 원",
                 example = "50000"
         )
-        Integer maxHoney,
+        Long maxHoney,
 
         @Schema(
                 description = """

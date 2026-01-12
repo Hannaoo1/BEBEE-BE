@@ -33,10 +33,10 @@ public class Post extends BaseTimeEntity {
     private EngagementType type;
 
     @Column(nullable = false)
-    private int unitHoney;
+    private Long unitHoney;
 
     @Column(nullable = false)
-    private int totalHoney;
+    private Long totalHoney;
 
     @Column(nullable = false, length = 30)
     private String region;
@@ -84,8 +84,8 @@ public class Post extends BaseTimeEntity {
             String content,
             PostPeriod period,
             List<PostSchedule> schedules,
-            Integer unitHoney,
-            Integer totalHoney,
+            Long unitHoney,
+            Long totalHoney,
             String region,
             Double latitude,
             Double longitude
@@ -119,5 +119,9 @@ public class Post extends BaseTimeEntity {
 
     public void updateLegalDongCode(String legalDongCode){
         this.legalDongCode = legalDongCode;
+    }
+
+    public void updateStatus(PostStatus status) {
+        this.status = status;
     }
 }

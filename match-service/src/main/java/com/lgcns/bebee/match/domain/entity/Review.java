@@ -22,6 +22,10 @@ public class Review extends BaseTimeEntity {
     @Column(name = "review_id")
     private Long id;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "match_id", nullable = false)
+    private Match match;
+
     @Column(nullable = false)
     private Long reviewerId;
 
@@ -37,12 +41,14 @@ public class Review extends BaseTimeEntity {
 
     // 리뷰 생성
     public static Review create(
+            Match match,
             Long reviewerId,
             Long revieweeId,
             ReviewDirection reviewDirection,
             List<Integer> keywordIds
     ) {
         Review review = new Review();
+        review.match = match;
         review.reviewerId = reviewerId;
         review.revieweeId = revieweeId;
         review.reviewDirection = reviewDirection;

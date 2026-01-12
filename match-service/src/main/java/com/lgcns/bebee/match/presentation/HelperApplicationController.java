@@ -1,5 +1,6 @@
 package com.lgcns.bebee.match.presentation;
 
+import com.lgcns.bebee.common.annotation.CurrentMember;
 import com.lgcns.bebee.match.application.usecase.ApplyHelperUseCase;
 import com.lgcns.bebee.match.application.usecase.GetHelperApplicationPostsUseCase;
 import com.lgcns.bebee.match.application.usecase.GetHelperApplicationsByPostUseCase;
@@ -22,16 +23,19 @@ public class HelperApplicationController implements HelperApplicationSwagger {
     private final GetHelperApplicationsByPostUseCase getHelperApplicationsByPostUseCase;
 
     @PostMapping
-    public ResponseEntity<Void> apply(@RequestBody HelperApplyReqDTO request) {
-        ApplyHelperUseCase.Param param = request.toParam();
+    public ResponseEntity<Void> apply(
+            @CurrentMember Long memberId,
+            @RequestBody HelperApplyReqDTO request
+    ) {
+        ApplyHelperUseCase.Param param = request.toParam(memberId, request);
         applyHelperUseCase.execute(param);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/posts")
-    public ResponseEntity<HelperApplicationPostsGetResDTO> getHelperApplicationPosts(@RequestParam String memberId) {
-        GetHelperApplicationPostsUseCase.Param param = new GetHelperApplicationPostsUseCase.Param(Long.parseLong(memberId));
+    public ResponseEntity<HelperApplicationPostsGetResDTO> getHelperApplicationPosts(@CurrentMember Long memberId) {
+        GetHelperApplicationPostsUseCase.Param param = new GetHelperApplicationPostsUseCase.Param(memberId);
         GetHelperApplicationPostsUseCase.Result result = getHelperApplicationPostsUseCase.execute(param);
 
         HelperApplicationPostsGetResDTO response = HelperApplicationPostsGetResDTO.from(result);
@@ -42,10 +46,10 @@ public class HelperApplicationController implements HelperApplicationSwagger {
     @GetMapping("/posts/{postId}/applicants")
     public ResponseEntity<HelperApplicantsByPostGetResDTO> getHelperApplicationsByPost(
             @PathVariable String postId,
-            @RequestParam String memberId
+            @CurrentMember Long memberId
     ) {
         GetHelperApplicationsByPostUseCase.Param param = new GetHelperApplicationsByPostUseCase.Param(
-                Long.parseLong(memberId),
+                memberId,
                 Long.parseLong(postId)
         );
         GetHelperApplicationsByPostUseCase.Result result = getHelperApplicationsByPostUseCase.execute(param);

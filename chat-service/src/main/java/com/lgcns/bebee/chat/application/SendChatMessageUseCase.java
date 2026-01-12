@@ -36,23 +36,22 @@ public class SendChatMessageUseCase implements UseCase<SendChatMessageUseCase.Pa
         Chat chat = Chat.create(
                 chatroom.getId(),
                 param.senderId,
+                param.receiverId,
                 param.textContent,
                 param.chatType,
                 param.attachments,
-                param.agreementId, param.matchType, param.startDate, param.endDate,
-                param.scheduleDays, param.scheduleStartTimes, param.scheduleEndTimes,
-                param.location,
-                param.unitPoints, param.totalPoints,
-                param.matchStatus,
+                null, null, null, null, null,
+                null, null, null, null,null, null,
                 param.createdAt
         );
+
+        Chat savedChat = chatRepository.save(chat);
+
+        chatroomManagement.updateLastMessage(chatroom, savedChat);
 
         // Redis를 통해 발신자와 수신자에게 메시지 발행
         messagePublisher.publishToMember(param.senderId, param.receiverId, chat);
 
-        chatRepository.save(chat);
-
-        chatroomManagement.updateLastMessage(chatroom, chat);
 
         return null;
     }
@@ -65,17 +64,6 @@ public class SendChatMessageUseCase implements UseCase<SendChatMessageUseCase.Pa
         private final String textContent;
         private final String chatType;
         private final List<String> attachments;
-        private final Long agreementId;
-        private final String matchType;
-        private final String startDate;
-        private final String endDate;
-        private final List<String> scheduleDays;
-        private final List<String> scheduleStartTimes;
-        private final List<String> scheduleEndTimes;
-        private final String location;
-        private final Integer unitPoints;
-        private final Integer totalPoints;
-        private final String matchStatus;
         private final LocalDateTime createdAt;
     }
 }

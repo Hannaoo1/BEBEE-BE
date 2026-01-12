@@ -17,14 +17,14 @@ public class HoneyHistory extends BaseTimeEntity {
     private Long honeyHistoryId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "honey_wallet_id", nullable = false)
     private HoneyWallet honeyWallet;
 
     @Column(nullable = false)
     private Long targetMemberId;
 
     @Column(nullable = false)
-    private Integer amount;
+    private Long amount; // 원 딘위
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -33,7 +33,7 @@ public class HoneyHistory extends BaseTimeEntity {
     public static HoneyHistory create(
             HoneyWallet honeyWallet,
             Long targetMemberId,
-            Integer amount,
+            Long amount,
             HoneyHistoryType type
     ) {
         HoneyHistory honeyHistory = new HoneyHistory();
@@ -44,4 +44,6 @@ public class HoneyHistory extends BaseTimeEntity {
 
         return honeyHistory;
     }
+
+
 }

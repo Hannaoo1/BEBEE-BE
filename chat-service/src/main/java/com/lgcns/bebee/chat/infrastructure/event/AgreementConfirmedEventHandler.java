@@ -1,8 +1,7 @@
 package com.lgcns.bebee.chat.infrastructure.event;
 
-import com.lgcns.bebee.chat.application.UpdateChatroomMatchStatusUseCase;
-import com.lgcns.bebee.chat.domain.entity.sync.MatchStatusSync;
-import com.lgcns.bebee.common.data.event.AgreementConfirmedEvent;
+import com.lgcns.bebee.chat.application.ProcessAgreementConfirmedUseCase;
+import com.lgcns.bebee.common.data.event.match.AgreementConfirmedEvent;
 import com.lgcns.bebee.common.data.event.EventHandler;
 import com.lgcns.bebee.common.data.event.EventType;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class AgreementConfirmedEventHandler implements EventHandler<AgreementConfirmedEvent> {
-    private final UpdateChatroomMatchStatusUseCase updateChatroomMatchStatusUseCase;
+    private final ProcessAgreementConfirmedUseCase processAgreementConfirmedUseCase;
 
     @Override
     public EventType getEventType() {
@@ -20,8 +19,14 @@ public class AgreementConfirmedEventHandler implements EventHandler<AgreementCon
 
     @Override
     public void handle(AgreementConfirmedEvent event) {
-        UpdateChatroomMatchStatusUseCase.Param param = new UpdateChatroomMatchStatusUseCase.Param(event.getChatroomId(), MatchStatusSync.MATCHED);
+        ProcessAgreementConfirmedUseCase.Param param = new ProcessAgreementConfirmedUseCase.Param(
+                event.getChatroomId(),
+                event.getChatId(),
+                event.getDisabledId(),
+                event.getHelperId(),
+                event.getCreatedAt()
+        );
 
-        updateChatroomMatchStatusUseCase.execute(param);
+        processAgreementConfirmedUseCase.execute(param);
     }
 }

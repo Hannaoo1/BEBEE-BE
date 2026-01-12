@@ -1,7 +1,7 @@
 package com.lgcns.bebee.chat.domain.entity;
 
 import com.lgcns.bebee.chat.domain.entity.sync.HelpCategorySync;
-import com.lgcns.bebee.chat.domain.entity.sync.MatchStatusSync;
+import com.lgcns.bebee.chat.domain.entity.vo.MatchStatus;
 import com.lgcns.bebee.common.data.domain.BaseTimeEntity;
 import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.*;
@@ -41,7 +41,7 @@ public class Chatroom extends BaseTimeEntity {
     private List<ChatroomHelpCategory> chatroomHelpCategories = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
-    private MatchStatusSync matchStatus = MatchStatusSync.NON_MATCHED;
+    private MatchStatus matchStatus = MatchStatus.NON_MATCHED;
 
     public static Chatroom create(MemberSync member1, MemberSync member2, Long postId, String postTitle, List<HelpCategorySync> helpCategories) {
         Chatroom chatroom = new Chatroom();
@@ -61,7 +61,7 @@ public class Chatroom extends BaseTimeEntity {
         this.lastMessage = lastMessage;
     }
 
-    public void updateMatchStatus(MatchStatusSync matchStatus){
+    public void updateMatchStatus(MatchStatus matchStatus){
         this.matchStatus = matchStatus;
     }
 }

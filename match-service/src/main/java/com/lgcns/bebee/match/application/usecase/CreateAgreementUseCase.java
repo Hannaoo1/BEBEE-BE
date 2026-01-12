@@ -2,19 +2,23 @@ package com.lgcns.bebee.match.application.usecase;
 
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
+import com.lgcns.bebee.common.data.dto.ScheduleDTO;
 import com.lgcns.bebee.common.exception.InvalidParamException;
 import com.lgcns.bebee.match.application.usecase.client.EventPublisher;
 import com.lgcns.bebee.match.common.exception.MatchErrors;
 import com.lgcns.bebee.match.common.exception.MatchInvalidParamErrors;
+import com.lgcns.bebee.match.domain.entity.Post;
 import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
 import com.lgcns.bebee.match.domain.entity.sync.Role;
 import com.lgcns.bebee.common.util.ParamValidator;
 import com.lgcns.bebee.match.domain.entity.Agreement;
-import com.lgcns.bebee.common.data.event.AgreementCreatedEvent;
+import com.lgcns.bebee.common.data.event.match.AgreementCreatedEvent;
+import com.lgcns.bebee.match.domain.entity.vo.PostStatus;
 import com.lgcns.bebee.match.domain.repository.AgreementRepository;
 import com.lgcns.bebee.match.domain.entity.vo.AgreementStatus;
 import com.lgcns.bebee.match.domain.entity.vo.EngagementType;
 import com.lgcns.bebee.match.domain.service.MemberManager;
+import com.lgcns.bebee.match.domain.service.PostManager;
 import com.lgcns.bebee.match.presentation.dto.DayEngagementTimeDTO;
 import com.lgcns.bebee.match.presentation.dto.TermEngagementTimeDTO;
 import com.lgcns.bebee.match.presentation.dto.res.AgreementHelpCategoryDTO;
@@ -26,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -34,6 +39,7 @@ public class CreateAgreementUseCase implements UseCase<CreateAgreementUseCase.Pa
 
     private final AgreementRepository agreementRepository;
     private final MemberManager memberManager;
+    private final PostManager postManager;
 
     private final EventPublisher eventPublisher;
 
@@ -56,7 +62,7 @@ public class CreateAgreementUseCase implements UseCase<CreateAgreementUseCase.Pa
 
         // 매칭 확인서 생성
         Agreement agreement = Agreement.create(
-                param.getPostId(),
+                param.postId,
                 param.getHelperId(),
                 param.getDisabledId(),
                 param.getType(),
@@ -80,10 +86,48 @@ public class CreateAgreementUseCase implements UseCase<CreateAgreementUseCase.Pa
             savedAgreement.getSchedules().size(); // 초기화
         }
 
-        eventPublisher.publish(new AgreementCreatedEvent(param.chatroomId));
+        Post post = postManager.findSinglePost(savedAgreement.getPostId());
+        post.updateStatus(PostStatus.PROCEEDING);
+
+        eventPublisher.publish(buildEvent(param.chatroomId, savedAgreement, param.createdAt));
 
         return Result.from(savedAgreement);
     }
+
+    private AgreementCreatedEvent buildEvent(Long chatroomId, Agreement agreement, LocalDateTime createdAt){
+        LocalDate startDate = agreement.getPeriod() != null ? agreement.getPeriod().getStartDate() : null;
+        LocalDate endDate = agreement.getPeriod() != null ? agreement.getPeriod().getEndDate() : null;
+
+        List<ScheduleDTO> schedules = agreement.getSchedules().stream()
+                .map(schedule -> new ScheduleDTO(
+                        schedule.getDayOfWeek(),
+                        schedule.getStartTime(),
+                        schedule.getEndTime()
+                ))
+                .toList();
+
+        List<Long> helpCategoryIds = agreement.getHelpCategories().stream()
+                .map(ahc -> ahc.getId().getHelpCategoryId())
+                .toList();
+
+        return new AgreementCreatedEvent(
+                chatroomId,
+                agreement.getId(),
+                agreement.getDisabledId(),
+                agreement.getHelperId(),
+                agreement.getType().name(),
+                agreement.getIsVolunteer(),
+                startDate,
+                endDate,
+                schedules,
+                agreement.getRegion(),
+                agreement.getUnitHoney().intValue(),
+                agreement.getTotalHoney().intValue(),
+                helpCategoryIds,
+                createdAt
+        );
+    }
+
 
     @Getter
     @RequiredArgsConstructor
@@ -93,13 +137,14 @@ public class CreateAgreementUseCase implements UseCase<CreateAgreementUseCase.Pa
         private final Long disabledId;
         private final EngagementType type;
         private final Boolean isVolunteer;
-        private final Integer unitHoney;
-        private final Integer totalHoney;
+        private final Long unitHoney;
+        private final Long totalHoney;
         private final String region;
         private final DayEngagementTimeDTO dayEngagementTime;
         private final TermEngagementTimeDTO termEngagementTime;
         private final List<Long> helpCategoryIds;
         private final Long chatroomId;
+        private final LocalDateTime createdAt;
 
         @Override
         public boolean validate() {
@@ -157,12 +202,10 @@ public class CreateAgreementUseCase implements UseCase<CreateAgreementUseCase.Pa
         private EngagementType type;
         private Boolean isVolunteer;
         private List<AgreementHelpCategoryDTO> helpCategories;
-        private Integer unitHoney;
-        private Integer totalHoney;
+        private Long unitHoney;
+        private Long totalHoney;
         private String region;
         private Object engagementTime;
-        private Boolean isDayComplete;
-        private Boolean isTermComplete;
 
         public static Result from(Agreement agreement) {
             Object engagementTime = null;
@@ -187,9 +230,7 @@ public class CreateAgreementUseCase implements UseCase<CreateAgreementUseCase.Pa
                     agreement.getUnitHoney(),
                     agreement.getTotalHoney(),
                     agreement.getRegion(),
-                    engagementTime,
-                    agreement.getIsDayComplete(),
-                    agreement.getIsTermComplete()
+                    engagementTime
             );
         }
     }

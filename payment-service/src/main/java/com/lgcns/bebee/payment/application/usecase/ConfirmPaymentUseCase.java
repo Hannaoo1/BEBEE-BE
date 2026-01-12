@@ -70,19 +70,19 @@ public class ConfirmPaymentUseCase implements UseCase<ConfirmPaymentUseCase.Para
         HoneyWallet wallet = honeyWalletRepository.findByMemberIdWithLock(temp.getMemberId())
                 .orElseGet(() -> HoneyWallet.create(temp.getMemberId(), 0L));
         wallet.charge(response.totalAmount().longValue());
-        honeyWalletRepository.save(wallet);
-        log.info("허니 충전 완료: memberId={}, amount={}, balance={}",
-                temp.getMemberId(), response.totalAmount(), wallet.getBalance());
+        HoneyWallet savedWallet = honeyWalletRepository.saveAndFlush(wallet);
+        log.info("꿀 충전 완료: memberId={}, amount={}, balance={}, walletId={}",
+                temp.getMemberId(), response.totalAmount(), savedWallet.getBalance(), savedWallet.getHoneyWalletId());
 
         // HoneyHistory 기록
         HoneyHistory history = HoneyHistory.create(
-                wallet,
+                savedWallet,
                 temp.getMemberId(),
-                response.totalAmount(),
+                response.totalAmount().longValue(),
                 HoneyHistoryType.CHARGE
         );
         honeyHistoryRepository.save(history);
-        log.info("허니 히스토리 기록 완료: historyId={}", history.getHoneyHistoryId());
+        log.info("꿀 히스토리 기록 완료: historyId={}", history.getHoneyHistoryId());
 
         // 6. Redis 임시 데이터 삭제
         tempPaymentPort.delete(param.getOrderId());
@@ -90,7 +90,7 @@ public class ConfirmPaymentUseCase implements UseCase<ConfirmPaymentUseCase.Para
 
         return new Result(
                 String.valueOf(savedPayment.getPaymentId()),
-                wallet.getBalance(),
+                savedWallet.getBalance(),
                 response.paymentKey()
         );
     }

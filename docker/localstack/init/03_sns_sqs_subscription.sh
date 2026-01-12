@@ -40,6 +40,31 @@ SUBSCRIPTIONS=(
 )
 
 # ------------------------------------------
+# 구독 관계 및 필터 정책 정의
+# ------------------------------------------
+# 각 구독에 대한 필터 정책을 정의합니다.
+declare -A FILTER_POLICIES
+
+# Chat 서비스: Agreement 관련 이벤트만 수신
+FILTER_POLICIES["chat:match"]='{
+  "eventType": [
+    "AgreementCreatedEvent",
+    "AgreementConfirmedEvent",
+    "AgreementRefusedEvent"
+  ]
+}'
+
+# Payment 서비스: Agreement Confirmed 이벤트만 수신
+FILTER_POLICIES["payment:match"]='{
+  "eventType": [
+    "AgreementConfirmedEvent"
+  ]
+}'
+
+# Notification 서비스: 모든 이벤트 수신 (예시)
+# FILTER_POLICIES["notification:match"]='{}'
+
+# ------------------------------------------
 # 구독 생성
 # ------------------------------------------
 for SUB in "${SUBSCRIPTIONS[@]}"; do
@@ -82,12 +107,35 @@ for SUB in "${SUBSCRIPTIONS[@]}"; do
     --topic-arn "${TOPIC_ARN}" \
     --protocol sqs \
     --notification-endpoint "${QUEUE_ARN}" \
+    --attributes '{"RawMessageDelivery": "true"}' \
     --output text \
     --query 'SubscriptionArn')
 
   if [ $? -eq 0 ]; then
     echo "✓ 구독 생성 완료"
     echo "  Subscription ARN: ${SUBSCRIPTION_ARN}"
+
+    # 필터 정책 설정
+    FILTER_KEY="${QUEUE_SERVICE}:${TOPIC_SERVICE}"
+    if [[ -v "FILTER_POLICIES[$FILTER_KEY]" ]]; then
+      FILTER_POLICY="${FILTER_POLICIES[$FILTER_KEY]}"
+
+      if [ "$FILTER_POLICY" != "{}" ]; then
+        echo "  필터 정책 적용 중..."
+
+        awslocal sns set-subscription-attributes \
+          --subscription-arn "${SUBSCRIPTION_ARN}" \
+          --attribute-name FilterPolicy \
+          --attribute-value "$FILTER_POLICY"
+
+        if [ $? -eq 0 ]; then
+          echo "  ✓ 필터 정책 적용 완료"
+          echo "  Filter: $(echo $FILTER_POLICY | jq -c)"
+        else
+          echo "  ✗ 필터 정책 적용 실패"
+        fi
+      fi
+    fi
   else
     echo "✗ 구독 생성 실패"
     continue

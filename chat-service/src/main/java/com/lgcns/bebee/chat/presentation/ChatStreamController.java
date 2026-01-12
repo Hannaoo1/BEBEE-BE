@@ -33,11 +33,6 @@ public class ChatStreamController {
                 request.textContent(),
                 request.chatType(),
                 request.attachments(),
-                Long.parseLong(request.agreementId()), request.matchType(), request.startDate(), request.endDate(),
-                request.scheduleDays(), request.scheduleStartTimes(), request.scheduleEndTimes(),
-                request.location(),
-                request.unitPoints(), request.totalPoints(),
-                request.matchStatus(),
                 request.createdAt()
         );
 

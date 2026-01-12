@@ -50,8 +50,8 @@ public class GetSinglePostUseCase implements UseCase<GetSinglePostUseCase.Param,
 
         private final String engagementType;
         private final String title;
-        private final Integer unitHoney;
-        private final Integer totalHoney;
+        private final Long unitHoney;
+        private final Long totalHoney;
 
         private final LocalDate date;
         private final LocalDate startDate;
