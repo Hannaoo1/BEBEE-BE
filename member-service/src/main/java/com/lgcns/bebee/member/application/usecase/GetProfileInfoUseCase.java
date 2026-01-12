@@ -10,7 +10,10 @@ import com.lgcns.bebee.member.domain.entity.sync.MemberHoneyWalletSync;
 import com.lgcns.bebee.member.domain.entity.vo.Gender;
 import com.lgcns.bebee.member.domain.entity.vo.ReviewKeywordCount;
 import com.lgcns.bebee.member.domain.entity.vo.Role;
-import com.lgcns.bebee.member.domain.repository.*;
+import com.lgcns.bebee.member.domain.repository.DocumentVerificationRepository;
+import com.lgcns.bebee.member.domain.repository.MemberDisabilityCategoryRepository;
+import com.lgcns.bebee.member.domain.repository.MemberHelpCategoryRepository;
+import com.lgcns.bebee.member.domain.service.BadgeReader;
 import com.lgcns.bebee.member.domain.service.HoneyWalletReader;
 import com.lgcns.bebee.member.domain.service.MemberManagement;
 import com.lgcns.bebee.member.domain.service.ReviewReader;
@@ -32,6 +35,7 @@ public class GetProfileInfoUseCase implements UseCase<GetProfileInfoUseCase.Para
     private final MemberHelpCategoryRepository memberHelpCategoryRepository;
     private final MemberDisabilityCategoryRepository memberDisabilityCategoryRepository;
     private final DocumentVerificationRepository documentVerificationRepository;
+    private final BadgeReader badgeReader;
     private final HoneyWalletReader honeyWalletReader;
     private final ReviewReader reviewReader;
 
@@ -44,7 +48,7 @@ public class GetProfileInfoUseCase implements UseCase<GetProfileInfoUseCase.Para
         Long honey = null;
         List<ReviewKeywordCount> reviews = null;
 
-        List<Object> badges = null; // TODO: 뱃지 조회
+        List<BadgeReader.BadgeStatusInfo> badges = null;
         List<DocumentVerification> documents = null;
 
         String disabilityType = null;
@@ -62,7 +66,7 @@ public class GetProfileInfoUseCase implements UseCase<GetProfileInfoUseCase.Para
 
         if (member.getRole().equals(Role.HELPER)) {
             // 도우미: badges, documents 조회
-            // TODO: 뱃지 조회
+            badges = badgeReader.getBadgeStatusList(member.getId());
             documents = documentVerificationRepository.findByMemberId(member.getId());
 
         } else if (member.getRole().equals(Role.DISABLED)) {
@@ -82,6 +86,7 @@ public class GetProfileInfoUseCase implements UseCase<GetProfileInfoUseCase.Para
                 honey,
                 helpCategories,
                 reviews,
+                badges,
                 documents,
                 disabilityType,
                 disabilityDescription
@@ -109,8 +114,8 @@ public class GetProfileInfoUseCase implements UseCase<GetProfileInfoUseCase.Para
         private Long honey;
         private List<ReviewKeywordCount> reviews;
         /* 도우미 전용 정보 */
+        private List<BadgeReader.BadgeStatusInfo> badges;
         private List<DocumentVerification> documents;
-        private Object badges;
         /* 장애인 전용 정보 */
         private String disabilityType;
         private String disabilityDescription;
@@ -120,6 +125,7 @@ public class GetProfileInfoUseCase implements UseCase<GetProfileInfoUseCase.Para
                 Long honey,
                 List<String> helpCategories,
                 List<ReviewKeywordCount> reviews,
+                List<BadgeReader.BadgeStatusInfo> badges,
                 List<DocumentVerification> documents,
                 String disabilityType,
                 String disabilityDescription
@@ -138,8 +144,8 @@ public class GetProfileInfoUseCase implements UseCase<GetProfileInfoUseCase.Para
                     member.getIntroduction(),
                     honey,
                     reviews,
+                    badges,
                     documents,
-                    null, // TODO: badges 조회 로직 추가 필요
                     disabilityType,
                     disabilityDescription
             );

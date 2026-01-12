@@ -1,14 +1,13 @@
 package com.lgcns.bebee.member.presentation.dto.res;
 
-import com.lgcns.bebee.member.application.usecase.GetHelperBadgesUseCase;
+import com.lgcns.bebee.member.domain.service.BadgeReader;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 // 뱃지 상태 DTO
 @Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 @Schema(description = "뱃지 상태 DTO")
 public class BadgeStatusDTO {
 
@@ -22,7 +21,7 @@ public class BadgeStatusDTO {
     private String badgeCode;
 
     // BadgeStatusInfo -> DTO 변환
-    public static BadgeStatusDTO from(GetHelperBadgesUseCase.BadgeStatusInfo info) {
+    public static BadgeStatusDTO from(BadgeReader.BadgeStatusInfo info) {
         return new BadgeStatusDTO(
                 info.getDisabilityCategoryId(),
                 info.getCount(),
