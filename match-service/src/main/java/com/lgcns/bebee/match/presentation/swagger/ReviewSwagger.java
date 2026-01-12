@@ -63,7 +63,7 @@ public interface ReviewSwagger {
             )
     })
     ResponseEntity<ReviewCreateResDTO> createReview(
-            @Parameter(description = "매칭 ID") Long matchId,
+            @Parameter(hidden = true) Long matchId,
             @Parameter(hidden = true) @CurrentMember Long currentMemberId,
             @RequestBody ReviewCreateReqDTO reqDTO
     );
