@@ -1,7 +1,7 @@
 package com.lgcns.bebee.payment.infrastructure.event;
 
 
-import com.lgcns.bebee.common.data.event.AgreementConfirmedEvent;
+import com.lgcns.bebee.common.data.event.match.AgreementConfirmedEvent;
 import com.lgcns.bebee.common.data.event.EventHandler;
 import com.lgcns.bebee.common.data.event.EventType;
 import com.lgcns.bebee.payment.application.usecase.UseHoneyUseCase;

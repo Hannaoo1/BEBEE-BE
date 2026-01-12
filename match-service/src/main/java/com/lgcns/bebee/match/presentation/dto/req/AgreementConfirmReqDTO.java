@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -14,6 +16,8 @@ public class AgreementConfirmReqDTO {
     private String postId;
     private String title;
     private String chatroomId;
+    private String chatId;
+    private LocalDateTime createdAt;
 
     public ConfirmAgreementUseCase.Param toParam(Long currentMemberId, String agreementId) {
         return new ConfirmAgreementUseCase.Param(
@@ -22,7 +26,9 @@ public class AgreementConfirmReqDTO {
                 Long.parseLong(postId),
                 title,
                 Long.parseLong(chatroomId),
-                Long.parseLong(agreementId)
+                Long.parseLong(chatId),
+                Long.parseLong(agreementId),
+                createdAt
         );
     }
 }

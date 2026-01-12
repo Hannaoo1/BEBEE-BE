@@ -1,3 +1,5 @@
+db = db.getSiblingDB('bebee');
+
 db.createCollection("chat", {
     validator:{
         $jsonSchema: {
@@ -28,23 +30,36 @@ db.createCollection("chat", {
                 },
                 "match_confirmation_content": {
                     bsonType: "object",
-                    required: ["type", "start_date", "schedule", "location", "points", "help_category", "status"],
+                    required: ["type", "start_date", "schedules", "region", "help_category_ids", "status"],
                     properties: {
-                        "agreementId": {
+                        "agreement_id": {
                             bsonType: "long"
                         },
+                        "disabled_id": {
+                            bsonType: "long",
+                            description: "도움 요청자 ID"
+                        },
+                        "helper_id": {
+                            bsonType: "long",
+                            description: "도우미 ID"
+                        },
+                        "is_volunteer": {
+                            bsonType: "bool",
+                            description: "나눔 여부 (true: 봉사, false: 유료)"
+                        },
                         "type": {
-                            bsonType: "string"
+                            bsonType: "string",
+                            enum: ["DAY", "TERM"]
                         },
                         "start_date": {
                             bsonType: "string",
-                            description: "YYYY.MM.DD"
+                            description: "YYYY-MM-DD"
                         },
                         "end_date": {
                             bsonType: "string",
-                            description: "YYYY.MM.DD"
+                            description: "YYYY-MM-DD"
                         },
-                        "schedule": {
+                        "schedules": {
                             bsonType: "array",
                             items: {
                                 bsonType: "object",
@@ -52,7 +67,7 @@ db.createCollection("chat", {
                                 properties: {
                                     "day": {
                                         bsonType: "string",
-                                        enum: ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
+                                        enum: ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"]
                                     },
                                     "start_time": {
                                         bsonType: "string",
@@ -65,30 +80,33 @@ db.createCollection("chat", {
                                 }
                             }
                         },
-                        "location": {
-                            bsonType: "string"
+                        "region": {
+                            bsonType: "string",
+                            description: "만남 장소"
                         },
                         "points": {
                             bsonType: "object",
-                            required: ["unit_points", "total"],
                             properties: {
-                                "unit_points": {
-                                    bsonType: "int"
+                                "unit_honey": {
+                                    bsonType: "int",
+                                    description: "단위 포인트 (시간당 허니)"
                                 },
-                                "total": {
-                                    bsonType: "int"
+                                "total_honey": {
+                                    bsonType: "int",
+                                    description: "총 포인트 (총 허니)"
                                 }
                             }
                         },
-                        "help_category": {
+                        "help_category_ids": {
                             bsonType: "array",
                             items: {
-                                bsonType: "string"
-                            }
+                                bsonType: "long"
+                            },
+                            description: "도움 카테고리 ID 목록"
                         },
                         "status": {
                             bsonType: "string",
-                            enum: ["PENDING", "REJECTED", "ACCEPTED"]
+                            enum: ["NON_MATCHED", "PROCEEDING", "MATCHED"]
                         }
                     }
                 },

@@ -20,6 +20,11 @@ public class ReviewManager {
     private final MatchRepository matchRepository;
     private final ReviewRepository reviewRepository;
 
+    public Review findById(long id) {
+        return reviewRepository.findById(id)
+                .orElseThrow(() -> MatchErrors.REVIEW_NOT_FOUND.toException());
+    }
+
     // ReviewDirection 결정
     public ReviewDirection determineReviewDirection(MemberSync member) {
         return (member.getRole() == Role.DISABLED)

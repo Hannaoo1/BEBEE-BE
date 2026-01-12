@@ -24,6 +24,7 @@ public enum MatchErrors implements ErrorInfo {
     ALREADY_APPLIED("이미 지원한 게시글입니다.", HttpStatus.CONFLICT),
     UNAUTHORIZED_ACCESS("접근 권한이 없습니다.", HttpStatus.FORBIDDEN),
 
+    REVIEW_NOT_FOUND("리뷰를 찾을 수 없습니다", HttpStatus.NOT_FOUND),
     ENGAGEMENT_NOT_COMPLETED("완료된 활동만 리뷰를 작성할 수 있습니다", HttpStatus.FORBIDDEN),
 
     ALREADY_REVIEWED("이미 작성한 리뷰입니다", HttpStatus.CONFLICT),

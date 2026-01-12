@@ -9,17 +9,6 @@ public record ChatMessageSendReqDTO(
     String textContent,
     String chatType,
     List<String> attachments,
-    String agreementId,
-    String matchType,
-    String startDate,
-    String endDate,
-    List<String> scheduleDays,
-    List<String> scheduleStartTimes,
-    List<String> scheduleEndTimes,
-    String location,
-    Integer unitPoints,
-    Integer totalPoints,
-    String matchStatus,
     LocalDateTime createdAt
 ) {
     public ChatMessageSendReqDTO {

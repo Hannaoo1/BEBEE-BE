@@ -10,7 +10,8 @@ public enum MemberInvalidParamErrors implements InvalidParamErrorInfo {
     INVALID_ROLE("유효하지 않은 역할입니다.", "role"),
     INVALID_GENDER("유효하지 않은 성별입니다.", "gender"),
     EMAIL_DUPLICATED("이미 사용 중인 이메일입니다.", "email"),
-    NICKNAME_DUPLICATED("이미 사용 중인 닉네임입니다.", "nickname");
+    NICKNAME_DUPLICATED("이미 사용 중인 닉네임입니다.", "nickname"),
+    REQUIRED_FIELD("필수 입력 항목입니다.", "");
 
     private final String desc;
     private final String field;

@@ -74,6 +74,7 @@ public class GetNearbyPostsUseCase implements UseCase<GetNearbyPostsUseCase.Para
         @RequiredArgsConstructor
         public static class PostDTO {
             private final Long postId;
+            private final String type;
             private final String title;
             private final String legalDongName;
             private final List<Long> helpCategoryIds;
@@ -103,6 +104,7 @@ public class GetNearbyPostsUseCase implements UseCase<GetNearbyPostsUseCase.Para
 
                 return new PostDTO(
                         post.getId(),
+                        post.getType().name(),
                         post.getTitle(),
                         post.getRegion(),
                         helpCategoryIds,

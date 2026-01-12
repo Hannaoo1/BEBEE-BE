@@ -107,6 +107,7 @@ for SUB in "${SUBSCRIPTIONS[@]}"; do
     --topic-arn "${TOPIC_ARN}" \
     --protocol sqs \
     --notification-endpoint "${QUEUE_ARN}" \
+    --attributes '{"RawMessageDelivery": "true"}' \
     --output text \
     --query 'SubscriptionArn')
 

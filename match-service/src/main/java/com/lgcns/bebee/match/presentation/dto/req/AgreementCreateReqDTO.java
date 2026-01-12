@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -26,6 +27,7 @@ public class AgreementCreateReqDTO {
     private Long totalHoney;
     private String region;
     private String chatroomId;
+    private LocalDateTime createdAt;
 
     @JsonTypeInfo(
             use = JsonTypeInfo.Id.NAME,
@@ -63,7 +65,8 @@ public class AgreementCreateReqDTO {
                 dayTime,
                 termTime,
                 helpCategoryIds,
-                Long.parseLong(chatroomId)
+                Long.parseLong(chatroomId),
+                createdAt
         );
     }
 }

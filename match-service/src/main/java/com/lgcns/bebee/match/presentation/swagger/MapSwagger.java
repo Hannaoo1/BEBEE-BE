@@ -216,6 +216,7 @@ public interface MapSwagger {
                                               "nearByHelpers": [
                                                 {
                                                   "postId": 1001,
+                                                  "type":"DAY",
                                                   "title": "외출 동행 도와주실 분 구합니다",
                                                   "legalDongName": "역삼동",
                                                   "helpCategories": [1, 3],
@@ -226,6 +227,7 @@ public interface MapSwagger {
                                                 },
                                                 {
                                                   "postId": 1002,
+                                                  "type":"TERM",
                                                   "title": "정기적 외출 지원 필요합니다",
                                                   "legalDongName": "청담동",
                                                   "helpCategories": [1, 5],
