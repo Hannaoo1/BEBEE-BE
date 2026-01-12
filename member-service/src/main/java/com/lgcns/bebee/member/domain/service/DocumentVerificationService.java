@@ -224,16 +224,26 @@ public class DocumentVerificationService {
             return 50;
         }
 
-        OcrClient.OcrResult result = ocrClient.extract(fileUrl, role);
-        return processOcrResult(result);
+        try {
+            OcrClient.OcrResult result = ocrClient.extract(fileUrl, role);
+            return processOcrResult(result);
+        } catch (Exception e) {
+            log.warn("OCR 분석 실패 (기본값 50점 적용): {}", e.getMessage());
+            return 50;  // OCR 실패 시 기본 점수 반환
+        }
     }
 
     /**
      * OCR 텍스트 인식 기반 점수 계산 (파일 방식)
      */
     private int calcOcrScore(MultipartFile file, String role) {
-        OcrClient.OcrResult result = ocrClient.analyze(file, role);
-        return processOcrResult(result);
+        try {
+            OcrClient.OcrResult result = ocrClient.analyze(file, role);
+            return processOcrResult(result);
+        } catch (Exception e) {
+            log.warn("OCR 분석 실패 (기본값 50점 적용): {}", e.getMessage());
+            return 50;  // OCR 실패 시 기본 점수 반환
+        }
     }
 
     private int processOcrResult(OcrClient.OcrResult result) {
