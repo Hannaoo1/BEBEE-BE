@@ -40,7 +40,7 @@ public interface ReviewSwagger {
             키워드 선택식 리뷰를 작성합니다.
 
             **요청 정보:**
-            - matchId: 매칭 ID (URL path로 전달)
+            - matchId: 매칭 ID (URL path: /reviews/{matchId})
             - keywordIds: 선택한 키워드 ID 목록 (최소 1개)
 
             **키워드 범위:**
@@ -63,7 +63,7 @@ public interface ReviewSwagger {
             )
     })
     ResponseEntity<ReviewCreateResDTO> createReview(
-            @Parameter(hidden = true) Long matchId,
+            @Parameter(description = "매칭 ID", required = true) String matchId,
             @Parameter(hidden = true) @CurrentMember Long currentMemberId,
             @RequestBody ReviewCreateReqDTO reqDTO
     );
