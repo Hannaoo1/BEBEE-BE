@@ -18,8 +18,8 @@ gateway:
     exclude-paths:
       - /member/auth/login
       - /member/auth/signup
-      - /member/auth/check-email    
-      - /member/auth/check-nickname 
+      - /member/auth/check-email
+      - /member/auth/check-nickname
       - /member/auth/reissue
       - /member/documents/**
       - /swagger-ui/**
