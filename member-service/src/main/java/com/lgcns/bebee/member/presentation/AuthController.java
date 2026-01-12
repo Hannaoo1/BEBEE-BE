@@ -50,7 +50,9 @@ public class AuthController implements AuthSwagger {
                 reqDTO.getDistrictCode(),
                 reqDTO.getHelpTypes(),
                 reqDTO.getDisabilityType(),
-                reqDTO.getDisabilityDescription());
+                reqDTO.getDisabilityDescription(),
+                reqDTO.getFileUrl(),
+                reqDTO.getSystemFlag());
 
         SignUpUseCase.Result result = signUpUseCase.execute(param);
         SignUpResDTO resDTO = SignUpResDTO.create(result);

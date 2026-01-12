@@ -12,10 +12,14 @@ import java.time.LocalDate;
 import java.util.regex.Pattern;
 
 import com.lgcns.bebee.member.domain.entity.DisabilityCategory;
+import com.lgcns.bebee.member.domain.entity.Document;
+import com.lgcns.bebee.member.domain.entity.DocumentVerification;
 import com.lgcns.bebee.member.domain.entity.HelpCategory;
 import com.lgcns.bebee.member.domain.entity.MemberDisabilityCategory;
 import com.lgcns.bebee.member.domain.entity.MemberHelpCategory;
 import com.lgcns.bebee.member.domain.repository.DisabilityCategoryRepository;
+import com.lgcns.bebee.member.domain.repository.DocumentRepository;
+import com.lgcns.bebee.member.domain.repository.DocumentVerificationRepository;
 import com.lgcns.bebee.member.domain.repository.HelpCategoryRepository;
 import com.lgcns.bebee.member.domain.repository.MemberDisabilityCategoryRepository;
 import com.lgcns.bebee.member.domain.repository.MemberHelpCategoryRepository;
@@ -35,6 +39,8 @@ public class SignUpUseCase implements UseCase<SignUpUseCase.Param, SignUpUseCase
     private final DisabilityCategoryRepository disabilityCategoryRepository;
     private final MemberHelpCategoryRepository memberHelpCategoryRepository;
     private final MemberDisabilityCategoryRepository memberDisabilityCategoryRepository;
+    private final DocumentRepository documentRepository;
+    private final DocumentVerificationRepository documentVerificationRepository;
 
     @Override
     @Transactional
@@ -91,6 +97,29 @@ public class SignUpUseCase implements UseCase<SignUpUseCase.Param, SignUpUseCase
             memberDisabilityCategoryRepository.save(memberDisabilityCategory);
         }
 
+        // 문서 검증 정보 저장 (Step 5에서 이미 분석 완료됨)
+        if (params.getFileUrl() != null && !params.getFileUrl().isBlank()) {
+            log.info("문서 검증 정보 저장 시작: fileUrl={}, systemFlag={}", params.getFileUrl(), params.getSystemFlag());
+            
+            // Document 생성
+            String docCode = "DOC_" + System.currentTimeMillis();
+            String docNameKo = "HELPER".equals(params.getRole()) ? "활동지원사 교육 이수증" : "장애인 복지카드";
+            Document document = Document.create(
+                    params.getRole(),
+                    docCode,
+                    docNameKo,
+                    docNameKo,
+                    savedMember);
+            documentRepository.save(document);
+
+            // DocumentVerification 생성 (분석은 이미 완료됨, systemFlag만 저장)
+            DocumentVerification verification = DocumentVerification.of(params.getFileUrl(), document);
+            verification.applyAnalysisResult(0, 0, 0, params.getSystemFlag() != null ? params.getSystemFlag() : "MID");
+            documentVerificationRepository.save(verification);
+            
+            log.info("문서 검증 정보 저장 완료: verificationId={}", verification.getId());
+        }
+
         return new Result(savedMember.getId());
     }
 
@@ -116,6 +145,10 @@ public class SignUpUseCase implements UseCase<SignUpUseCase.Param, SignUpUseCase
         // DISABLED용: 장애 유형 및 설명
         private final String disabilityType;
         private final String disabilityDescription;
+
+        // 문서 관련 (Step 5에서 업로드 및 분석 완료)
+        private final String fileUrl;
+        private final String systemFlag;
 
         @Override
         public boolean validate() {

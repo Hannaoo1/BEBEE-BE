@@ -57,9 +57,11 @@ public class DocumentController implements DocumentSwagger {
                 
                 // memberId 없으면 → 분석만 수행 (5단계: 회원가입 전 문서 검증)
                 if (memberId == null) {
+                        // SSRF 방지: S3 URL 패턴만 허용 (일관된 검증)
+                        validateS3Url(fileUrl);
                         log.info("문서 분석 요청 (회원가입 전): fileUrl={}, role={}", maskUrl(fileUrl), role);
                         
-                        // UseCase 호출 (검증은 UseCase 내부 Param.validate()에서 수행)
+                        // UseCase 호출 (SSRF 검증은 DocumentVerificationService에서 추가 수행)
                         AnalyzeDocumentUseCase.Param param = new AnalyzeDocumentUseCase.Param(fileUrl, role);
                         AnalyzeDocumentUseCase.Result result = analyzeDocumentUseCase.execute(param);
                         
@@ -204,7 +206,14 @@ public class DocumentController implements DocumentSwagger {
 
                 try {
                         URL parsedUrl = new URL(url);
-                        String host = parsedUrl.getHost().toLowerCase();
+                        String host = parsedUrl.getHost();
+                        
+                        // NPE 방지: 호스트가 없는 URL 처리
+                        if (host == null) {
+                                log.warn("호스트가 없는 URL: {}", maskUrl(url));
+                                throw new IllegalArgumentException("허용되지 않은 URL 형식입니다.");
+                        }
+                        host = host.toLowerCase();
 
                         // 정확히 일치하는 호스트 확인
                         if (ALLOWED_EXACT_HOSTS.contains(host)) {

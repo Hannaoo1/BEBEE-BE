@@ -27,4 +27,8 @@ public class MemberSignUpReqDTO {
     // DISABLED용: 장애 유형 및 설명
     private String disabilityType;
     private String disabilityDescription;
+
+    // 문서 관련 (Step 5에서 업로드 및 분석 완료)
+    private String fileUrl;
+    private String systemFlag;
 }
