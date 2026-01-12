@@ -41,12 +41,14 @@ public class Review extends BaseTimeEntity {
 
     // 리뷰 생성
     public static Review create(
+            Match match,
             Long reviewerId,
             Long revieweeId,
             ReviewDirection reviewDirection,
             List<Integer> keywordIds
     ) {
         Review review = new Review();
+        review.match = match;
         review.reviewerId = reviewerId;
         review.revieweeId = revieweeId;
         review.reviewDirection = reviewDirection;

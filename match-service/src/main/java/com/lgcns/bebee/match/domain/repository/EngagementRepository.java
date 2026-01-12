@@ -18,4 +18,6 @@ public interface EngagementRepository extends JpaRepository<Engagement, Long>, E
     );
 
     List<Engagement> findByDate(LocalDate date);
+
+    List<Engagement> findAllByMatch_MatchId(Long matchId);
 }
