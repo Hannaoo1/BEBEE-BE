@@ -145,9 +145,16 @@ public class DocumentVerificationService {
         HttpURLConnection conn = null;
         try {
             conn = (HttpURLConnection) new URI(fileUrl).toURL().openConnection();
+            conn.setInstanceFollowRedirects(false);  // SSRF 방지: 리다이렉트 비활성화
             conn.setConnectTimeout(5000);  // 연결 타임아웃 5초
             conn.setReadTimeout(10000);    // 읽기 타임아웃 10초
             conn.setRequestMethod("GET");
+
+            int responseCode = conn.getResponseCode();
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+                log.warn("S3 파일 접근 실패, 응답 코드: {}", responseCode);
+                return 50;
+            }
 
             try (InputStream is = conn.getInputStream()) {
                 return extractExifScore(is);
@@ -211,6 +218,12 @@ public class DocumentVerificationService {
      * OCR 텍스트 인식 기반 점수 계산 (URL 방식)
      */
     private int calcOcrScore(String fileUrl, String role) {
+        // SSRF 방지: S3 URL 패턴만 허용
+        if (!isValidS3Url(fileUrl)) {
+            log.warn("OCR 분석 - 유효하지 않은 S3 URL: {}", maskUrl(fileUrl));
+            return 50;
+        }
+
         OcrClient.OcrResult result = ocrClient.extract(fileUrl, role);
         return processOcrResult(result);
     }

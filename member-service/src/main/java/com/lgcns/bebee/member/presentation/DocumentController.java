@@ -164,12 +164,39 @@ public class DocumentController implements DocumentSwagger {
                         @RequestParam(required = false) String role) {
 
                 if (fileUrl != null && !fileUrl.isBlank()) {
-                        log.info("URL 기반 OCR 추출 요청: {}", fileUrl);
+                        // SSRF 방지: S3 URL 패턴만 허용
+                        validateS3Url(fileUrl);
+                        log.info("URL 기반 OCR 추출 요청: {}", maskUrl(fileUrl));
                         return ResponseEntity.ok(ocrClient.extract(fileUrl, role));
                 }
 
-                log.info("파일 기반 OCR 추출 요청: {}", file != null ? file.getOriginalFilename() : "null");
+                if (file == null || file.isEmpty()) {
+                        throw new IllegalArgumentException("file 또는 fileUrl 중 하나는 필수입니다.");
+                }
+
+                log.info("파일 기반 OCR 추출 요청: {}", file.getOriginalFilename());
                 return ResponseEntity.ok(ocrClient.analyze(file, role));
+        }
+
+        /**
+         * S3 URL 유효성 검증 (SSRF 방지)
+         */
+        private void validateS3Url(String url) {
+                if (!url.startsWith("https://") ||
+                        (!url.contains(".s3.") && !url.contains("s3.amazonaws.com") &&
+                         !url.contains("cloudfront.net") && !url.contains("images.be-bee.link"))) {
+                        log.warn("허용되지 않은 URL: {}", maskUrl(url));
+                        throw new IllegalArgumentException("허용되지 않은 URL 형식입니다.");
+                }
+        }
+
+        /**
+         * URL 마스킹 (민감 정보 로깅 방지)
+         */
+        private String maskUrl(String url) {
+                if (url == null) return null;
+                int queryIndex = url.indexOf('?');
+                return queryIndex > 0 ? url.substring(0, queryIndex) + "?[MASKED]" : url;
         }
 
 }
