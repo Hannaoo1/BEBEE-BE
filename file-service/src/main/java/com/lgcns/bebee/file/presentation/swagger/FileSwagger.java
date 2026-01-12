@@ -1,6 +1,7 @@
 package com.lgcns.bebee.file.presentation.swagger;
 
 import com.lgcns.bebee.file.presentation.dto.req.PresignedUrlReqDTO;
+import com.lgcns.bebee.file.presentation.dto.req.SignupPresignedUrlReqDTO;
 import com.lgcns.bebee.file.presentation.dto.res.PresignedUrlResDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface FileSwagger {
 
     @Operation(
-            summary = "Presigned URL 생성",
-            description = """
+                summary = "Presigned URL 생성",
+                description = """
                     S3에 파일을 직접 업로드하기 위한 Presigned URL을 생성합니다.
 
                     **사용 방법:**
@@ -71,5 +72,38 @@ public interface FileSwagger {
                     )
             )
             PresignedUrlReqDTO reqDTO
+    );
+
+@Operation(
+            summary = "회원가입 전용 Presigned URL 생성",
+            description = """
+                회원가입 도중 신분증/이수증 업로드를 위한 전용 Presigned URL을 생성합니다.
+                
+                **보안 사항:**
+                - 이 API는 인증(JWT) 없이 호출 가능하도록 설정되지만, 
+                - 업로드 경로는 내부적으로 무조건 **'documents/signup'**으로 고정됩니다.
+                - 따라서 미인증 유저가 다른 디렉토리에 접근하는 것을 원천 차단합니다.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "회원가입 전용 Presigned URL 생성 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = PresignedUrlResDTO.class)
+                    )
+            )
+    })
+    ResponseEntity<PresignedUrlResDTO> generateSignupPresignedUrl(
+            @RequestBody(
+                    description = "회원가입 전용 Presigned URL 생성 요청 정보",
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SignupPresignedUrlReqDTO.class)
+                    )
+            )
+            SignupPresignedUrlReqDTO reqDTO
     );
 }
