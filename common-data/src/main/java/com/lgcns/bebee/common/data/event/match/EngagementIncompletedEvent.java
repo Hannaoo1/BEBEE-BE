@@ -1,4 +1,5 @@
-package com.lgcns.bebee.common.data.event;
+package com.lgcns.bebee.common.data.event.match;
+import com.lgcns.bebee.common.data.event.DomainEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import java.time.LocalDate;
@@ -12,20 +13,10 @@ import java.time.LocalDate;
 
 @Getter
 @RequiredArgsConstructor
-public class EngagementIncompletedEvent extends DomainEvent {
+public class EngagementIncompletedEvent implements DomainEvent {
     private final Long engagementId;
     private final Long agreementId;
     private final Long helperId;
     private final Long disabledId;
     private final LocalDate engagementDate;
-
-    @Override
-    public String getEventName() {
-        return this.getClass().getSimpleName();
-    }
-
-    @Override
-    public String getEventDesc() {
-        return "활동 미완료 처리 이벤트";
-    }
 }
