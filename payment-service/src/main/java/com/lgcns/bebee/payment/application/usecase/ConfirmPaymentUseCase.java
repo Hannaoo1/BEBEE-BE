@@ -2,9 +2,11 @@ package com.lgcns.bebee.payment.application.usecase;
 
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
+import com.lgcns.bebee.common.data.event.payment.PaymentConfirmedEvent;
 import com.lgcns.bebee.payment.application.client.TossPaymentsClient;
 import com.lgcns.bebee.payment.application.client.TempPaymentPort;
 import com.lgcns.bebee.payment.application.client.dto.TempPaymentInfo;
+import com.lgcns.bebee.payment.application.usecase.client.EventPublisher;
 import com.lgcns.bebee.payment.common.exception.PaymentErrors;
 import com.lgcns.bebee.payment.domain.entity.HoneyHistory;
 import com.lgcns.bebee.payment.domain.entity.HoneyWallet;
@@ -31,6 +33,8 @@ public class ConfirmPaymentUseCase implements UseCase<ConfirmPaymentUseCase.Para
     private final PaymentRepository paymentRepository;
     private final HoneyWalletRepository honeyWalletRepository;
     private final HoneyHistoryRepository honeyHistoryRepository;
+
+    private final EventPublisher eventPublisher;
 
     @Transactional
     @Override
@@ -83,6 +87,13 @@ public class ConfirmPaymentUseCase implements UseCase<ConfirmPaymentUseCase.Para
         );
         honeyHistoryRepository.save(history);
         log.info("꿀 히스토리 기록 완료: historyId={}", history.getHoneyHistoryId());
+
+        // 결제 승인(꿀 지갑 생성/잔액 충전) 후 이벤트 발행
+        eventPublisher.publish(new PaymentConfirmedEvent(
+                temp.getMemberId(),
+                savedWallet.getHoneyWalletId(),
+                savedWallet.getBalance()
+        ));
 
         // 6. Redis 임시 데이터 삭제
         tempPaymentPort.delete(param.getOrderId());
