@@ -19,8 +19,8 @@ public class PostAppliedEventHandler implements EventHandler<PostAppliedEvent> {
     @Override
     public void handle(PostAppliedEvent event) {
         SendPushNotificationUseCase.Param param = new SendPushNotificationUseCase.Param(
-                event.getDisabledId(),
                 event.getHelperId(),
+                event.getDisabledId(),
                 "APPLICATION",
                 event.getApplicationId(),
                 null,
