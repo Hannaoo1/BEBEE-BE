@@ -95,7 +95,7 @@ public class ConfirmPaymentUseCase implements UseCase<ConfirmPaymentUseCase.Para
                 savedWallet.getBalance()
         ));
 
-        // 6. Redis 임시 데이터 삭제
+        // Redis 임시 데이터 삭제
         tempPaymentPort.delete(param.getOrderId());
         log.info("Redis 임시 데이터 삭제 완료: orderId={}", param.getOrderId());
 
