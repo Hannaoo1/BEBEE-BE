@@ -34,12 +34,12 @@ public class ApplicationAppNotification extends AppNotification {
 
     @Override
     public String getTitle() {
-        return "새로운 신청이 있습니다";
+        return "새로운 지원이 있습니다";
     }
 
     @Override
     public String getBody() {
-        return "도움 요청에 새로운 신청이 있습니다.";
+        return "도움 요청에 새로운 지원이 있습니다.";
     }
 
     @Override
