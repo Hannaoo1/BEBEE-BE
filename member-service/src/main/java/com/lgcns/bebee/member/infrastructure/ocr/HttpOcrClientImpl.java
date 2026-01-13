@@ -46,7 +46,7 @@ public class HttpOcrClientImpl implements OcrClient {
             parts.add("role", role);
 
             OcrResponse response = ocrWebClient.post()
-                    .uri("/api/ocr/analyze")
+                    .uri("/ocr/api/ocr/analyze") // 게이트웨이 경로 포함
                     .contentType(MediaType.MULTIPART_FORM_DATA)
                     .body(BodyInserters.fromMultipartData(parts))
                     .retrieve()
@@ -76,7 +76,7 @@ public class HttpOcrClientImpl implements OcrClient {
                     "role", role != null ? role : "");
 
             OcrResponse response = ocrWebClient.post()
-                    .uri("/api/ocr/extract") // 파이썬 서비스의 새로운 엔드포인트
+                    .uri("/ocr/api/ocr/extract") // 게이트웨이 경로 포함
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(requestBody)
                     .retrieve()
