@@ -62,6 +62,10 @@ spring:
       credentials:
         access-key: test
         secret-key: test
+
+      sqs:
+        listener:
+          max-delay-between-polls: 10
   # Flyway 설정
   flyway:
     # Flyway 활성화
@@ -109,8 +113,12 @@ cors:
   max-age: ${CORS_MAX_AGE:3600}
 
 app:
+  sns:
+    payment-topic-arn: "${AWS_SNS_TOPIC_ARN:arn:aws:sns:ap-northeast-2:000000000000:bebee-local-payment-topic}"
   sqs:
     payment-queue-url: "${AWS_SQS_QUEUE_URL:http://sqs.ap-northeast-2.localhost.localstack.cloud:4566/000000000000/bebee-local-payment-queue}"
+
+event: "aws"
 
 tsid:
   node:
