@@ -2,18 +2,40 @@ package com.lgcns.bebee.payment.common.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lgcns.bebee.common.data.event.*;
+import com.lgcns.bebee.common.data.event.aws.SnsEventPublisher;
 import com.lgcns.bebee.common.data.event.aws.SqsEventListener;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import software.amazon.awssdk.services.sns.SnsClient;
 
 import java.util.List;
 
 @Configuration
 public class EventConfig {
+
+    @Bean
+    public DomainEventPublisher domainEventPublisher(
+            OutboxRepository outboxRepository,
+            ApplicationEventPublisher eventPublisher,
+            ObjectMapper objectMapper
+    ){
+        return new DomainEventPublisher(outboxRepository, eventPublisher, objectMapper);
+    }
+
     @Bean
     public EventHandlerRegistry eventHandlerRegistry(List<EventHandler<? extends DomainEvent>> handlers){
         return new EventHandlerRegistry(handlers);
+    }
+
+    @Bean
+    public SpringEventListener springEventListener(EventPublisher eventPublisher, OutboxRepository outboxRepository){
+        return new SpringEventListener(eventPublisher, outboxRepository);
+    }
+
+    @Bean
+    public SnsEventPublisher snsEventPublisher(SnsClient snsClient, ObjectMapper objectMapper){
+        return new SnsEventPublisher(snsClient, objectMapper);
     }
 
     @Bean
@@ -25,11 +47,12 @@ public class EventConfig {
     }
 
     @Bean
-    public DomainEventPublisher domainEventPublisher(
+    public OutboxRetryScheduler outboxRetryScheduler(
             OutboxRepository outboxRepository,
-            ApplicationEventPublisher eventPublisher,
-            ObjectMapper objectMapper
-            ){
-        return new DomainEventPublisher(outboxRepository, eventPublisher, objectMapper);
+            EventPublisher eventPublisher,
+            EventTypeMapper eventTypeMapper,
+            ObjectMapper objectMapper) {
+
+        return new OutboxRetryScheduler(outboxRepository, eventPublisher, objectMapper, eventTypeMapper);
     }
 }
