@@ -17,7 +17,7 @@ public class OcrProperties {
     /**
      * OCR 서비스 기본 URL
      */
-    private String baseUrl = "https://api.be-bee.link/ocr";
+    private String baseUrl = "https://api.be-bee.link";
     
     /**
      * 타임아웃 (밀리초)
