@@ -2,7 +2,7 @@ package com.lgcns.bebee.member.infrastructure.event;
 
 import com.lgcns.bebee.common.data.event.EventHandler;
 import com.lgcns.bebee.common.data.event.EventType;
-import com.lgcns.bebee.common.data.event.payment.PaymentConfirmedEvent;
+import com.lgcns.bebee.common.data.event.payment.HoneyWalletChangedEvent;
 import com.lgcns.bebee.member.domain.entity.sync.MemberHoneyWalletSync;
 import com.lgcns.bebee.member.domain.repository.HoneyWalletRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,18 +13,18 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PaymentConfirmedEventHandler implements EventHandler<PaymentConfirmedEvent> {
+public class HoneyWalletChangedEventHandler implements EventHandler<HoneyWalletChangedEvent> {
     private final HoneyWalletRepository honeyWalletRepository;
 
     @Override
     public EventType getEventType() {
-        return EventType.PAYMENT_CONFIRMED;
+        return EventType.HONEY_WALLET_CHANGED;
     }
 
     @Override
     @Transactional
-    public void handle(PaymentConfirmedEvent event) {
-        log.info("PaymentConfirmed 이벤트 처리 시작 - memberId: {}, honeyWalletId: {}, balance: {}",
+    public void handle(HoneyWalletChangedEvent event) {
+        log.info("HoneyWalletChanged 이벤트 처리 시작 - memberId: {}, honeyWalletId: {}, balance: {}",
                 event.getMemberId(), event.getHoneyWalletId(), event.getBalance());
 
         // HoneyWallet 동기화: 있으면 업데이트, 없으면 생성
@@ -41,7 +41,7 @@ public class PaymentConfirmedEventHandler implements EventHandler<PaymentConfirm
         wallet.updateBalance(event.getBalance());
         honeyWalletRepository.save(wallet);
 
-        log.info("PaymentConfirmed 이벤트 처리 완료 - memberId: {}, balance: {}",
+        log.info("HoneyWalletChanged 이벤트 처리 완료 - memberId: {}, balance: {}",
                 event.getMemberId(), event.getBalance());
     }
 }

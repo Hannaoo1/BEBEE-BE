@@ -73,7 +73,7 @@ FILTER_POLICIES["match:match"]='{
 # Member 서비스
 FILTER_POLICIES["member:payment"]='{
   "eventType": [
-    "PaymentConfirmedEvent"
+    "HoneyWalletChangedEvent"
   ]
 }'
 

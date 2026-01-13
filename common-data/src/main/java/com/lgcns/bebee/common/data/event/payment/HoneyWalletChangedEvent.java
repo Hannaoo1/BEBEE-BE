@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor
-public class PaymentConfirmedEvent extends DomainEvent {
+public class HoneyWalletChangedEvent extends DomainEvent {
     private final Long memberId;
     private final Long honeyWalletId;
     private final Long balance; // 변경 후 잔액 (원 단위)
