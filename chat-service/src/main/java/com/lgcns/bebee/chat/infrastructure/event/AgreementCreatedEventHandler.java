@@ -3,7 +3,6 @@ package com.lgcns.bebee.chat.infrastructure.event;
 import com.lgcns.bebee.chat.application.ProcessAgreementCreatedUseCase;
 import com.lgcns.bebee.common.data.event.match.AgreementCreatedEvent;
 import com.lgcns.bebee.common.data.event.EventHandler;
-import com.lgcns.bebee.common.data.event.EventType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -13,9 +12,10 @@ public class AgreementCreatedEventHandler implements EventHandler<AgreementCreat
     private final ProcessAgreementCreatedUseCase processAgreementCreatedUseCase;
 
     @Override
-    public EventType getEventType() {
-        return EventType.AGREEMENT_CREATED;
+    public Class<AgreementCreatedEvent> getEventClass() {
+        return AgreementCreatedEvent.class;
     }
+
 
     @Override
     public void handle(AgreementCreatedEvent event) {

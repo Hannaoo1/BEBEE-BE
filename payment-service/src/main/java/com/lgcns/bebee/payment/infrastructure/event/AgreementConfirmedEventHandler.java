@@ -3,7 +3,6 @@ package com.lgcns.bebee.payment.infrastructure.event;
 
 import com.lgcns.bebee.common.data.event.match.AgreementConfirmedEvent;
 import com.lgcns.bebee.common.data.event.EventHandler;
-import com.lgcns.bebee.common.data.event.EventType;
 import com.lgcns.bebee.payment.application.usecase.UseHoneyUseCase;
 import com.lgcns.bebee.payment.domain.entity.sync.EngagementType;
 import com.lgcns.bebee.payment.domain.entity.sync.PaymentAgreementSync;
@@ -25,9 +24,10 @@ public class AgreementConfirmedEventHandler implements EventHandler<AgreementCon
     private final MatchRepository matchRepository;
 
     @Override
-    public EventType getEventType() {
-        return EventType.AGREEMENT_CONFIRMED;
+    public Class<AgreementConfirmedEvent> getEventClass() {
+        return AgreementConfirmedEvent.class;
     }
+
 
     @Override
     @Transactional

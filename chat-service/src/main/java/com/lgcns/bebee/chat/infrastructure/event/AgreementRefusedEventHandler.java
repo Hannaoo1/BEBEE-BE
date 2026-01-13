@@ -3,7 +3,6 @@ package com.lgcns.bebee.chat.infrastructure.event;
 import com.lgcns.bebee.chat.application.ProcessAgreementRefusedUseCase;
 import com.lgcns.bebee.common.data.event.match.AgreementRefusedEvent;
 import com.lgcns.bebee.common.data.event.EventHandler;
-import com.lgcns.bebee.common.data.event.EventType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +12,10 @@ public class AgreementRefusedEventHandler implements EventHandler<AgreementRefus
     private final ProcessAgreementRefusedUseCase processAgreementRefusedUseCase;
 
     @Override
-    public EventType getEventType() { return EventType.AGREEMENT_REFUSED;}
+    public Class<AgreementRefusedEvent> getEventClass() {
+        return AgreementRefusedEvent.class;
+    }
+
 
     @Override
     public void handle(AgreementRefusedEvent event) {

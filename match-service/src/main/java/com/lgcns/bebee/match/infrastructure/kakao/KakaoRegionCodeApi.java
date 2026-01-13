@@ -1,7 +1,7 @@
 package com.lgcns.bebee.match.infrastructure.kakao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.lgcns.bebee.match.application.usecase.client.RegionCodeClient;
+import com.lgcns.bebee.match.application.client.RegionCodeClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

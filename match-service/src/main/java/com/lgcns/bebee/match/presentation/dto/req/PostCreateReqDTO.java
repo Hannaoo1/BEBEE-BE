@@ -1,9 +1,9 @@
 package com.lgcns.bebee.match.presentation.dto.req;
 
 import com.lgcns.bebee.match.application.usecase.CreatePostUseCase;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -63,6 +63,15 @@ public record PostCreateReqDTO(
 
         @Schema(
                 description = "활동 가능 요일 및 시간 목록 (TERM 타입일 때 필수)",
+                example = """
+                [
+                  {
+                    "dayOfWeek": "MONDAY",
+                    "startTime": "09:00:00",
+                    "endTime": "18:00:00"
+                  }
+                ]
+                """,
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED
         )
         List<ScheduleDTO> schedules,

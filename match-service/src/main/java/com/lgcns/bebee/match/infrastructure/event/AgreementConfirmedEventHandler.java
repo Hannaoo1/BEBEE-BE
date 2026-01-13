@@ -2,7 +2,6 @@ package com.lgcns.bebee.match.infrastructure.event;
 
 import com.lgcns.bebee.common.data.event.match.AgreementConfirmedEvent;
 import com.lgcns.bebee.common.data.event.EventHandler;
-import com.lgcns.bebee.common.data.event.EventType;
 import com.lgcns.bebee.match.application.usecase.CreateAgreementEngagementsUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -13,8 +12,8 @@ public class AgreementConfirmedEventHandler implements EventHandler<AgreementCon
     private final CreateAgreementEngagementsUseCase createAgreementEngagementsUseCase;
 
     @Override
-    public EventType getEventType() {
-        return  EventType.AGREEMENT_CONFIRMED;
+    public Class<AgreementConfirmedEvent> getEventClass() {
+        return AgreementConfirmedEvent.class;
     }
 
     @Override
