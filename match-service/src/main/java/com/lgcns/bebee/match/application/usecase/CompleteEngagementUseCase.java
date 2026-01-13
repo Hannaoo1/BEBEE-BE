@@ -3,8 +3,10 @@ package com.lgcns.bebee.match.application.usecase;
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
 import com.lgcns.bebee.match.application.usecase.client.EventPublisher;
+import com.lgcns.bebee.common.data.event.EngagementCompletedEvent;
 import com.lgcns.bebee.match.domain.entity.Agreement;
 import com.lgcns.bebee.match.domain.entity.Engagement;
+import com.lgcns.bebee.match.domain.entity.Match;
 import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
 import com.lgcns.bebee.match.domain.entity.sync.Role;
 import com.lgcns.bebee.match.domain.entity.vo.EngagementStatus;
@@ -32,7 +34,14 @@ public class CompleteEngagementUseCase implements UseCase<CompleteEngagementUseC
         engagement.complete();
 
         if(engagement.getStatus() == EngagementStatus.COMPLETED) {
-            // eventPublisher.publish();
+            Match match = engagement.getMatch();
+            eventPublisher.publish(new EngagementCompletedEvent(
+                engagement.getId(),
+                match.getAgreementId(),
+                match.getHelperId(),
+                match.getDisabledId(),
+                engagement.getDate()
+            ));
         }
 
         Agreement agreement = engagement.getMatch().getAgreement();
