@@ -46,7 +46,7 @@ public class HttpOcrClientImpl implements OcrClient {
             parts.add("role", role);
 
             OcrResponse response = ocrWebClient.post()
-                    .uri("/ocr/api/ocr/analyze") // 게이트웨이 경로 포함
+                    .uri("/api/ocr/analyze") // OCR 서비스 직접 엔드포인트
                     .contentType(MediaType.MULTIPART_FORM_DATA)
                     .body(BodyInserters.fromMultipartData(parts))
                     .retrieve()
@@ -76,7 +76,7 @@ public class HttpOcrClientImpl implements OcrClient {
                     "role", role != null ? role : "");
 
             OcrResponse response = ocrWebClient.post()
-                    .uri("/ocr/api/ocr/extract") // 게이트웨이 경로 포함
+                    .uri("/api/ocr/extract") // OCR 서비스 직접 엔드포인트
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(requestBody)
                     .retrieve()
