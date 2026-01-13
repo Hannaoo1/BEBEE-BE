@@ -38,36 +38,22 @@ public class HttpOcrClientImpl implements OcrClient {
     @Override
     public OcrResult analyze(MultipartFile file, String role) {
         try {
-            log.debug("OCR 분석 요청: {}, role: {}", file.getOriginalFilename(), role);
+            log.debug("OCR 분석 요청 (파일): {}, role: {}", file.getOriginalFilename(), role);
 
-            // MultipartFile을 Resource로 변환하여 MultiValueMap에 추가
             Resource resource = file.getResource();
             MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
             parts.add("file", resource);
             parts.add("role", role);
 
-            // OCR 서비스 호출
             OcrResponse response = ocrWebClient.post()
-                    .uri("/api/ocr/analyze")
+                    .uri("/ocr/api/ocr/analyze") // 게이트웨이 경로 포함
                     .contentType(MediaType.MULTIPART_FORM_DATA)
                     .body(BodyInserters.fromMultipartData(parts))
                     .retrieve()
                     .bodyToMono(OcrResponse.class)
                     .block();
 
-            if (response == null) {
-                throw DocumentErrors.OCR_FAILED.toException();
-            }
-
-            log.debug("OCR 분석 완료: confidence={}, keywords={}, names={}, fields={}",
-                    response.getConfidence(), response.getKeywords(), response.getNames(), response.getFields());
-
-            return new OcrResult(
-                    response.getExtractedText(),
-                    response.getConfidence(),
-                    response.getKeywords(),
-                    response.getNames(),
-                    response.getFields());
+            return toOcrResult(response);
 
         } catch (WebClientResponseException e) {
             log.error("OCR 서비스 호출 실패: status={}, body={}",
@@ -77,6 +63,61 @@ public class HttpOcrClientImpl implements OcrClient {
             log.error("OCR 분석 중 예외 발생", e);
             throw DocumentErrors.OCR_FAILED.toException();
         }
+    }
+
+    @Override
+    public OcrResult extract(String fileUrl, String role) {
+        try {
+            log.info("OCR 추출 요청 (URL): {}, role: {}", maskUrl(fileUrl), role);
+
+            // S3 이미지 URL과 사용자 역할을 JSON 바디로 전송
+            Map<String, String> requestBody = Map.of(
+                    "fileUrl", fileUrl,
+                    "role", role != null ? role : "");
+
+            OcrResponse response = ocrWebClient.post()
+                    .uri("/ocr/api/ocr/extract") // 게이트웨이 경로 포함
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(requestBody)
+                    .retrieve()
+                    .bodyToMono(OcrResponse.class)
+                    .block();
+
+            return toOcrResult(response);
+
+        } catch (WebClientResponseException e) {
+            log.error("OCR 서비스 호출 실패 (URL): status={}, body={}",
+                    e.getStatusCode(), e.getResponseBodyAsString(), e);
+            throw DocumentErrors.OCR_FAILED.toException();
+        } catch (Exception e) {
+            log.error("OCR 추출 중 예외 발생 (URL)", e);
+            throw DocumentErrors.OCR_FAILED.toException();
+        }
+    }
+
+    /**
+     * URL 마스킹 (presigned URL의 민감 정보 로깅 방지)
+     */
+    private String maskUrl(String url) {
+        if (url == null) return null;
+        int queryIndex = url.indexOf('?');
+        return queryIndex > 0 ? url.substring(0, queryIndex) + "?[MASKED]" : url;
+    }
+
+    private OcrResult toOcrResult(OcrResponse response) {
+        if (response == null) {
+            throw DocumentErrors.OCR_FAILED.toException();
+        }
+
+        log.info("OCR 처리 완료: confidence={}, keywords={}, names={}, fields={}",
+                response.getConfidence(), response.getKeywords(), response.getNames(), response.getFields());
+
+        return new OcrResult(
+                response.getExtractedText(),
+                response.getConfidence(),
+                response.getKeywords(),
+                response.getNames(),
+                response.getFields());
     }
 
     /**

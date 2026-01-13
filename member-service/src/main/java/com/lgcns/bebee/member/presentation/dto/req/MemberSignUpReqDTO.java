@@ -24,7 +24,12 @@ public class MemberSignUpReqDTO {
     // HELPER용: 도움 유형 목록
     private java.util.List<String> helpTypes;
 
-    // DISABLED용: 장애 유형 및 설명
+    // DISABLED용: 장애 유형, 등급 및 설명
     private String disabilityType;
+    private String disabilityGrade;         // "1" = 중증, "2" = 경증
     private String disabilityDescription;
+
+    // 문서 관련 (Step 5에서 업로드 및 분석 완료)
+    private String fileUrl;
+    private String systemFlag;
 }

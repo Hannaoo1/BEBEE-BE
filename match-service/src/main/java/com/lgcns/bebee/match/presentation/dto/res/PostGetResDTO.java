@@ -10,6 +10,9 @@ import java.util.List;
 
 @Schema(description = "게시글 상세 조회 응답")
 public record PostGetResDTO(
+        @Schema(description = "게시글 작성자 id", example = "100")
+        String memberId,
+
         @Schema(description = "게시글 작성자 닉네임", example = "김철수")
         String memberNickname,
 
@@ -63,6 +66,7 @@ public record PostGetResDTO(
 ) {
     public static PostGetResDTO from(GetSinglePostUseCase.Result result) {
         return new PostGetResDTO(
+                String.valueOf(result.getMemberId()),
                 result.getMemberNickname(),
                 result.getMemberAddress(),
                 result.getMemberProfileImageUrl(),

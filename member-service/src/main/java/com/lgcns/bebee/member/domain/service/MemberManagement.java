@@ -31,7 +31,9 @@ public class MemberManagement {
      * 컨벤션에 따라 PasswordEncoder.matches()를 사용합니다.
      */
     public void checkPassword(Member member, String rawPassword) {
-        if (!passwordEncoder.matches(rawPassword, member.getPassword())) {
+        boolean isMatch = passwordEncoder.matches(rawPassword, member.getPassword());
+
+        if (!isMatch) {
             throw MemberErrors.INVALID_PASSWORD.toException();
         }
     }
@@ -61,7 +63,7 @@ public class MemberManagement {
             BigDecimal latitude,
             BigDecimal longitude,
             String districtCode) {
-//        passwordPolicyValidator.validate(rawPassword);
+        passwordPolicyValidator.validate(rawPassword);
         String encodedPassword = passwordEncoder.encode(rawPassword);
 
         return Member.create(

@@ -23,6 +23,7 @@ public class OcrConfig {
             .baseUrl(properties.getBaseUrl())
             .clientConnector(new org.springframework.http.client.reactive.ReactorClientHttpConnector(
                 HttpClient.create()
+                    .followRedirect(false)  // SSRF 방지: 리다이렉트 비활성화
                     .responseTimeout(Duration.ofMillis(properties.getTimeout()))
             ))
             .build();
