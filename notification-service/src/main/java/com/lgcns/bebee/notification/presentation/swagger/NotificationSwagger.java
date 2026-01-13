@@ -43,12 +43,6 @@ public interface NotificationSwagger {
             )
     })
     ResponseEntity<Void> registerToken(
-            @Parameter(
-                    description = "회원 ID (임시 용도, 나중에 JWT 토큰에서 추출)",
-                    required = true,
-                    example = "100"
-            )
-            @RequestParam Long memberId,
 
             @Parameter(
                     description = """
