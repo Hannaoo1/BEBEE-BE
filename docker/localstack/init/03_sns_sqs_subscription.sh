@@ -39,6 +39,7 @@ SUBSCRIPTIONS=(
   "notification:match"
   "payment:match"
   "member:payment"
+  "member:match"
 )
 
 # ------------------------------------------
@@ -74,6 +75,20 @@ FILTER_POLICIES["match:match"]='{
 FILTER_POLICIES["member:payment"]='{
   "eventType": [
     "HoneyWalletChangedEvent"
+  ]
+}'
+
+  # Match 서비스: BadgeCreated 이벤트 수신
+FILTER_POLICIES["match:member"]='{
+    "eventType": [
+      "BadgeCreatedEvent"
+  ]
+}'
+
+# Member 서비스: EngagementCompleted 이벤트 수신
+  FILTER_POLICIES["member:match"]='{
+    "eventType": [
+      "EngagementCompletedEvent"
   ]
 }'
 
