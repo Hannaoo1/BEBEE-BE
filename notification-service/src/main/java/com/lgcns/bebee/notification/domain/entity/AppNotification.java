@@ -26,8 +26,8 @@ public abstract class AppNotification extends BaseTimeEntity {
     @Column(nullable = false)
     protected Long senderId;
 
-    @Column(nullable = false)
-    private Boolean isRead;
+    @Column
+    private Boolean isRead = false;
 
     @Column
     private LocalDateTime readAt;
