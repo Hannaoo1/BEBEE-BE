@@ -4,6 +4,7 @@ import com.lgcns.bebee.notification.core.exception.NotificationInvalidParamError
 
 public enum DeviceType {
     WEB_PC,
+    WEB_MOBILE,
     WEB_IOS,
     WEB_ANDROID;
 

@@ -71,7 +71,7 @@ CREATE TABLE push_notification_subscription
   push_notification_subscription_id BIGINT NOT NULL PRIMARY KEY,
   subscriber_id BIGINT NOT NULL,
   token VARCHAR(256) NOT NULL UNIQUE,
-  device_type ENUM('WEB_PC', 'WEB_IOS', 'WEB_ANDROID') NOT NULL,
+  device_type ENUM('WEB_PC', 'WEB_MOBILE', 'WEB_IOS', 'WEB_ANDROID') NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 
