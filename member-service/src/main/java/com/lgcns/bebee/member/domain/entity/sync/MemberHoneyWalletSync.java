@@ -30,4 +30,8 @@ public class MemberHoneyWalletSync extends BaseTimeEntity {
 
         return honeyWallet;
     }
+
+    public void updateBalance(Long balance) {
+        this.balance = balance;
+    }
 }
