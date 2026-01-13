@@ -38,6 +38,7 @@ SUBSCRIPTIONS=(
   "notification:chat"
   "notification:match"
   "payment:match"
+  "member:payment"
 )
 
 # ------------------------------------------
@@ -62,9 +63,17 @@ FILTER_POLICIES["payment:match"]='{
   ]
 }'
 
+# Match 서비스
 FILTER_POLICIES["match:match"]='{
   "eventType": [
     "AgreementConfirmedEvent"
+  ]
+}'
+
+# Member 서비스
+FILTER_POLICIES["member:payment"]='{
+  "eventType": [
+    "PaymentConfirmedEvent"
   ]
 }'
 
