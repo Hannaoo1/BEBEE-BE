@@ -76,7 +76,7 @@ public class HttpOcrClientImpl implements OcrClient {
                     "role", role != null ? role : "");
 
             OcrResponse response = ocrWebClient.post()
-                    .uri("/api/ocr/extract") // OCR 서비스 직접 엔드포인트
+                    .uri("/ocr/api/ocr/extract") // 파이썬 서비스의 새로운 엔드포인트
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(requestBody)
                     .retrieve()

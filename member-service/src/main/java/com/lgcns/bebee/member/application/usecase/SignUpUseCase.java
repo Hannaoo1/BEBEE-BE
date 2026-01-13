@@ -66,8 +66,9 @@ public class SignUpUseCase implements UseCase<SignUpUseCase.Param, SignUpUseCase
 
         Member savedMember = memberRepository.save(newMember);
 
-        // HELPER: 도움 유형 저장
-        if ("HELPER".equals(params.getRole()) && params.getHelpTypes() != null && !params.getHelpTypes().isEmpty()) {
+        // HELPER/DISABLED: 도움 유형 저장 (두 역할 모두 필요)
+        if ((params.getRole().equals("HELPER") || params.getRole().equals("DISABLED")) 
+                && params.getHelpTypes() != null && !params.getHelpTypes().isEmpty()) {
             for (String helpTypeName : params.getHelpTypes()) {
                 StringBuilder hexBuilder = new StringBuilder();
                 for (byte b : helpTypeName.getBytes()) {
