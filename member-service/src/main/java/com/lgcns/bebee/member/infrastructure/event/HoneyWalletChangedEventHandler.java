@@ -2,6 +2,7 @@ package com.lgcns.bebee.member.infrastructure.event;
 
 import com.lgcns.bebee.common.data.event.EventHandler;
 import com.lgcns.bebee.common.data.event.EventType;
+import com.lgcns.bebee.common.data.event.match.EngagementCompletedEvent;
 import com.lgcns.bebee.common.data.event.payment.HoneyWalletChangedEvent;
 import com.lgcns.bebee.member.domain.entity.sync.MemberHoneyWalletSync;
 import com.lgcns.bebee.member.domain.repository.HoneyWalletRepository;
@@ -17,8 +18,8 @@ public class HoneyWalletChangedEventHandler implements EventHandler<HoneyWalletC
     private final HoneyWalletRepository honeyWalletRepository;
 
     @Override
-    public EventType getEventType() {
-        return EventType.HONEY_WALLET_CHANGED;
+    public Class<HoneyWalletChangedEvent> getEventClass() {
+        return HoneyWalletChangedEvent.class;
     }
 
     @Override

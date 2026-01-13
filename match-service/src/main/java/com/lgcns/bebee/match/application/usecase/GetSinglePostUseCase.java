@@ -42,6 +42,7 @@ public class GetSinglePostUseCase implements UseCase<GetSinglePostUseCase.Param,
     @Getter
     @RequiredArgsConstructor
     public static class Result{
+        private final Long memberId;
         private final String memberNickname;
         private final String memberAddress;
         private final String memberProfileImageUrl;
@@ -100,6 +101,7 @@ public class GetSinglePostUseCase implements UseCase<GetSinglePostUseCase.Param,
             }
 
             return new Result(
+                    member.getId(),
                     member.getNickname(),
                     member.getAddressRoad(),
                     member.getProfileImageUrl(),

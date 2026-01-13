@@ -1,8 +1,7 @@
 package com.lgcns.bebee.member.infrastructure.event;
 
-import com.lgcns.bebee.common.data.event.EngagementCompletedEvent;
+import com.lgcns.bebee.common.data.event.match.EngagementCompletedEvent;
 import com.lgcns.bebee.common.data.event.EventHandler;
-import com.lgcns.bebee.common.data.event.EventType;
 import com.lgcns.bebee.member.application.usecase.CreateBadgeUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,8 +14,8 @@ public class EngagementCompletedEventHandler implements EventHandler<EngagementC
     private final CreateBadgeUseCase createBadgeUseCase;
 
     @Override
-    public EventType getEventType() {
-        return EventType.ENGAGEMENT_COMPLETED;
+    public Class<EngagementCompletedEvent> getEventClass() {
+        return EngagementCompletedEvent.class;
     }
 
     @Override

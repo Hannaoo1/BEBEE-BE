@@ -11,7 +11,7 @@ import java.util.List;
 
 @Getter
 @RequiredArgsConstructor
-public class AgreementCreatedEvent extends DomainEvent {
+public class AgreementCreatedEvent implements DomainEvent {
     private final Long chatroomId;
 
     private final Long agreementId;
@@ -31,14 +31,4 @@ public class AgreementCreatedEvent extends DomainEvent {
     private final List<Long> helpCategoryIds;
 
     private final LocalDateTime createdAt;
-
-    @Override
-    public String getEventName() {
-        return this.getClass().getSimpleName();
-    }
-
-    @Override
-    public String getEventDesc() {
-        return "매칭 확인서 생성 이벤트";
-    }
 }

@@ -2,7 +2,7 @@ package com.lgcns.bebee.match.application.usecase;
 
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
-import com.lgcns.bebee.match.application.usecase.client.EventPublisher;
+import com.lgcns.bebee.common.data.event.DomainEventPublisher;
 import com.lgcns.bebee.match.domain.entity.Post;
 import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
 import com.lgcns.bebee.common.data.event.match.PostCreatedEvent;
@@ -27,7 +27,7 @@ public class CreatePostUseCase implements UseCase<CreatePostUseCase.Param, Creat
     private final MemberManager memberManager;
     private final PostManager postManager;
 
-    private final EventPublisher eventPublisher;
+    private final DomainEventPublisher eventPublisher;
 
     @Transactional
     @Override

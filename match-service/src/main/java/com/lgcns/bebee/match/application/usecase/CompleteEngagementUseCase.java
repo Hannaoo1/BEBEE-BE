@@ -2,7 +2,6 @@ package com.lgcns.bebee.match.application.usecase;
 
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
-import com.lgcns.bebee.match.application.usecase.client.EventPublisher;
 import com.lgcns.bebee.match.domain.entity.Agreement;
 import com.lgcns.bebee.match.domain.entity.Engagement;
 import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
@@ -21,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class CompleteEngagementUseCase implements UseCase<CompleteEngagementUseCase.Param, CompleteEngagementUseCase.Result> {
     private final MemberManager memberManager;
     private final EngagementManager engagementManager;
-    private final EventPublisher eventPublisher;
 
     @Override
     public Result execute(Param param) {

@@ -4,6 +4,7 @@ import com.lgcns.bebee.common.data.event.match.AgreementConfirmedEvent;
 import com.lgcns.bebee.common.data.event.match.AgreementCreatedEvent;
 import com.lgcns.bebee.common.data.event.match.AgreementRefusedEvent;
 import com.lgcns.bebee.common.data.event.match.PostCreatedEvent;
+import com.lgcns.bebee.common.data.event.match.EngagementCompletedEvent;
 import com.lgcns.bebee.common.data.event.payment.HoneyWalletChangedEvent;
 import lombok.Getter;
 

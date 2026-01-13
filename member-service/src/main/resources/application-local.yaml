@@ -59,6 +59,18 @@ spring:
       # Redis Port
       port: ${REDIS_PORT:6379}
 
+  cloud:
+    aws:
+      endpoint: http://localhost:4566
+      region:
+        static: ap-northeast-2
+      credentials:
+        access-key: test
+        secret-key: test
+
+      sqs:
+        listener:
+          max-delay-between-polls: 10
   # Flyway 설정
   flyway:
     # Flyway 활성화
@@ -115,6 +127,13 @@ cors:
 ocr:
   base-url: ${OCR_SERVICE_URL:http://localhost:8086}
   timeout: ${OCR_TIMEOUT:90000}
+
+app:
+  sns:
+    topic-arn: "${AWS_SNS_TOPIC_ARN:arn:aws:sns:ap-northeast-2:000000000000:bebee-local-member-topic}"
+  sqs:
+    queue-url: "${AWS_SQS_QUEUE_URL:http://sqs.ap-northeast-2.localhost.localstack.cloud:4566/000000000000/bebee-local-member-queue}"
+
 
 # 로깅 설정
 logging:

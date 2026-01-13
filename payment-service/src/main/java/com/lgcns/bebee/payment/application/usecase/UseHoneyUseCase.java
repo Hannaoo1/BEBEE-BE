@@ -2,10 +2,10 @@ package com.lgcns.bebee.payment.application.usecase;
 
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
+import com.lgcns.bebee.common.data.event.DomainEventPublisher;
 import com.lgcns.bebee.common.data.event.payment.HoneyWalletChangedEvent;
 import com.lgcns.bebee.common.exception.InvalidParamException;
 import com.lgcns.bebee.common.util.ParamValidator;
-import com.lgcns.bebee.payment.application.usecase.client.EventPublisher;
 import com.lgcns.bebee.payment.common.exception.PaymentErrors;
 import com.lgcns.bebee.payment.common.exception.PaymentInvalidParamErrors;
 import com.lgcns.bebee.payment.domain.entity.HoneyEscrow;
@@ -36,7 +36,7 @@ public class UseHoneyUseCase implements UseCase<UseHoneyUseCase.Param, Void> {
     private final HoneyHistoryRepository honeyHistoryRepository;
     private final HoneyWalletRepository honeyWalletRepository;
 
-    private final EventPublisher eventPublisher;
+    private final DomainEventPublisher eventPublisher;
 
     @Override
     @Transactional

@@ -2,11 +2,11 @@ package com.lgcns.bebee.payment.application.usecase;
 
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
+import com.lgcns.bebee.common.data.event.DomainEventPublisher;
 import com.lgcns.bebee.common.data.event.payment.HoneyWalletChangedEvent;
 import com.lgcns.bebee.payment.application.client.TossPaymentsClient;
 import com.lgcns.bebee.payment.application.client.TempPaymentPort;
 import com.lgcns.bebee.payment.application.client.dto.TempPaymentInfo;
-import com.lgcns.bebee.payment.application.usecase.client.EventPublisher;
 import com.lgcns.bebee.payment.common.exception.PaymentErrors;
 import com.lgcns.bebee.payment.domain.entity.HoneyHistory;
 import com.lgcns.bebee.payment.domain.entity.HoneyWallet;
@@ -34,7 +34,7 @@ public class ConfirmPaymentUseCase implements UseCase<ConfirmPaymentUseCase.Para
     private final HoneyWalletRepository honeyWalletRepository;
     private final HoneyHistoryRepository honeyHistoryRepository;
 
-    private final EventPublisher eventPublisher;
+    private final DomainEventPublisher eventPublisher;
 
     @Transactional
     @Override

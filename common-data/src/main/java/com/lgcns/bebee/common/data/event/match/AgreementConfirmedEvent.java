@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @RequiredArgsConstructor
-public class AgreementConfirmedEvent extends DomainEvent {
+public class AgreementConfirmedEvent implements DomainEvent {
     private final Long chatroomId;
     private final Long chatId;
     private final Long disabledId;
@@ -20,14 +20,4 @@ public class AgreementConfirmedEvent extends DomainEvent {
     private final Long unitHoney;
     private final Long totalHoney;
     private final String type;
-
-    @Override
-    public String getEventName() {
-        return this.getClass().getSimpleName();
-    }
-
-    @Override
-    public String getEventDesc() {
-        return "매칭 확인서 수락 이벤트";
-    }
 }

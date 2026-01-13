@@ -114,9 +114,9 @@ cors:
 
 app:
   sns:
-    payment-topic-arn: "${AWS_SNS_TOPIC_ARN:arn:aws:sns:ap-northeast-2:000000000000:bebee-local-payment-topic}"
+    topic-arn: "${AWS_SNS_TOPIC_ARN:arn:aws:sns:ap-northeast-2:000000000000:bebee-local-payment-topic}"
   sqs:
-    payment-queue-url: "${AWS_SQS_QUEUE_URL:http://sqs.ap-northeast-2.localhost.localstack.cloud:4566/000000000000/bebee-local-payment-queue}"
+    queue-url: "${AWS_SQS_QUEUE_URL:http://sqs.ap-northeast-2.localhost.localstack.cloud:4566/000000000000/bebee-local-payment-queue}"
 
 event: "aws"
 
@@ -132,9 +132,6 @@ logging:
 
     # P6Spy SQL 로그 레벨
     p6spy: INFO
-
-    # Hibernate 파라미터 바인딩 로그 레벨 (trace: 모든 파라미터 값 출력)
-    org.hibernate.type: trace
 
     com.lgcns.bebee.payment: ${LOGGING_LEVEL_SERVICE:info}
 
