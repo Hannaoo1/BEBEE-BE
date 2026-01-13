@@ -1,5 +1,6 @@
 package com.lgcns.bebee.notification.presentation;
 
+import com.lgcns.bebee.common.annotation.CurrentMember;
 import com.lgcns.bebee.notification.application.RegisterFcmTokenUseCase;
 import com.lgcns.bebee.notification.presentation.dto.req.FcmTokenRegisterReqDTO;
 import com.lgcns.bebee.notification.presentation.swagger.NotificationSwagger;
@@ -14,7 +15,7 @@ public class NotificationController implements NotificationSwagger {
 
     @PostMapping("/fcm/tokens")
     public ResponseEntity<Void> registerToken(
-            @RequestParam Long memberId,
+            @CurrentMember Long memberId,
             @RequestBody FcmTokenRegisterReqDTO reqDTO
             ){
         RegisterFcmTokenUseCase.Param param = new RegisterFcmTokenUseCase.Param(memberId, reqDTO.token(), reqDTO.deviceType());
