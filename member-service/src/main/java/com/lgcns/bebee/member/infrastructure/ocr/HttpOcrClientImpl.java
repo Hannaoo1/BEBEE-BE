@@ -68,7 +68,7 @@ public class HttpOcrClientImpl implements OcrClient {
     @Override
     public OcrResult extract(String fileUrl, String role) {
         try {
-            log.debug("OCR 추출 요청 (URL): {}, role: {}", maskUrl(fileUrl), role);
+            log.info("OCR 추출 요청 (URL): {}, role: {}", maskUrl(fileUrl), role);
 
             // S3 이미지 URL과 사용자 역할을 JSON 바디로 전송
             Map<String, String> requestBody = Map.of(
@@ -109,7 +109,7 @@ public class HttpOcrClientImpl implements OcrClient {
             throw DocumentErrors.OCR_FAILED.toException();
         }
 
-        log.debug("OCR 처리 완료: confidence={}, keywords={}, names={}, fields={}",
+        log.info("OCR 처리 완료: confidence={}, keywords={}, names={}, fields={}",
                 response.getConfidence(), response.getKeywords(), response.getNames(), response.getFields());
 
         return new OcrResult(
