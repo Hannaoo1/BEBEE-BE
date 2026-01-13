@@ -12,6 +12,8 @@ import com.lgcns.bebee.member.domain.entity.sync.AgreementSync;
 import com.lgcns.bebee.member.domain.repository.AgreementRepository;
 import com.lgcns.bebee.member.domain.repository.BadgeRepository;
 import com.lgcns.bebee.member.domain.repository.MemberDisabilityCategoryRepository;
+import com.lgcns.bebee.member.application.usecase.client.EventPublisher;
+import com.lgcns.bebee.common.data.event.member.BadgeCreatedEvent;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,6 +31,7 @@ public class CreateBadgeUseCase implements UseCase<CreateBadgeUseCase.Param, Cre
     private final AgreementRepository agreementRepository;
     private final MemberDisabilityCategoryRepository memberDisabilityCategoryRepository;
     private final BadgeRepository badgeRepository;
+    private final EventPublisher eventPublisher;
 
     @Transactional
     @Override
@@ -71,6 +74,18 @@ public class CreateBadgeUseCase implements UseCase<CreateBadgeUseCase.Param, Cre
 
             updatedBadges.add(new BadgeInfo(badge.getId(), helperId, categoryId, newCount, badgeCode));
         }
+
+        // 뱃지 생성 이벤트 발행
+        List<BadgeCreatedEvent.BadgeInfo> eventBadges = updatedBadges.stream()
+                .map(b -> new BadgeCreatedEvent.BadgeInfo(
+                        b.getDisabilityCategoryId(),
+                        b.getCompletionCount(),
+                        b.getBadgeCode()
+                ))
+                .toList();
+
+        eventPublisher.publish(new BadgeCreatedEvent(helperId, eventBadges));
+
         return Result.from(updatedBadges);
     }
 
