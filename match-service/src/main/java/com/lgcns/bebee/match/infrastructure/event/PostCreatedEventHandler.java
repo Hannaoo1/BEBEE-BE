@@ -1,7 +1,6 @@
 package com.lgcns.bebee.match.infrastructure.event;
 
 import com.lgcns.bebee.common.data.event.EventHandler;
-import com.lgcns.bebee.common.data.event.EventType;
 import com.lgcns.bebee.common.data.event.match.PostCreatedEvent;
 import com.lgcns.bebee.match.application.usecase.UpdatePostLegalDongCodeUseCase;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +12,8 @@ public class PostCreatedEventHandler implements EventHandler<PostCreatedEvent> {
     private final UpdatePostLegalDongCodeUseCase updatePostLegalDongCodeUseCase;
 
     @Override
-    public EventType getEventType() {
-        return EventType.POST_CREATED;
+    public Class<PostCreatedEvent> getEventClass() {
+        return PostCreatedEvent.class;
     }
 
     @Override

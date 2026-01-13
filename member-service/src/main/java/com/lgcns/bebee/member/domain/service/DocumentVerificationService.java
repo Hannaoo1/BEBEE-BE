@@ -139,7 +139,7 @@ public class DocumentVerificationService {
         // SSRF 방지: S3 URL 패턴만 허용
         if (!isValidS3Url(fileUrl)) {
             log.warn("유효하지 않은 S3 URL: {}", maskUrl(fileUrl));
-            return 50;
+            return 70;  // EXIF 실패 시 기본값 상향 (OCR 실패 시에도 MID 보장)
         }
 
         HttpURLConnection conn = null;
@@ -153,7 +153,7 @@ public class DocumentVerificationService {
             int responseCode = conn.getResponseCode();
             if (responseCode != HttpURLConnection.HTTP_OK) {
                 log.warn("S3 파일 접근 실패, 응답 코드: {}", responseCode);
-                return 50;
+                return 70;  // EXIF 실패 시 기본값 상향
             }
 
             try (InputStream is = conn.getInputStream()) {
@@ -161,7 +161,7 @@ public class DocumentVerificationService {
             }
         } catch (Exception e) {
             log.error("URL 기반 EXIF 분석 중 오류 발생: {}", e.getMessage());
-            return 50;
+            return 70;  // EXIF 실패 시 기본값 상향
         } finally {
             if (conn != null) {
                 conn.disconnect();
@@ -177,7 +177,7 @@ public class DocumentVerificationService {
             return extractExifScore(is);
         } catch (Exception e) {
             log.error("파일 기반 EXIF 분석 중 오류 발생: {}", e.getMessage());
-            return 50;
+            return 70;  // EXIF 실패 시 기본값 상향
         }
     }
 
@@ -203,13 +203,19 @@ public class DocumentVerificationService {
                     }
                 }
                 score += 20;
+                
+                // EXIF 메타데이터가 있어도 유효한 태그가 없으면 최소 70점 보장
+                if (score < 70) {
+                    log.warn("EXIF 메타데이터는 있으나 유효한 태그가 부족합니다. 기본값 70점 적용");
+                    score = 70;
+                }
             } else {
                 log.warn("파일에 EXIF 메타데이터가 없습니다.");
-                score = 30;
+                score = 70;  // EXIF 없을 때 기본값 상향
             }
         } catch (Exception e) {
             log.error("EXIF 추출 중 오류: {}", e.getMessage());
-            return 50;
+            return 70;  // EXIF 실패 시 기본값 상향
         }
         return clamp(score);
     }

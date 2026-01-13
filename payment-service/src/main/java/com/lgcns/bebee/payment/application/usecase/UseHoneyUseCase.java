@@ -2,6 +2,8 @@ package com.lgcns.bebee.payment.application.usecase;
 
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
+import com.lgcns.bebee.common.data.event.DomainEventPublisher;
+import com.lgcns.bebee.common.data.event.payment.HoneyWalletChangedEvent;
 import com.lgcns.bebee.common.exception.InvalidParamException;
 import com.lgcns.bebee.common.util.ParamValidator;
 import com.lgcns.bebee.payment.common.exception.PaymentErrors;
@@ -33,6 +35,8 @@ public class UseHoneyUseCase implements UseCase<UseHoneyUseCase.Param, Void> {
     private final HoneyEscrowService honeyEscrowService;
     private final HoneyHistoryRepository honeyHistoryRepository;
     private final HoneyWalletRepository honeyWalletRepository;
+
+    private final DomainEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -75,6 +79,13 @@ public class UseHoneyUseCase implements UseCase<UseHoneyUseCase.Param, Void> {
                 HoneyHistoryType.WITHDRAWL
         );
         honeyHistoryRepository.save(history);
+
+        // 4. 꿀 차감 후 이벤트 발행
+        eventPublisher.publish(new HoneyWalletChangedEvent(
+                param.getDisabledId(),
+                savedWallet.getHoneyWalletId(),
+                savedWallet.getBalance()
+        ));
 
         return null;
     }

@@ -99,9 +99,9 @@ spring:
 
 app:
   sns:
-    chat-topic-arn: "${AWS_SNS_TOPIC_ARN:arn:aws:sns:ap-northeast-2:000000000000:bebee-local-chat-topic}"
+    topic-arn: "${AWS_SNS_TOPIC_ARN:arn:aws:sns:ap-northeast-2:000000000000:bebee-local-chat-topic}"
   sqs:
-    chat-queue-url: "${AWS_SQS_QUEUE_ARN:http://sqs.ap-northeast-2.localhost.localstack.cloud:4566/000000000000/bebee-local-chat-queue}"
+    queue-url: "${AWS_SQS_QUEUE_ARN:http://sqs.ap-northeast-2.localhost.localstack.cloud:4566/000000000000/bebee-local-chat-queue}"
 
 
 # JWT 설정

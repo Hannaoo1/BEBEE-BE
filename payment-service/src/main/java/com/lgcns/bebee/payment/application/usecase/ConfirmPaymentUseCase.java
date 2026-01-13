@@ -2,6 +2,8 @@ package com.lgcns.bebee.payment.application.usecase;
 
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
+import com.lgcns.bebee.common.data.event.DomainEventPublisher;
+import com.lgcns.bebee.common.data.event.payment.HoneyWalletChangedEvent;
 import com.lgcns.bebee.payment.application.client.TossPaymentsClient;
 import com.lgcns.bebee.payment.application.client.TempPaymentPort;
 import com.lgcns.bebee.payment.application.client.dto.TempPaymentInfo;
@@ -31,6 +33,8 @@ public class ConfirmPaymentUseCase implements UseCase<ConfirmPaymentUseCase.Para
     private final PaymentRepository paymentRepository;
     private final HoneyWalletRepository honeyWalletRepository;
     private final HoneyHistoryRepository honeyHistoryRepository;
+
+    private final DomainEventPublisher eventPublisher;
 
     @Transactional
     @Override
@@ -84,7 +88,14 @@ public class ConfirmPaymentUseCase implements UseCase<ConfirmPaymentUseCase.Para
         honeyHistoryRepository.save(history);
         log.info("꿀 히스토리 기록 완료: historyId={}", history.getHoneyHistoryId());
 
-        // 6. Redis 임시 데이터 삭제
+        // 결제 승인(꿀 지갑 생성/잔액 충전) 후 이벤트 발행
+        eventPublisher.publish(new HoneyWalletChangedEvent(
+                temp.getMemberId(),
+                savedWallet.getHoneyWalletId(),
+                savedWallet.getBalance()
+        ));
+
+        // Redis 임시 데이터 삭제
         tempPaymentPort.delete(param.getOrderId());
         log.info("Redis 임시 데이터 삭제 완료: orderId={}", param.getOrderId());
 

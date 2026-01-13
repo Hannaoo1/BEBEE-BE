@@ -46,7 +46,7 @@ public class HttpOcrClientImpl implements OcrClient {
             parts.add("role", role);
 
             OcrResponse response = ocrWebClient.post()
-                    .uri("/api/ocr/analyze")
+                    .uri("/api/ocr/analyze") // OCR 서비스 직접 엔드포인트
                     .contentType(MediaType.MULTIPART_FORM_DATA)
                     .body(BodyInserters.fromMultipartData(parts))
                     .retrieve()
@@ -68,7 +68,7 @@ public class HttpOcrClientImpl implements OcrClient {
     @Override
     public OcrResult extract(String fileUrl, String role) {
         try {
-            log.debug("OCR 추출 요청 (URL): {}, role: {}", maskUrl(fileUrl), role);
+            log.info("OCR 추출 요청 (URL): {}, role: {}", maskUrl(fileUrl), role);
 
             // S3 이미지 URL과 사용자 역할을 JSON 바디로 전송
             Map<String, String> requestBody = Map.of(
@@ -76,7 +76,7 @@ public class HttpOcrClientImpl implements OcrClient {
                     "role", role != null ? role : "");
 
             OcrResponse response = ocrWebClient.post()
-                    .uri("/api/ocr/extract") // 파이썬 서비스의 새로운 엔드포인트
+                    .uri("/ocr/api/ocr/extract") // 파이썬 서비스의 새로운 엔드포인트
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(requestBody)
                     .retrieve()
@@ -109,7 +109,7 @@ public class HttpOcrClientImpl implements OcrClient {
             throw DocumentErrors.OCR_FAILED.toException();
         }
 
-        log.debug("OCR 처리 완료: confidence={}, keywords={}, names={}, fields={}",
+        log.info("OCR 처리 완료: confidence={}, keywords={}, names={}, fields={}",
                 response.getConfidence(), response.getKeywords(), response.getNames(), response.getFields());
 
         return new OcrResult(

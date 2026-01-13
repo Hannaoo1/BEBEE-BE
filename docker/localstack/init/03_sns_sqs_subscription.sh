@@ -32,11 +32,13 @@ echo "=========================================="
 # 형식: "QUEUE_SERVICE:TOPIC_SERVICE"
 SUBSCRIPTIONS=(
   "match:member"
+  "match:match"
   "chat:member"
   "chat:match"
   "notification:chat"
   "notification:match"
   "payment:match"
+  "member:payment"
 )
 
 # ------------------------------------------
@@ -58,6 +60,20 @@ FILTER_POLICIES["chat:match"]='{
 FILTER_POLICIES["payment:match"]='{
   "eventType": [
     "AgreementConfirmedEvent"
+  ]
+}'
+
+# Match 서비스
+FILTER_POLICIES["match:match"]='{
+  "eventType": [
+    "AgreementConfirmedEvent"
+  ]
+}'
+
+# Member 서비스
+FILTER_POLICIES["member:payment"]='{
+  "eventType": [
+    "HoneyWalletChangedEvent"
   ]
 }'
 

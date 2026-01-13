@@ -23,13 +23,12 @@ public class FcmPushNotificationPublisher implements PushNotificationClient {
 
     @Override
     public void sendMessage(String token, String title, String body, Map<String, String> data) {
+        data.put("title", title);
+        data.put("body", body);
+
         try {
             Message message = Message.builder()
                     .setToken(token)
-                    .setNotification(Notification.builder()
-                            .setTitle(title)
-                            .setBody(body)
-                            .build())
                     .putAllData(data)
                     .build();
 

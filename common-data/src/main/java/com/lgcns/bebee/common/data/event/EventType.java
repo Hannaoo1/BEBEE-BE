@@ -4,7 +4,6 @@ import com.lgcns.bebee.common.data.event.match.AgreementConfirmedEvent;
 import com.lgcns.bebee.common.data.event.match.AgreementCreatedEvent;
 import com.lgcns.bebee.common.data.event.match.AgreementRefusedEvent;
 import com.lgcns.bebee.common.data.event.match.PostCreatedEvent;
-import com.lgcns.bebee.common.data.event.member.BadgeCreatedEvent;
 import com.lgcns.bebee.common.data.event.EngagementCompletedEvent;
 import lombok.Getter;
 
@@ -18,7 +17,6 @@ public enum EventType {
 
     POST_CREATED("PostCreatedEvent", PostCreatedEvent.class),
     ENGAGEMENT_COMPLETED("EngagementCompletedEvent", EngagementCompletedEvent.class),
-    BADGE_CREATED("BadgeCreatedEvent", BadgeCreatedEvent.class),
     ;
 
     private final String eventName;
