@@ -17,7 +17,14 @@ public record NearbyHelpersGetResDTO(
                         memberDTO.getAgeGroup(),
                         memberDTO.getLatitude(),
                         memberDTO.getLongitude(),
-                        memberDTO.getHelpCategories()
+                        memberDTO.getHelpCategories(),
+                        memberDTO.getBadges().stream()
+                                .map(badge -> new BadgeDTO(
+                                        badge.getDisabilityCategoryId(),
+                                        badge.getCompletionCount(),
+                                        badge.getBadgeCode()
+                                ))
+                                .toList()
                 ))
                 .toList();
 
@@ -31,7 +38,15 @@ public record NearbyHelpersGetResDTO(
             Integer ageGroup,
             Double latitude,
             Double longitude,
-            List<Long> helpCategories
+            List<Long> helpCategories,
+            List<BadgeDTO> badges
+    ){
+    }
+
+    public record BadgeDTO(
+            Long disabilityCategoryId,
+            Integer completionCount,
+            String badgeCode
     ){
     }
 }

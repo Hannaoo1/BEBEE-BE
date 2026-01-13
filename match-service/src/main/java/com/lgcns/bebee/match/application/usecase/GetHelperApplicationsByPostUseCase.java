@@ -12,6 +12,7 @@ import com.lgcns.bebee.match.domain.entity.Post;
 import com.lgcns.bebee.match.domain.entity.sync.Gender;
 import com.lgcns.bebee.match.domain.entity.sync.MemberSync;
 import com.lgcns.bebee.match.domain.repository.HelperApplicationRepository;
+import com.lgcns.bebee.match.domain.service.BadgeManager;
 import com.lgcns.bebee.match.domain.service.MemberManager;
 import com.lgcns.bebee.match.domain.service.PostManager;
 import lombok.AccessLevel;
@@ -31,6 +32,7 @@ public class GetHelperApplicationsByPostUseCase implements UseCase<GetHelperAppl
     private final PostManager postManager;
     private final HelperApplicationRepository applicationRepository;
     private final MemberManager memberManager;
+    private final BadgeManager badgeManager;
 
     @Transactional(readOnly = true)
     @Override
@@ -51,12 +53,23 @@ public class GetHelperApplicationsByPostUseCase implements UseCase<GetHelperAppl
 
                     Integer ageGroup = AgeGroupCalculator.calculateAgeGroup(applicant.getBirthDate());
 
+                    // 도우미의 뱃지 정보 조회
+                    List<BadgeInfo> badges = badgeManager.findBadgesByHelperId(applicant.getId())
+                            .stream()
+                            .map(badge -> new BadgeInfo(
+                                    badge.getDisabilityCategoryId(),
+                                    badge.getCompletionCount(),
+                                    badge.getBadgeCode()
+                            ))
+                            .collect(Collectors.toList());
+
                     return new ApplicantInfo(
                             applicant.getId(),
                             applicant.getNickname(),
                             ageGroup,
                             applicant.getGender(),
-                            application.getIsVolunteer()
+                            application.getIsVolunteer(),
+                            badges
                     );
                 })
                 .collect(Collectors.toList());
@@ -96,5 +109,14 @@ public class GetHelperApplicationsByPostUseCase implements UseCase<GetHelperAppl
         private Integer ageGroup;
         private Gender gender;
         private Boolean isVolunteer;
+        private List<BadgeInfo> badges;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class BadgeInfo {
+        private Long disabilityCategoryId;
+        private Integer completionCount;
+        private String badgeCode;
     }
 }
