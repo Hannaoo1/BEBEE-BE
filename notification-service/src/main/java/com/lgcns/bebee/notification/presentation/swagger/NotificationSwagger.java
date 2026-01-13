@@ -45,6 +45,7 @@ public interface NotificationSwagger {
     ResponseEntity<Void> registerToken(
             @Parameter(hidden = true)
             @CurrentMember Long memberId,
+
             @Parameter(
                     description = """
                             FCM 토큰 정보

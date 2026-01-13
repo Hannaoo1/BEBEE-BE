@@ -2,9 +2,9 @@ package com.lgcns.bebee.match.application.usecase;
 
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
+import com.lgcns.bebee.common.data.event.DomainEventPublisher;
 import com.lgcns.bebee.common.data.event.match.AgreementRefusedEvent;
 import com.lgcns.bebee.common.exception.InvalidParamException;
-import com.lgcns.bebee.match.application.usecase.client.EventPublisher;
 import com.lgcns.bebee.match.common.exception.MatchInvalidParamErrors;
 import com.lgcns.bebee.common.util.ParamValidator;
 import com.lgcns.bebee.match.domain.entity.Agreement;
@@ -23,7 +23,7 @@ import static com.lgcns.bebee.match.common.exception.MatchErrors.*;
 public class RefuseAgreementUseCase implements UseCase<RefuseAgreementUseCase.Param, Void> {
     private final AgreementReader agreementReader;
 
-    private final EventPublisher eventPublisher;
+    private final DomainEventPublisher eventPublisher;
 
     @Transactional
     @Override

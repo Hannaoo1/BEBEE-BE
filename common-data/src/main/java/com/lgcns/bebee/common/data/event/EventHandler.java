@@ -1,6 +1,6 @@
 package com.lgcns.bebee.common.data.event;
 
 public interface EventHandler<T extends DomainEvent> {
-    EventType getEventType();
+    Class<T> getEventClass();
     void handle(T event);
 }

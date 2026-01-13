@@ -3,8 +3,8 @@ package com.lgcns.bebee.match.application.usecase;
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
 import com.lgcns.bebee.common.data.dto.ScheduleDTO;
+import com.lgcns.bebee.common.data.event.DomainEventPublisher;
 import com.lgcns.bebee.common.exception.InvalidParamException;
-import com.lgcns.bebee.match.application.usecase.client.EventPublisher;
 import com.lgcns.bebee.match.common.exception.MatchErrors;
 import com.lgcns.bebee.match.common.exception.MatchInvalidParamErrors;
 import com.lgcns.bebee.match.domain.entity.Post;
@@ -41,7 +41,7 @@ public class CreateAgreementUseCase implements UseCase<CreateAgreementUseCase.Pa
     private final MemberManager memberManager;
     private final PostManager postManager;
 
-    private final EventPublisher eventPublisher;
+    private final DomainEventPublisher eventPublisher;
 
     @Transactional
     @Override
