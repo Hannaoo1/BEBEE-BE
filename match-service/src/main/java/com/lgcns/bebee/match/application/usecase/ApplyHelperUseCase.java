@@ -2,6 +2,8 @@ package com.lgcns.bebee.match.application.usecase;
 
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
+import com.lgcns.bebee.common.data.event.DomainEventPublisher;
+import com.lgcns.bebee.common.data.event.match.PostAppliedEvent;
 import com.lgcns.bebee.common.exception.InvalidParamException;
 import com.lgcns.bebee.match.common.exception.MatchErrors;
 import com.lgcns.bebee.match.common.exception.MatchInvalidParamErrors;
@@ -26,9 +28,10 @@ public class ApplyHelperUseCase implements UseCase<ApplyHelperUseCase.Param, Voi
     private final MemberManager memberManager;
     private final PostManager postManager;
     private final HelperApplicationRepository applicationRepository;
+    private final DomainEventPublisher eventPublisher;
 
-    @Transactional
     @Override
+    @Transactional
     public Void execute(Param param) {
         param.validate();
 
@@ -53,6 +56,14 @@ public class ApplyHelperUseCase implements UseCase<ApplyHelperUseCase.Param, Voi
                 param.getIsVolunteer()
         );
         Application savedApplication = applicationRepository.save(application);
+
+        eventPublisher.publish(new PostAppliedEvent(
+                post.getMemberId(),
+                savedApplication.getApplicantId(),
+                savedApplication.getApplicationId(),
+                savedApplication.getPost().getId(),
+                savedApplication.getPost().getTitle()
+                ));
 
         return null;
     }

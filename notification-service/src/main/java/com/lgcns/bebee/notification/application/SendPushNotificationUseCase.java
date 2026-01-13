@@ -21,7 +21,7 @@ public class SendPushNotificationUseCase implements UseCase<SendPushNotification
     private final PushNotificationSubscriptionManagement subscriptionManagement;
     private final PushNotificationClient pushNotificationClient;
 
-    private final AppNotificationRepository inAppNotificationRepository;
+    private final AppNotificationRepository appNotificationRepository;
 
     @Override
     @Transactional
@@ -41,7 +41,7 @@ public class SendPushNotificationUseCase implements UseCase<SendPushNotification
         // FCM 푸시 알림 전송
         pushNotificationClient.sendMessage(subscription.getToken(), title, body, data);
 
-        inAppNotificationRepository.save(appNotification);
+        appNotificationRepository.save(appNotification);
         return null;
     }
 
