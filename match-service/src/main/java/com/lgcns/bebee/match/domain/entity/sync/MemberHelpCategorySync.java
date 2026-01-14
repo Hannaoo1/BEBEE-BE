@@ -14,7 +14,7 @@ public class MemberHelpCategorySync extends BaseTimeEntity {
     @EmbeddedId
     private MemberHelpCategorySyncId id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("memberId")
     @JoinColumn(name = "member_id", nullable = false)
     private MemberSync member;

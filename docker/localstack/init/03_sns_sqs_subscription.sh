@@ -78,6 +78,14 @@ FILTER_POLICIES["member:payment"]='{
   ]
 }'
 
+# Member 서비스: EngagementCompleted, ReviewCreated 이벤트 수신
+FILTER_POLICIES["member:match"]='{
+  "eventType": [
+    "EngagementCompletedEvent",
+    "ReviewCreatedEvent"
+  ]
+}'
+
   # Match 서비스: BadgeCreated 이벤트 수신
 FILTER_POLICIES["match:member"]='{
     "eventType": [
@@ -85,12 +93,7 @@ FILTER_POLICIES["match:member"]='{
   ]
 }'
 
-# Member 서비스: EngagementCompleted 이벤트 수신
-  FILTER_POLICIES["member:match"]='{
-    "eventType": [
-      "EngagementCompletedEvent"
-  ]
-}'
+
 
 # Notification 서비스: 모든 이벤트 수신 (예시)
 # FILTER_POLICIES["notification:match"]='{}'
