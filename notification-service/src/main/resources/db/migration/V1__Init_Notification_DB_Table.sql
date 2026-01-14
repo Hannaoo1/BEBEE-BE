@@ -13,7 +13,7 @@ CREATE TABLE app_notification
     app_notification_id BIGINT       NOT NULL PRIMARY KEY,
     receiver_id         BIGINT       NOT NULL,
     sender_id           BIGINT       NOT NULL,
-    is_read             BOOLEAN      NOT NULL,
+    is_read             BOOLEAN      NOT NULL DEFAULT FALSE,
     read_at             TIMESTAMP,
     type                ENUM ('CHAT', 'APPLICATION', 'MATCH'),
     created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

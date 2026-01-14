@@ -64,11 +64,11 @@ public class Member extends BaseTimeEntity {
     @Column(length = 255)
     private String introduction;
 
-    @Column(nullable = false, precision = 10, scale = 7)
-    private BigDecimal latitude;
+    @Column(nullable = false)
+    private Double latitude;
 
-    @Column(nullable = false, precision = 10, scale = 7)
-    private BigDecimal longitude;
+    @Column(nullable = false)
+    private Double longitude;
 
     @Column(nullable = false, length = 10)
     private String districtCode;
@@ -85,8 +85,8 @@ public class Member extends BaseTimeEntity {
             String phoneNumber,
             String role,
             String addressRoad,
-            BigDecimal latitude,
-            BigDecimal longitude,
+            Double latitude,
+            Double longitude,
             String districtCode) {
         Member member = new Member();
         member.email = email;

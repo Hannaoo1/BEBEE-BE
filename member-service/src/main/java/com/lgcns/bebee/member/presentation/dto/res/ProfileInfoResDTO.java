@@ -49,14 +49,17 @@ public class ProfileInfoResDTO {
     @Schema(description = "뱃지 정보 (도우미 전용)")
     private List<BadgeStatusDTO> badges;
 
-    @Schema(description = "제출한 경력 관련 서류 목록 (도우미 전용)")
-    private List<DocumentVerificationResDTO> documents;
+    @Schema(description = "제출한 이수증 서류 목록 (도우미 전용)")
+    private List<DocumentInfo> documents;
 
     // 장애인 전용 정보
     @Schema(description = "장애 유형 (장애인 전용)", example = "시각장애")
     private String disabilityType;
 
-    @Schema(description = "장애 상세 설명 (장애인 전용)", example = "시각 장애 1급입니다.")
+    @Schema(description = "장애 등급 (장애인 전용)", example = "1")
+    private String disabilityGrade;
+
+    @Schema(description = "장애 상세 설명 (장애인 전용)", example = "양 눈 빛 감지는 가능해요")
     private String disabilityDescription;
 
     public static ProfileInfoResDTO from(GetProfileInfoUseCase.Result result) {
@@ -81,9 +84,10 @@ public class ProfileInfoResDTO {
                                 .toList() : null,
                 result.getDocuments() != null ?
                         result.getDocuments().stream()
-                                .map(DocumentVerificationResDTO::from)
+                                .map(DocumentInfo::from)
                                 .toList() : null,
                 result.getDisabilityType(),
+                result.getDisabilityGrade(),
                 result.getDisabilityDescription()
         );
     }
@@ -97,5 +101,27 @@ public class ProfileInfoResDTO {
 
         @Schema(description = "해당 키워드를 받은 횟수", example = "5")
         private Long count;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @Schema(description = "제출 서류 정보")
+    public static class DocumentInfo {
+        @Schema(description = "서류 ID", example = "1")
+        private Long id;
+
+        @Schema(description = "서류 코드", example = "DOC001")
+        private String docCode;
+
+        @Schema(description = "서류 이름", example = "장애인증명서")
+        private String docName;
+
+        public static DocumentInfo from(GetProfileInfoUseCase.DocumentInfo useCaseDocumentInfo) {
+            return new DocumentInfo(
+                    useCaseDocumentInfo.getId(),
+                    useCaseDocumentInfo.getDocCode(),
+                    useCaseDocumentInfo.getDocName()
+            );
+        }
     }
 }
