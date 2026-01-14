@@ -124,4 +124,8 @@ public class Post extends BaseTimeEntity {
     public void updateStatus(PostStatus status) {
         this.status = status;
     }
+
+    public void incrementApplicantCount() {
+        this.applicantCount++;
+    }
 }

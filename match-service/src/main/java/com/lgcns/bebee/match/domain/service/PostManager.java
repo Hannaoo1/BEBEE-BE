@@ -25,6 +25,16 @@ public class PostManager {
     }
 
     @Transactional
+    public Post findSinglePostForUpdate(Long postId) {
+        return postRepository.findById(postId).orElseThrow(MatchErrors.POST_NOT_FOUND::toException);
+    }
+
+    @Transactional
+    public void savePost(Post post) {
+        postRepository.save(post);
+    }
+
+    @Transactional
     public Post createPost(
             Long memberId,
             String postType,

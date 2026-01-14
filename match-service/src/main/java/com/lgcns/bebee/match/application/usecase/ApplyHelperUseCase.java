@@ -44,7 +44,7 @@ public class ApplyHelperUseCase implements UseCase<ApplyHelperUseCase.Param, Voi
             throw MatchErrors.ALREADY_APPLIED.toException();
         }
 
-        Post post = postManager.findSinglePost(param.getPostId());
+        Post post = postManager.findSinglePostForUpdate(param.getPostId());
         if (post.getStatus() == PostStatus.MATCHED) {
             throw MatchErrors.ALREADY_MATCHED.toException();
         }
@@ -56,6 +56,10 @@ public class ApplyHelperUseCase implements UseCase<ApplyHelperUseCase.Param, Voi
                 param.getIsVolunteer()
         );
         Application savedApplication = applicationRepository.save(application);
+
+        // 게시물 지원자 수 증가 및 저장
+        post.incrementApplicantCount();
+        postManager.savePost(post);
 
         eventPublisher.publish(new PostAppliedEvent(
                 post.getMemberId(),
