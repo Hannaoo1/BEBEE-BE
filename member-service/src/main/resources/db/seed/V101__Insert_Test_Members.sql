@@ -28,7 +28,7 @@ INSERT INTO member (
 ) VALUES (
     100,
     'kim.cheolsu@example.com',
-    '{bcrypt}$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.TVuHOnu',
+    '$2a$10$4pyW8SwZmR0msFWv5RxWfu.xO0mo0vQZiZGaG7ZQDjY.UQMB6thDa',
     '김철수',
     '김철수',
     '1960-05-15',
@@ -303,7 +303,7 @@ INSERT INTO member (
 ) VALUES (
     700,
     'kang.jihoon@example.com',
-    '{bcrypt}$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.TVuHOnu',
+    '$2a$10$4pyW8SwZmR0msFWv5RxWfu.xO0mo0vQZiZGaG7ZQDjY.UQMB6thDa',
     '강지훈',
     '강지훈',
     '1990-09-05',
@@ -346,7 +346,7 @@ INSERT INTO member (
 ) VALUES (
     800,
     'yoon.seoyeon@example.com',
-    '{bcrypt}$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.TVuHOnu',
+    '$2a$10$4pyW8SwZmR0msFWv5RxWfu.xO0mo0vQZiZGaG7ZQDjY.UQMB6thDa',
     '윤서연',
     '윤서연',
     '1995-12-18',
