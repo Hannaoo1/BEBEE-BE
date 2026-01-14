@@ -13,6 +13,7 @@ import java.util.List;
 
 @Configuration
 public class EventConfig {
+
     @Bean
     public DomainEventPublisher domainEventPublisher(
             OutboxRepository outboxRepository,
@@ -50,7 +51,6 @@ public class EventConfig {
             EventPublisher eventPublisher,
             EventTypeMapper eventTypeMapper,
             ObjectMapper objectMapper) {
-
         return new OutboxRetryScheduler(outboxRepository, eventPublisher, objectMapper, eventTypeMapper);
     }
 }

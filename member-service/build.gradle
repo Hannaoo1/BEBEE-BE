@@ -59,9 +59,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     // Spring Cloud AWS Starter - AWS 서비스 통합 위한 스타터 의존성
-    // TODO: 이벤트 처리 담당자가 활성화 예정
-    // implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs:3.4.2'
-    // implementation 'software.amazon.awssdk:sts:2.40.17'
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter-sns:3.4.2'
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs:3.4.2'
+    implementation 'software.amazon.awssdk:sts:2.40.17'
 
     // 테스트용 (MockMultipartFile 등을 여기서만 사용)
     testImplementation 'org.springframework:spring-test'

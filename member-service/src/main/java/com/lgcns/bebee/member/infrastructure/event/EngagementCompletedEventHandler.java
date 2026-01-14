@@ -20,9 +20,15 @@ public class EngagementCompletedEventHandler implements EventHandler<EngagementC
 
     @Override
     public void handle(EngagementCompletedEvent event) {
-        log.info("활동 완료 이벤트 처리 시작 - agreementId: {}", event.getAgreementId());
-        CreateBadgeUseCase.Param param = new CreateBadgeUseCase.Param(event.getAgreementId());
+        log.info("EngagementCompleted 이벤트 처리 시작 - engagementId: {}, helperId: {}, disabledId: {}",
+                event.getEngagementId(), event.getHelperId(), event.getDisabledId());
+
+        CreateBadgeUseCase.Param param = new CreateBadgeUseCase.Param(
+                event.getHelperId(),
+                event.getDisabledId()
+        );
         createBadgeUseCase.execute(param);
-        log.info("활동 완료 이벤트 처리 완료 - agreementId: {}", event.getAgreementId());
+
+        log.info("EngagementCompleted 이벤트 처리 완료 - helperId: {}", event.getHelperId());
     }
 }
