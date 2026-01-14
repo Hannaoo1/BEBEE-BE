@@ -36,9 +36,9 @@ public class MemberController implements MemberSwagger {
                 .phoneNumber(result.getMember().getPhoneNumber())
                 .introduction(result.getMember().getIntroduction() != null ? result.getMember().getIntroduction() : "")
                 .latitude(result.getMember().getLatitude() != null ?
-                        java.math.BigDecimal.valueOf(result.getMember().getLatitude()) : null)
+                        Double.valueOf(result.getMember().getLatitude()) : null)
                 .longitude(result.getMember().getLongitude() != null ?
-                        java.math.BigDecimal.valueOf(result.getMember().getLongitude()) : null)
+                        Double.valueOf(result.getMember().getLongitude()) : null)
                 .profileImageUrl(
                         result.getMember().getProfileImageUrl() != null ? result.getMember().getProfileImageUrl() : "")
                 .sweetness(result.getMember().getSweetness())
