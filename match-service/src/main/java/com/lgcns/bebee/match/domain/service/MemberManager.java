@@ -49,7 +49,7 @@ public class MemberManager {
                 memberId,
                 nickname,
                 Gender.valueOf(gender),
-                Role.valueOf(gender),
+                Role.valueOf(role),
                 birthDate,
                 latitude,
                 longitude,
