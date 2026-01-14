@@ -3,7 +3,7 @@ package com.lgcns.bebee.chat.application;
 import com.lgcns.bebee.chat.application.client.MessagePublisher;
 import com.lgcns.bebee.chat.domain.entity.Chat;
 import com.lgcns.bebee.chat.domain.entity.Chatroom;
-import com.lgcns.bebee.chat.domain.entity.MemberSync;
+import com.lgcns.bebee.chat.domain.entity.sync.MemberSync;
 import com.lgcns.bebee.chat.domain.entity.vo.MatchStatus;
 import com.lgcns.bebee.chat.domain.repository.ChatRepository;
 import com.lgcns.bebee.chat.domain.service.ChatManagement;

@@ -1,6 +1,6 @@
 package com.lgcns.bebee.chat.infrastructure.jpa.dto;
 
-import com.lgcns.bebee.chat.domain.entity.MemberSync;
+import com.lgcns.bebee.chat.domain.entity.sync.MemberSync;
 
 /**
  * Chatroom 조회 조건을 담는 DTO

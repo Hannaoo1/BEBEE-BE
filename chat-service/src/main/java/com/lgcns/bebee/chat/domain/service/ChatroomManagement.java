@@ -3,7 +3,7 @@ package com.lgcns.bebee.chat.domain.service;
 import com.lgcns.bebee.chat.core.exception.ChatErrors;
 import com.lgcns.bebee.chat.domain.entity.Chat;
 import com.lgcns.bebee.chat.domain.entity.Chatroom;
-import com.lgcns.bebee.chat.domain.entity.MemberSync;
+import com.lgcns.bebee.chat.domain.entity.sync.MemberSync;
 import com.lgcns.bebee.chat.domain.entity.sync.HelpCategorySync;
 import com.lgcns.bebee.chat.domain.repository.ChatroomRepository;
 import lombok.RequiredArgsConstructor;

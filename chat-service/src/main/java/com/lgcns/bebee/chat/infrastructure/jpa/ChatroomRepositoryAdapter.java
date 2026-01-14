@@ -1,7 +1,7 @@
 package com.lgcns.bebee.chat.infrastructure.jpa;
 
 import com.lgcns.bebee.chat.domain.entity.Chatroom;
-import com.lgcns.bebee.chat.domain.entity.MemberSync;
+import com.lgcns.bebee.chat.domain.entity.sync.MemberSync;
 import com.lgcns.bebee.chat.domain.entity.sync.HelpCategorySync;
 import com.lgcns.bebee.chat.domain.repository.ChatroomRepository;
 import com.lgcns.bebee.chat.infrastructure.jpa.dto.ChatroomSearchCond;

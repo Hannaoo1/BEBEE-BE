@@ -1,14 +1,11 @@
 package com.lgcns.bebee.chat.domain.service;
 
 import com.lgcns.bebee.chat.core.exception.ChatErrors;
-import com.lgcns.bebee.chat.domain.entity.MemberSync;
+import com.lgcns.bebee.chat.domain.entity.sync.MemberSync;
 import com.lgcns.bebee.chat.domain.repository.MemberSyncRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

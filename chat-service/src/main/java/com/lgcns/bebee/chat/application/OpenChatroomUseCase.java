@@ -1,7 +1,7 @@
 package com.lgcns.bebee.chat.application;
 
 import com.lgcns.bebee.chat.domain.entity.Chatroom;
-import com.lgcns.bebee.chat.domain.entity.MemberSync;
+import com.lgcns.bebee.chat.domain.entity.sync.MemberSync;
 import com.lgcns.bebee.chat.domain.entity.sync.HelpCategorySync;
 import com.lgcns.bebee.chat.domain.service.ChatroomManagement;
 import com.lgcns.bebee.chat.domain.service.MemberManagement;

@@ -3,7 +3,7 @@ package com.lgcns.bebee.chat.presentation.dto.res;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.lgcns.bebee.chat.application.GetChatroomsUseCase;
 import com.lgcns.bebee.chat.domain.entity.Chatroom;
-import com.lgcns.bebee.chat.domain.entity.MemberSync;
+import com.lgcns.bebee.chat.domain.entity.sync.MemberSync;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 

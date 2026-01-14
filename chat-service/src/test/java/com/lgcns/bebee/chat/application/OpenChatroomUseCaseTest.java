@@ -3,7 +3,7 @@ package com.lgcns.bebee.chat.application;
 import com.lgcns.bebee.chat.domain.entity.Chatroom;
 import com.lgcns.bebee.chat.domain.entity.ChatroomHelpCategory;
 import com.lgcns.bebee.chat.domain.entity.HelpCategorySync;
-import com.lgcns.bebee.chat.domain.entity.MemberSync;
+import com.lgcns.bebee.chat.domain.entity.sync.MemberSync;
 import com.lgcns.bebee.chat.domain.service.ChatroomManagement;
 import com.lgcns.bebee.chat.domain.service.MemberManagement;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +15,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 

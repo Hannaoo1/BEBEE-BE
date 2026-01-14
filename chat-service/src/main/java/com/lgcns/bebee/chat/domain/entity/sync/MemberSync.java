@@ -1,6 +1,5 @@
-package com.lgcns.bebee.chat.domain.entity;
+package com.lgcns.bebee.chat.domain.entity.sync;
 
-import com.lgcns.bebee.common.data.domain.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -40,6 +39,8 @@ public class MemberSync implements Persistable<Long> {
         member.id = memberId;
         member.nickname = nickname;
         member.profileImageUrl = profileImageUrl;
+        member.createdAt = LocalDateTime.now();
+        member.updatedAt = LocalDateTime.now();
         return member;
     }
 

@@ -1,6 +1,7 @@
 package com.lgcns.bebee.chat.domain.entity;
 
 import com.lgcns.bebee.chat.domain.entity.sync.HelpCategorySync;
+import com.lgcns.bebee.chat.domain.entity.sync.MemberSync;
 import com.lgcns.bebee.chat.domain.entity.vo.MatchStatus;
 import com.lgcns.bebee.common.data.domain.BaseTimeEntity;
 import io.hypersistence.utils.hibernate.id.Tsid;
