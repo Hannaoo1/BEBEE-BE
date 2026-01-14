@@ -76,7 +76,7 @@ public class ProfileInfoResDTO {
                 result.getHoney(),
                 result.getReviews() != null ?
                         result.getReviews().stream()
-                                .map(r -> new ReviewKeywordDTO(r.keywordId(), r.count()))
+                                .map(r -> new ReviewKeywordDTO(r.keywordId(), r.description(), r.isPositive(), r.count()))
                                 .toList() : null,
                 result.getBadges() != null ?
                         result.getBadges().stream()
@@ -98,6 +98,12 @@ public class ProfileInfoResDTO {
     public static class ReviewKeywordDTO {
         @Schema(description = "키워드 ID", example = "1")
         private Integer keywordId;
+
+        @Schema(description = "키워드 설명", example = "시간 약속 잘 지켜요")
+        private String description;
+
+        @Schema(description = "긍정/부정 여부", example = "true")
+        private Boolean isPositive;
 
         @Schema(description = "해당 키워드를 받은 횟수", example = "5")
         private Long count;

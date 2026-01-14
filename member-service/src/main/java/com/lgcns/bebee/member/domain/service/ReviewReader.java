@@ -1,5 +1,6 @@
 package com.lgcns.bebee.member.domain.service;
 
+import com.lgcns.bebee.member.domain.entity.vo.ReviewKeyword;
 import com.lgcns.bebee.member.domain.entity.vo.ReviewKeywordCount;
 import com.lgcns.bebee.member.domain.repository.MatchReviewSyncRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,12 @@ public class ReviewReader {
     public List<ReviewKeywordCount> getReceivedReviewKeywordCounts(Long memberId) {
         return matchReviewSyncRepository.countKeywordsByRevieweeId(memberId)
                 .stream()
-                .map(kc -> new ReviewKeywordCount(kc.getKeywordId(), kc.getCount()))
+                .map(kc -> new ReviewKeywordCount(
+                        kc.getKeywordId(),
+                        ReviewKeyword.getDescriptionById(kc.getKeywordId()),
+                        ReviewKeyword.isPositiveById(kc.getKeywordId()),
+                        kc.getCount()
+                ))
                 .collect(Collectors.toList());
     }
 }
