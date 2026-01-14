@@ -47,4 +47,14 @@ public class MatchReviewSync extends BaseTimeEntity {
         review.reviewDirection = reviewDirection;
         return review;
     }
+
+    public void addKeyword(Integer keywordId) {
+        MatchReviewKeywordSync keyword = MatchReviewKeywordSync.create(keywordId);
+        keyword.assignToReview(this);
+        this.keywords.add(keyword);
+    }
+
+    public void addKeywords(List<Integer> keywordIds) {
+        keywordIds.forEach(this::addKeyword);
+    }
 }
