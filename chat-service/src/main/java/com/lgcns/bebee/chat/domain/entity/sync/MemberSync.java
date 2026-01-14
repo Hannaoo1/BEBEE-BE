@@ -41,6 +41,7 @@ public class MemberSync implements Persistable<Long> {
         member.profileImageUrl = profileImageUrl;
         member.createdAt = LocalDateTime.now();
         member.updatedAt = LocalDateTime.now();
+        member.sweetness = BigDecimal.ZERO; // 임시 처리
         return member;
     }
 
