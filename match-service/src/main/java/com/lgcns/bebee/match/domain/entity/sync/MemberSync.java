@@ -1,11 +1,11 @@
 package com.lgcns.bebee.match.domain.entity.sync;
 
-import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
+import org.springframework.data.domain.Persistable;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,9 +16,8 @@ import java.util.List;
 @Table(name = "member_sync")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MemberSync {
+public class MemberSync implements Persistable<Long> {
     @Id
-    @Tsid
     @Column(name = "member_id")
     private Long id;
 
@@ -97,5 +96,19 @@ public class MemberSync {
         helpCategories.forEach(helpCategory -> helpCategory.assignToMember(member));
 
         return member;
+    }
+
+    @Transient
+    private Boolean isNew = true;
+
+    @Override
+    public boolean isNew() {
+        return this.isNew;
+    }
+
+    @PostPersist
+    @PostLoad
+    protected void markNotNew() {
+        this.isNew = false;
     }
 }
