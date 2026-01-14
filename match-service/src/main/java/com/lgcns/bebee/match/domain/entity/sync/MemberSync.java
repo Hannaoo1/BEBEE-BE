@@ -58,11 +58,11 @@ public class MemberSync {
     private LocalDateTime updatedAt;
 
     @BatchSize(size = 100)
-    @OneToMany(mappedBy = "memberSync", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberDisabilityCategorySync> disabilityCategories = new ArrayList<>();
 
     @BatchSize(size = 100)
-    @OneToMany(mappedBy = "memberSync", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberHelpCategorySync> helpCategories = new ArrayList<>();
 
     public static MemberSync create(
