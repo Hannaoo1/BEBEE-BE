@@ -71,7 +71,7 @@ FILTER_POLICIES["match:match"]='{
   ]
 }'
 
-# Member 서비스: HoneyWalletChanged 이벤트 수신
+# Member 서비스
 FILTER_POLICIES["member:payment"]='{
   "eventType": [
     "HoneyWalletChangedEvent"
@@ -85,6 +85,15 @@ FILTER_POLICIES["member:match"]='{
     "ReviewCreatedEvent"
   ]
 }'
+
+  # Match 서비스: BadgeCreated 이벤트 수신
+FILTER_POLICIES["match:member"]='{
+    "eventType": [
+      "BadgeCreatedEvent"
+  ]
+}'
+
+
 
 # Notification 서비스: 모든 이벤트 수신 (예시)
 # FILTER_POLICIES["notification:match"]='{}'

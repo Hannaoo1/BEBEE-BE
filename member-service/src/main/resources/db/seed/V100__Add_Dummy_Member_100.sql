@@ -22,7 +22,7 @@ INSERT INTO member (
 ) VALUES (
     100, 
     'dummy@example.com', 
-    '{bcrypt}$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.TVuHOnu', 
+    '$2a$10$4pyW8SwZmR0msFWv5RxWfu.xO0mo0vQZiZGaG7ZQDjY.UQMB6thDa',
     'Dummy User', 
     'Dummy', 
     '1990-01-01', 

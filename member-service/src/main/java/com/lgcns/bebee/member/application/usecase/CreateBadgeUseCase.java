@@ -2,16 +2,15 @@ package com.lgcns.bebee.member.application.usecase;
 
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
+import com.lgcns.bebee.common.data.event.DomainEventPublisher;
 import com.lgcns.bebee.common.exception.InvalidParamException;
 import com.lgcns.bebee.common.util.ParamValidator;
-import com.lgcns.bebee.member.core.exception.MemberErrors;
 import com.lgcns.bebee.member.core.exception.MemberInvalidParamErrors;
 import com.lgcns.bebee.member.domain.entity.Badge;
 import com.lgcns.bebee.member.domain.entity.MemberDisabilityCategory;
-import com.lgcns.bebee.member.domain.entity.sync.AgreementSync;
-import com.lgcns.bebee.member.domain.repository.AgreementRepository;
 import com.lgcns.bebee.member.domain.repository.BadgeRepository;
 import com.lgcns.bebee.member.domain.repository.MemberDisabilityCategoryRepository;
+import com.lgcns.bebee.common.data.event.member.BadgeCreatedEvent;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,21 +25,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CreateBadgeUseCase implements UseCase<CreateBadgeUseCase.Param, CreateBadgeUseCase.Result> {
 
-    private final AgreementRepository agreementRepository;
     private final MemberDisabilityCategoryRepository memberDisabilityCategoryRepository;
     private final BadgeRepository badgeRepository;
+    private final DomainEventPublisher eventPublisher;
 
     @Transactional
     @Override
     public Result execute(Param param) {
         param.validate();
 
-        // AgreementSync를 통해 도우미, 장애인 ID 정보 추출
-        AgreementSync agreement = agreementRepository.findById(param.getAgreementId())
-                .orElseThrow(() -> MemberErrors.AGREEMENT_NOT_FOUND.toException());
-
-        Long helperId = agreement.getHelperId();
-        Long disabledId = agreement.getDisabledId();
+        Long helperId = param.getHelperId();
+        Long disabledId = param.getDisabledId();
 
         // 장애인의 장애 유형 조회
         List<MemberDisabilityCategory> disabilityCategories = memberDisabilityCategoryRepository
@@ -71,20 +66,39 @@ public class CreateBadgeUseCase implements UseCase<CreateBadgeUseCase.Param, Cre
 
             updatedBadges.add(new BadgeInfo(badge.getId(), helperId, categoryId, newCount, badgeCode));
         }
+
+        // 뱃지 생성 이벤트 발행
+        List<BadgeCreatedEvent.BadgeInfo> eventBadges = updatedBadges.stream()
+                .map(b -> new BadgeCreatedEvent.BadgeInfo(
+                        b.getDisabilityCategoryId(),
+                        b.getCompletionCount(),
+                        b.getBadgeCode()
+                ))
+                .toList();
+
+        eventPublisher.publish(new BadgeCreatedEvent(helperId, eventBadges));
+
         return Result.from(updatedBadges);
     }
 
     @Getter
     @RequiredArgsConstructor
     public static class Param implements Params {
-        private final Long agreementId;
+        private final Long helperId;
+        private final Long disabledId;
 
         @Override
         public boolean validate() {
-            if (!ParamValidator.isValidId(agreementId)) {
+            if (!ParamValidator.isValidId(helperId)) {
                 throw new InvalidParamException(
                         MemberInvalidParamErrors.REQUIRED_FIELD,
-                        "agreementId"
+                        "helperId"
+                );
+            }
+            if (!ParamValidator.isValidId(disabledId)) {
+                throw new InvalidParamException(
+                        MemberInvalidParamErrors.REQUIRED_FIELD,
+                        "disabledId"
                 );
             }
             return true;

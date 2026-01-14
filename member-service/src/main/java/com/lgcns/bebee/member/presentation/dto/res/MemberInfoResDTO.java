@@ -35,9 +35,9 @@ public class MemberInfoResDTO {
     @Schema(description = "자기소개", example = "안녕하세요, 잘 부탁드립니다.")
     private String introduction;
     @Schema(description = "위도", example = "37.5012000")
-    private BigDecimal latitude;
+    private Double latitude;
     @Schema(description = "경도", example = "127.0396000")
-    private BigDecimal longitude;
+    private Double longitude;
 
     // 프로필 정보
     @Schema(description = "프로필 이미지 URL", example = "https://example.com/profile.jpg")

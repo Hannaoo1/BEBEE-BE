@@ -1,13 +1,7 @@
 package com.lgcns.bebee.common.data.event;
 
-import com.lgcns.bebee.common.data.event.match.AgreementConfirmedEvent;
-import com.lgcns.bebee.common.data.event.match.AgreementCreatedEvent;
-import com.lgcns.bebee.common.data.event.match.AgreementRefusedEvent;
-import com.lgcns.bebee.common.data.event.match.PostCreatedEvent;
-import com.lgcns.bebee.common.data.event.match.EngagementCompletedEvent;
-import com.lgcns.bebee.common.data.event.payment.HoneyWalletChangedEvent;
+import com.lgcns.bebee.common.data.event.match.*;
 import lombok.Getter;
-
 import java.util.Arrays;
 
 @Getter
@@ -18,8 +12,6 @@ public enum EventType {
 
     POST_CREATED("PostCreatedEvent", PostCreatedEvent.class),
     ENGAGEMENT_COMPLETED("EngagementCompletedEvent", EngagementCompletedEvent.class),
-
-    HONEY_WALLET_CHANGED("HoneyWalletChangedEvent", HoneyWalletChangedEvent.class)
     ;
 
     private final String eventName;

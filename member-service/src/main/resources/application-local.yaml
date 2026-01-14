@@ -128,12 +128,12 @@ ocr:
   base-url: ${OCR_SERVICE_URL:http://localhost:8086}
   timeout: ${OCR_TIMEOUT:90000}
 
+# SNS/SQS 설정
 app:
   sns:
     topic-arn: "${AWS_SNS_TOPIC_ARN:arn:aws:sns:ap-northeast-2:000000000000:bebee-local-member-topic}"
   sqs:
     queue-url: "${AWS_SQS_QUEUE_URL:http://sqs.ap-northeast-2.localhost.localstack.cloud:4566/000000000000/bebee-local-member-queue}"
-
 
 # 로깅 설정
 logging:
