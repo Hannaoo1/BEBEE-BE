@@ -37,6 +37,11 @@ public class DocumentManagement {
                 .orElseThrow(DocumentErrors.DOCUMENT_NOT_FOUND::toException);
     }
 
+    public List<Document> findAllByMemberId(Long memberId) {
+        return documentRepository.findAllByMemberId(memberId)
+                .orElseThrow(DocumentErrors.DOCUMENT_NOT_FOUND::toException);
+    }
+
     /**
      * Document 저장
      * 

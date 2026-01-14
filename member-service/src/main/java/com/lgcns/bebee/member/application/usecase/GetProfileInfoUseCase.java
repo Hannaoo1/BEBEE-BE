@@ -3,20 +3,17 @@ package com.lgcns.bebee.member.application.usecase;
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
 import com.lgcns.bebee.common.util.AgeGroupCalculator;
-import com.lgcns.bebee.member.domain.entity.DocumentVerification;
 import com.lgcns.bebee.member.domain.entity.Member;
 import com.lgcns.bebee.member.domain.entity.MemberDisabilityCategory;
 import com.lgcns.bebee.member.domain.entity.sync.MemberHoneyWalletSync;
 import com.lgcns.bebee.member.domain.entity.vo.Gender;
 import com.lgcns.bebee.member.domain.entity.vo.ReviewKeywordCount;
 import com.lgcns.bebee.member.domain.entity.vo.Role;
-import com.lgcns.bebee.member.domain.repository.DocumentVerificationRepository;
 import com.lgcns.bebee.member.domain.repository.MemberDisabilityCategoryRepository;
 import com.lgcns.bebee.member.domain.repository.MemberHelpCategoryRepository;
-import com.lgcns.bebee.member.domain.service.BadgeReader;
-import com.lgcns.bebee.member.domain.service.HoneyWalletReader;
-import com.lgcns.bebee.member.domain.service.MemberManagement;
-import com.lgcns.bebee.member.domain.service.ReviewReader;
+import com.lgcns.bebee.member.domain.service.*;
+import com.lgcns.bebee.member.domain.entity.Document;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,7 +31,7 @@ public class GetProfileInfoUseCase implements UseCase<GetProfileInfoUseCase.Para
     private final MemberManagement memberManagement;
     private final MemberHelpCategoryRepository memberHelpCategoryRepository;
     private final MemberDisabilityCategoryRepository memberDisabilityCategoryRepository;
-    private final DocumentVerificationRepository documentVerificationRepository;
+    private final DocumentManagement documentManagement;
     private final BadgeReader badgeReader;
     private final HoneyWalletReader honeyWalletReader;
     private final ReviewReader reviewReader;
@@ -49,9 +46,10 @@ public class GetProfileInfoUseCase implements UseCase<GetProfileInfoUseCase.Para
         List<ReviewKeywordCount> reviews = null;
 
         List<BadgeReader.BadgeStatusInfo> badges = null;
-        List<DocumentVerification> documents = null;
+        List<DocumentInfo> documents = null;
 
         String disabilityType = null;
+        String disabilityGrade = null;
         String disabilityDescription = null;
 
         helpCategories = memberHelpCategoryRepository.findByMember_Id(member.getId())
@@ -67,16 +65,19 @@ public class GetProfileInfoUseCase implements UseCase<GetProfileInfoUseCase.Para
         if (member.getRole().equals(Role.HELPER)) {
             // 도우미: badges, documents 조회
             badges = badgeReader.getBadgeStatusList(member.getId());
-            documents = documentVerificationRepository.findByMemberId(member.getId());
-
+            documents = documentManagement.findAllByMemberId(member.getId())
+                    .stream()
+                    .map(DocumentInfo::from)
+                    .collect(Collectors.toList());
         } else if (member.getRole().equals(Role.DISABLED)) {
-            // 장애인: disabilityType, disabilityDescription 조회
+            // 장애인: disabilityType, disabilityGrade, disabilityDescription 조회
             List<MemberDisabilityCategory> disabilityCategories = memberDisabilityCategoryRepository
                     .findByMember_Id(member.getId());
 
             if (!disabilityCategories.isEmpty()) {
                 MemberDisabilityCategory firstCategory = disabilityCategories.get(0);
                 disabilityType = firstCategory.getDisabilityCategory().getType();
+                disabilityGrade = firstCategory.getLevel();
                 disabilityDescription = firstCategory.getDisabilityDescription();
             }
         }
@@ -89,6 +90,7 @@ public class GetProfileInfoUseCase implements UseCase<GetProfileInfoUseCase.Para
                 badges,
                 documents,
                 disabilityType,
+                disabilityGrade,
                 disabilityDescription
         );
     }
@@ -115,9 +117,10 @@ public class GetProfileInfoUseCase implements UseCase<GetProfileInfoUseCase.Para
         private List<ReviewKeywordCount> reviews;
         /* 도우미 전용 정보 */
         private List<BadgeReader.BadgeStatusInfo> badges;
-        private List<DocumentVerification> documents;
+        private List<DocumentInfo> documents;
         /* 장애인 전용 정보 */
         private String disabilityType;
+        private final String disabilityGrade;
         private String disabilityDescription;
 
         public static Result from(
@@ -126,8 +129,9 @@ public class GetProfileInfoUseCase implements UseCase<GetProfileInfoUseCase.Para
                 List<String> helpCategories,
                 List<ReviewKeywordCount> reviews,
                 List<BadgeReader.BadgeStatusInfo> badges,
-                List<DocumentVerification> documents,
+                List<DocumentInfo> documents,
                 String disabilityType,
+                String disabilityGrade,
                 String disabilityDescription
         ) {
             Integer ageGroup = AgeGroupCalculator.calculateAgeGroup(member.getBirthDate());
@@ -147,7 +151,24 @@ public class GetProfileInfoUseCase implements UseCase<GetProfileInfoUseCase.Para
                     badges,
                     documents,
                     disabilityType,
+                    disabilityGrade,
                     disabilityDescription
+            );
+        }
+    }
+
+    @Getter
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class DocumentInfo {
+        private final Long id;
+        private final String docCode;
+        private final String docName;
+
+        public static DocumentInfo from(Document document) {
+            return new DocumentInfo(
+                    document.getDocumentId(),
+                    document.getDocCode(),
+                    document.getDocNameKo()
             );
         }
     }

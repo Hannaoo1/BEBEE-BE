@@ -14,7 +14,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
 
     Optional<Document> findByDocCode(String docCode);
 
-    List<Document> findByMember(Member member);
+    Optional<List<Document>> findAllByMemberId(Long memberId);
 
     List<Document> findByTargetRole(String targetRole);
 }
