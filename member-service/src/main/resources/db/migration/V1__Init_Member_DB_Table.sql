@@ -10,7 +10,11 @@ DROP TABLE IF EXISTS `document`;
 DROP TABLE IF EXISTS `disability_category`;
 DROP TABLE IF EXISTS `help_category`;
 DROP TABLE IF EXISTS `member`;
-
+DROP TABLE IF EXISTS `badge`;
+DROP TABLE IF EXISTS 'outbox';
+DROP TABLE IF EXISTS 'agreement_sync';
+DROP TABLE IF EXISTS 'match_review_sync';
+DROP TABLE IF EXISTS 'match_review_keyword_sync';
 # CREATE TABLES
 -- 1. MEMBER
 CREATE TABLE `member` (
