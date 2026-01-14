@@ -14,10 +14,10 @@ public class MemberHelpCategorySync extends BaseTimeEntity {
     @EmbeddedId
     private MemberHelpCategorySyncId id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("memberId")
     @JoinColumn(name = "member_id", nullable = false)
-    private MemberSync member;
+    private MemberSync memberSync;
 
     public static MemberHelpCategorySync create(Long helpCategoryId) {
         MemberHelpCategorySync category = new MemberHelpCategorySync();
@@ -25,7 +25,7 @@ public class MemberHelpCategorySync extends BaseTimeEntity {
         return category;
     }
 
-    protected void assignToMember(MemberSync member) {
-        this.member = member;
+    protected void assignToMember(MemberSync memberSync) {
+        this.memberSync = memberSync;
     }
 }

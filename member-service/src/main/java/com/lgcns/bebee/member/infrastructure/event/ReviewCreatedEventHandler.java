@@ -2,7 +2,7 @@ package com.lgcns.bebee.member.infrastructure.event;
 
 import com.lgcns.bebee.common.data.event.EventHandler;
 import com.lgcns.bebee.common.data.event.match.ReviewCreatedEvent;
-import com.lgcns.bebee.member.application.usecase.SyncReviewUseCase;
+import com.lgcns.bebee.member.application.usecase.ProcessReviewCreatedUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ReviewCreatedEventHandler implements EventHandler<ReviewCreatedEvent> {
 
-    private final SyncReviewUseCase syncReviewUseCase;
+    private final ProcessReviewCreatedUseCase processReviewCreatedUseCase;
 
     @Override
     public Class<ReviewCreatedEvent> getEventClass() {
@@ -26,7 +26,7 @@ public class ReviewCreatedEventHandler implements EventHandler<ReviewCreatedEven
         log.info("ReviewCreated 이벤트 처리 시작 - reviewId: {}, revieweeId: {}, keywordCount: {}",
                 event.getReviewId(), event.getRevieweeId(), event.getKeywordIds().size());
 
-        SyncReviewUseCase.Param param = new SyncReviewUseCase.Param(
+        ProcessReviewCreatedUseCase.Param param = new ProcessReviewCreatedUseCase.Param(
                 event.getReviewId(),
                 event.getMatchId(),
                 event.getReviewerId(),
@@ -35,7 +35,7 @@ public class ReviewCreatedEventHandler implements EventHandler<ReviewCreatedEven
                 event.getKeywordIds()
         );
 
-        syncReviewUseCase.execute(param);
+        processReviewCreatedUseCase.execute(param);
 
         log.info("ReviewCreated 이벤트 처리 완료 - reviewId: {}", event.getReviewId());
     }
