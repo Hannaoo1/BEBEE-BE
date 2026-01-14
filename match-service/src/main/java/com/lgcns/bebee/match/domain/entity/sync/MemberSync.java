@@ -64,4 +64,38 @@ public class MemberSync {
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "memberSync", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberHelpCategorySync> helpCategories = new ArrayList<>();
+
+    public static MemberSync create(
+            Long memberId,
+            String nickname,
+            Gender gender,
+            Role role,
+            LocalDate birthDate,
+            Double latitude,
+            Double longitude,
+            String profileImageUrl,
+            String addressRoad,
+            String legalDongCode,
+            List<MemberDisabilityCategorySync> disabilityCategories,
+            List<MemberHelpCategorySync> helpCategories
+    ) {
+        MemberSync member = new MemberSync();
+        member.id = memberId;
+        member.nickname = nickname;
+        member.gender = gender;
+        member.role = role;
+        member.birthDate = birthDate;
+        member.latitude = latitude;
+        member.longitude = longitude;
+        member.profileImageUrl = profileImageUrl;
+        member.addressRoad = addressRoad;
+        member.legalDongCode = legalDongCode;
+        member.createdAt = LocalDateTime.now();
+        member.updatedAt = LocalDateTime.now();
+
+        disabilityCategories.forEach(disabilityCategory -> disabilityCategory.assignToMember(member));
+        helpCategories.forEach(helpCategory -> helpCategory.assignToMember(member));
+
+        return member;
+    }
 }
