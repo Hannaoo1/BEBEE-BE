@@ -17,8 +17,8 @@ public class MemberSignUpReqDTO {
     private String phoneNumber;
     private String role;
     private String addressRoad;
-    private BigDecimal latitude;
-    private BigDecimal longitude;
+    private Double latitude;
+    private Double longitude;
     private String districtCode;
 
     // HELPER용: 도움 유형 목록

@@ -17,11 +17,15 @@ public class MemberHelpCategorySync extends BaseTimeEntity {
     @ManyToOne
     @MapsId("memberId")
     @JoinColumn(name = "member_id", nullable = false)
-    private MemberSync memberSync;
+    private MemberSync member;
 
     public static MemberHelpCategorySync create(Long helpCategoryId) {
         MemberHelpCategorySync category = new MemberHelpCategorySync();
         category.id = new MemberHelpCategorySyncId(null, helpCategoryId);
         return category;
+    }
+
+    protected void assignToMember(MemberSync member) {
+        this.member = member;
     }
 }
