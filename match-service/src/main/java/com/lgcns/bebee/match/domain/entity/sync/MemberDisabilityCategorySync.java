@@ -17,7 +17,7 @@ public class MemberDisabilityCategorySync extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("memberId")
     @JoinColumn(name = "member_id", nullable = false)
-    private MemberSync memberSync;
+    private MemberSync member;
 
     public static MemberDisabilityCategorySync create(Long disabilityCategoryId) {
         MemberDisabilityCategorySync category = new MemberDisabilityCategorySync();
@@ -25,7 +25,7 @@ public class MemberDisabilityCategorySync extends BaseTimeEntity {
         return category;
     }
 
-    protected void assignToMember(MemberSync memberSync) {
-        this.memberSync = memberSync;
+    protected void assignToMember(MemberSync member) {
+        this.member = member;
     }
 }
