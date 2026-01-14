@@ -5,12 +5,12 @@ import com.lgcns.bebee.common.application.UseCase;
 import com.lgcns.bebee.common.util.AgeGroupCalculator;
 import com.lgcns.bebee.member.domain.entity.Member;
 import com.lgcns.bebee.member.domain.entity.MemberDisabilityCategory;
-import com.lgcns.bebee.member.domain.entity.sync.MemberHoneyWalletSync;
 import com.lgcns.bebee.member.domain.entity.vo.Gender;
 import com.lgcns.bebee.member.domain.entity.vo.ReviewKeywordCount;
 import com.lgcns.bebee.member.domain.entity.vo.Role;
 import com.lgcns.bebee.member.domain.repository.MemberDisabilityCategoryRepository;
 import com.lgcns.bebee.member.domain.repository.MemberHelpCategoryRepository;
+import com.lgcns.bebee.member.domain.repository.HoneyWalletRepository;
 import com.lgcns.bebee.member.domain.service.*;
 import com.lgcns.bebee.member.domain.entity.Document;
 
@@ -33,7 +33,7 @@ public class GetProfileInfoUseCase implements UseCase<GetProfileInfoUseCase.Para
     private final MemberDisabilityCategoryRepository memberDisabilityCategoryRepository;
     private final DocumentManagement documentManagement;
     private final BadgeReader badgeReader;
-    private final HoneyWalletReader honeyWalletReader;
+    private final HoneyWalletRepository honeyWalletRepository;
     private final ReviewReader reviewReader;
 
     @Override
@@ -57,8 +57,9 @@ public class GetProfileInfoUseCase implements UseCase<GetProfileInfoUseCase.Para
                 .map(mhc -> mhc.getHelpCategory().getHelpType())
                 .collect(Collectors.toList());
 
-        MemberHoneyWalletSync wallet = honeyWalletReader.findByMemberId(member.getId());
-        honey = wallet.getBalance() / 100;
+        honey = honeyWalletRepository.findByMemberId(member.getId())
+                .map(wallet -> wallet.getBalance() / 100)
+                .orElse(0L);
 
         reviews = reviewReader.getReceivedReviewKeywordCounts(member.getId());
 
