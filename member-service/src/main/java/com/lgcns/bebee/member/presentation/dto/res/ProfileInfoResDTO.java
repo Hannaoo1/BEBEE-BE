@@ -56,7 +56,10 @@ public class ProfileInfoResDTO {
     @Schema(description = "장애 유형 (장애인 전용)", example = "시각장애")
     private String disabilityType;
 
-    @Schema(description = "장애 상세 설명 (장애인 전용)", example = "시각 장애 1급입니다.")
+    @Schema(description = "장애 등급 (장애인 전용)", example = "1")
+    private String disabilityGrade;
+
+    @Schema(description = "장애 상세 설명 (장애인 전용)", example = "양 눈 빛 감지는 가능해요")
     private String disabilityDescription;
 
     public static ProfileInfoResDTO from(GetProfileInfoUseCase.Result result) {
@@ -84,6 +87,7 @@ public class ProfileInfoResDTO {
                                 .map(DocumentVerificationResDTO::from)
                                 .toList() : null,
                 result.getDisabilityType(),
+                result.getDisabilityGrade(),
                 result.getDisabilityDescription()
         );
     }

@@ -52,6 +52,7 @@ public class GetProfileInfoUseCase implements UseCase<GetProfileInfoUseCase.Para
         List<DocumentVerification> documents = null;
 
         String disabilityType = null;
+        String disabilityGrade = null;
         String disabilityDescription = null;
 
         helpCategories = memberHelpCategoryRepository.findByMember_Id(member.getId())
@@ -70,13 +71,14 @@ public class GetProfileInfoUseCase implements UseCase<GetProfileInfoUseCase.Para
             documents = documentVerificationRepository.findByMemberId(member.getId());
 
         } else if (member.getRole().equals(Role.DISABLED)) {
-            // 장애인: disabilityType, disabilityDescription 조회
+            // 장애인: disabilityType, disabilityGrade, disabilityDescription 조회
             List<MemberDisabilityCategory> disabilityCategories = memberDisabilityCategoryRepository
                     .findByMember_Id(member.getId());
 
             if (!disabilityCategories.isEmpty()) {
                 MemberDisabilityCategory firstCategory = disabilityCategories.get(0);
                 disabilityType = firstCategory.getDisabilityCategory().getType();
+                disabilityGrade = firstCategory.getLevel();
                 disabilityDescription = firstCategory.getDisabilityDescription();
             }
         }
@@ -89,6 +91,7 @@ public class GetProfileInfoUseCase implements UseCase<GetProfileInfoUseCase.Para
                 badges,
                 documents,
                 disabilityType,
+                disabilityGrade,
                 disabilityDescription
         );
     }
@@ -118,6 +121,7 @@ public class GetProfileInfoUseCase implements UseCase<GetProfileInfoUseCase.Para
         private List<DocumentVerification> documents;
         /* 장애인 전용 정보 */
         private String disabilityType;
+        private final String disabilityGrade;
         private String disabilityDescription;
 
         public static Result from(
@@ -128,6 +132,7 @@ public class GetProfileInfoUseCase implements UseCase<GetProfileInfoUseCase.Para
                 List<BadgeReader.BadgeStatusInfo> badges,
                 List<DocumentVerification> documents,
                 String disabilityType,
+                String disabilityGrade,
                 String disabilityDescription
         ) {
             Integer ageGroup = AgeGroupCalculator.calculateAgeGroup(member.getBirthDate());
@@ -147,6 +152,7 @@ public class GetProfileInfoUseCase implements UseCase<GetProfileInfoUseCase.Para
                     badges,
                     documents,
                     disabilityType,
+                    disabilityGrade,
                     disabilityDescription
             );
         }
