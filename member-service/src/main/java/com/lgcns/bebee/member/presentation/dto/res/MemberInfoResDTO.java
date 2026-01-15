@@ -66,4 +66,25 @@ public class MemberInfoResDTO {
     private String disabilityType;
     @Schema(description = "장애 상세 설명 (장애인 전용)", example = "시각 장애 1급입니다. 도움이 필요합니다.")
     private String disabilityDescription;
+
+    // 받은 리뷰 정보
+    @Schema(description = "받은 후기 키워드 목록")
+    private List<ReviewKeywordDTO> reviews;
+
+    @Getter
+    @AllArgsConstructor
+    @Schema(description = "리뷰 키워드 정보")
+    public static class ReviewKeywordDTO {
+        @Schema(description = "키워드 ID", example = "1")
+        private Integer keywordId;
+
+        @Schema(description = "키워드 설명", example = "시간 약속 잘 지켜요")
+        private String description;
+
+        @Schema(description = "긍정/부정 여부", example = "true")
+        private Boolean isPositive;
+
+        @Schema(description = "해당 키워드를 받은 횟수", example = "5")
+        private Long count;
+    }
 }

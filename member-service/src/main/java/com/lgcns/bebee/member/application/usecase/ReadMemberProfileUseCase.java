@@ -5,12 +5,14 @@ import com.lgcns.bebee.common.application.UseCase;
 import com.lgcns.bebee.common.util.AgeGroupCalculator;
 import com.lgcns.bebee.member.domain.entity.Member;
 import com.lgcns.bebee.member.domain.entity.MemberDisabilityCategory;
+import com.lgcns.bebee.member.domain.entity.vo.ReviewKeywordCount;
 import com.lgcns.bebee.member.domain.entity.vo.Role;
 import com.lgcns.bebee.member.domain.repository.MemberRepository;
 import com.lgcns.bebee.member.domain.repository.MemberHelpCategoryRepository;
 import com.lgcns.bebee.member.domain.repository.MemberDisabilityCategoryRepository;
 import com.lgcns.bebee.member.domain.repository.DocumentVerificationRepository;
 import com.lgcns.bebee.member.domain.entity.DocumentVerification;
+import com.lgcns.bebee.member.domain.service.ReviewReader;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,7 @@ public class ReadMemberProfileUseCase
     private final MemberHelpCategoryRepository memberHelpCategoryRepository;
     private final MemberDisabilityCategoryRepository memberDisabilityCategoryRepository;
     private final DocumentVerificationRepository documentVerificationRepository;
+    private final ReviewReader reviewReader;
 
     @Override
     @Transactional(readOnly = true)
@@ -43,7 +46,10 @@ public class ReadMemberProfileUseCase
         // 2. 연령대 계산
         Integer ageGroup = AgeGroupCalculator.calculateAgeGroup(member.getBirthDate());
 
-        // 3. 역할별 추가 정보 조회
+        // 3. 받은 리뷰 조회
+        List<ReviewKeywordCount> reviews = reviewReader.getReceivedReviewKeywordCounts(member.getId());
+
+        // 4. 역할별 추가 정보 조회
         List<String> helpTypes = null;
         List<DocumentVerification> documents = null;
         String disabilityType = null;
@@ -73,6 +79,7 @@ public class ReadMemberProfileUseCase
         return Result.builder()
                 .member(member)
                 .ageGroup(ageGroup)
+                .reviews(reviews)
                 .helpTypes(helpTypes)
                 .documents(documents)
                 .disabilityType(disabilityType)
@@ -91,6 +98,7 @@ public class ReadMemberProfileUseCase
     public static class Result {
         private final Member member;
         private final Integer ageGroup;
+        private final List<ReviewKeywordCount> reviews;
         private final List<String> helpTypes;
         private final List<DocumentVerification> documents;
         private final String disabilityType;
