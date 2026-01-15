@@ -7,6 +7,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import com.lgcns.bebee.match.domain.entity.vo.ReviewDirection;
+
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "`match`")
 @Getter
@@ -35,14 +40,27 @@ public class Match extends BaseTimeEntity {
     @JoinColumn(name = "agreement_id", nullable = false, unique = true)
     private Agreement agreement;
 
-    @OneToOne(mappedBy = "match")
-    private Review helperReview;  // 도우미가 작성한 리뷰
-
-    @OneToOne(mappedBy = "match")
-    private Review disabledReview;
+    @OneToMany(mappedBy = "match")
+    private List<Review> reviews = new ArrayList<>();
 
     public Long getAgreementId() {
         return agreement != null ? agreement.getId() : null;
+    }
+
+    // 도우미가 작성한 리뷰
+    public Review getHelperReview() {
+        return reviews.stream()
+                .filter(r -> r.getReviewDirection() == ReviewDirection.HELPER_TO_DISABLED)
+                .findFirst()
+                .orElse(null);
+    }
+
+    // 장애인이 작성한 리뷰
+    public Review getDisabledReview() {
+        return reviews.stream()
+                .filter(r -> r.getReviewDirection() == ReviewDirection.DISABLED_TO_HELPER)
+                .findFirst()
+                .orElse(null);
     }
 
     public static Match create(
