@@ -2,16 +2,13 @@ package com.lgcns.bebee.member.application.usecase;
 
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
-import com.lgcns.bebee.common.data.event.DomainEventPublisher;
-import com.lgcns.bebee.common.data.event.member.MemberSignedUpEvent;
 import com.lgcns.bebee.member.core.exception.MemberInvalidParamErrors;
 import lombok.extern.slf4j.Slf4j;
 import com.lgcns.bebee.member.domain.entity.Member;
 import com.lgcns.bebee.member.domain.repository.MemberRepository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Pattern;
 
 import com.lgcns.bebee.member.domain.entity.DisabilityCategory;
@@ -45,8 +42,6 @@ public class SignUpUseCase implements UseCase<SignUpUseCase.Param, SignUpUseCase
     private final DocumentRepository documentRepository;
     private final DocumentVerificationRepository documentVerificationRepository;
 
-    private final DomainEventPublisher eventPublisher;
-
     @Override
     @Transactional
     public SignUpUseCase.Result execute(Param params) {
@@ -67,23 +62,26 @@ public class SignUpUseCase implements UseCase<SignUpUseCase.Param, SignUpUseCase
                 params.getAddressRoad(),
                 params.getLatitude(),
                 params.getLongitude(),
-                params.getDistrictCode());
+                params.getDistrictCode(),
+                params.getIntroduction());
 
         Member savedMember = memberRepository.save(newMember);
 
-        List<Long> helpCategoryIds = new ArrayList<>();
-        List<Long> disabilityCategoryIds = new ArrayList<>();
-
         // HELPER/DISABLED: 도움 유형 저장 (두 역할 모두 필요)
-        if ((params.getRole().equals("HELPER") || params.getRole().equals("DISABLED"))
+        if ((params.getRole().equals("HELPER") || params.getRole().equals("DISABLED")) 
                 && params.getHelpTypes() != null && !params.getHelpTypes().isEmpty()) {
             for (String helpTypeName : params.getHelpTypes()) {
+                StringBuilder hexBuilder = new StringBuilder();
+                for (byte b : helpTypeName.getBytes()) {
+                    hexBuilder.append(String.format("%02X", b));
+                }
+                log.info("도움 유형 조회 요청: [{}], Hex: {}", helpTypeName, hexBuilder.toString());
+
                 HelpCategory helpCategory = helpCategoryRepository
                         .findByHelpType(helpTypeName)
                         .orElseThrow(() -> new IllegalArgumentException("도움 유형을 찾을 수 없습니다: " + helpTypeName));
                 MemberHelpCategory memberHelpCategory = MemberHelpCategory.create(savedMember, helpCategory);
                 memberHelpCategoryRepository.save(memberHelpCategory);
-                helpCategoryIds.add(helpCategory.getHelpCategoryId());
             }
         }
 
@@ -99,7 +97,6 @@ public class SignUpUseCase implements UseCase<SignUpUseCase.Param, SignUpUseCase
                     params.getDisabilityGrade() != null ? params.getDisabilityGrade() : "1",
                     params.getDisabilityDescription() != null ? params.getDisabilityDescription() : "");
             memberDisabilityCategoryRepository.save(memberDisabilityCategory);
-            disabilityCategoryIds.add(disabilityCategory.getDisabilityCategoryId());
         }
 
         // 문서 검증 정보 저장 (Step 5에서 이미 분석 완료됨)
@@ -130,22 +127,6 @@ public class SignUpUseCase implements UseCase<SignUpUseCase.Param, SignUpUseCase
             log.info("문서 검증 정보 저장 완료: verificationId={}", verification.getId());
         }
 
-
-        eventPublisher.publish(new MemberSignedUpEvent(
-                savedMember.getId(),
-                savedMember.getNickname(),
-                savedMember.getGender().name(),
-                savedMember.getRole().name(),
-                savedMember.getBirthDate(),
-                savedMember.getLatitude(),
-                savedMember.getLongitude(),
-                savedMember.getProfileImageUrl(),
-                savedMember.getAddressRoad(),
-                savedMember.getDistrictCode(),
-                disabilityCategoryIds,
-                helpCategoryIds
-        ));
-
         return new Result(savedMember.getId());
     }
 
@@ -161,12 +142,13 @@ public class SignUpUseCase implements UseCase<SignUpUseCase.Param, SignUpUseCase
         private final String phoneNumber;
         private final String role;
         private final String addressRoad;
-        private final Double latitude;
-        private final Double longitude;
+        private final BigDecimal latitude;
+        private final BigDecimal longitude;
         private final String districtCode;
 
-        // HELPER용: 도움 유형 목록
+        // HELPER/DISABLED 공통: 도움 유형 목록, 자기소개
         private final java.util.List<String> helpTypes;
+        private final String introduction;
 
         // DISABLED용: 장애 유형, 등급 및 설명
         private final String disabilityType;
