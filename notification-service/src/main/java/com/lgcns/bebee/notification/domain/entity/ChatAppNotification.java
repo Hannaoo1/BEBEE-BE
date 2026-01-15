@@ -25,9 +25,15 @@ public class ChatAppNotification extends AppNotification {
     @Column(nullable = false)
     private Integer messageCount = 1;
 
-    public static ChatAppNotification create(Long senderId, Long receiverId, Long chatroomId, String messagePreview) {
+    public static ChatAppNotification create(
+            Long senderId,
+            String senderNickname,
+            Long receiverId,
+            Long chatroomId,
+            String messagePreview) {
         ChatAppNotification appNotification = new ChatAppNotification();
         appNotification.senderId = senderId;
+        appNotification.senderNickname = senderNickname;
         appNotification.receiverId = receiverId;
         appNotification.type = NotificationType.CHAT;
         appNotification.chatroomId = chatroomId;
