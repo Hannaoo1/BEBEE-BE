@@ -63,6 +63,17 @@ public class MemberController implements MemberSwagger {
                     .disabilityDescription(result.getDisabilityDescription());
         }
 
+        if (result.getReviews() != null) {
+            builder.reviews(result.getReviews().stream()
+                    .map(r -> new MemberInfoResDTO.ReviewKeywordDTO(
+                            r.keywordId(),
+                            r.description(),
+                            r.isPositive(),
+                            r.count()
+                    ))
+                    .collect(java.util.stream.Collectors.toList()));
+        }
+
         return ResponseEntity.ok(builder.build());
     }
 
