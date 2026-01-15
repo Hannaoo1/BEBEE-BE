@@ -84,7 +84,6 @@ public class ProfileInfoResDTO {
                                                 .map(DocumentVerificationResDTO::from)
                                                 .toList() : null,
                                 result.getDisabilityType(),
-                                result.getDisabilityTypeNm(),
                                 result.getDisabilityDescription());
         }
 
