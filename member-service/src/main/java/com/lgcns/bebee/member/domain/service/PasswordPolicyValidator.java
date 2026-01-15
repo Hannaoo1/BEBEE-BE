@@ -9,11 +9,14 @@ import org.springframework.stereotype.Component;
 public class PasswordPolicyValidator {
 
     private static final Pattern PASSWORD_PATTERN =
-            Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%&])[A-Za-z\\d!@#$%&]{8,19}$");
+            Pattern.compile("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d!@#$%^&*]{8,16}$");
 
     public void validate(String rawPassword) {
-        if (rawPassword == null || !PASSWORD_PATTERN.matcher(rawPassword).matches()) {
+        if (rawPassword == null) {
             throw new InvalidParamException(MemberInvalidParamErrors.PASSWORD_NOT_NULL);
+        }
+        if (!PASSWORD_PATTERN.matcher(rawPassword).matches()) {
+            throw new InvalidParamException(MemberInvalidParamErrors.INVALID_PASSWORD);
         }
     }
 }
