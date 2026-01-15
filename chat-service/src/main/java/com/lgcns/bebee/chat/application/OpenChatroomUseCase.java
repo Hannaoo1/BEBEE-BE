@@ -3,10 +3,13 @@ package com.lgcns.bebee.chat.application;
 import com.lgcns.bebee.chat.domain.entity.Chatroom;
 import com.lgcns.bebee.chat.domain.entity.sync.MemberSync;
 import com.lgcns.bebee.chat.domain.entity.sync.HelpCategorySync;
+import com.lgcns.bebee.chat.domain.repository.ChatroomRepository;
 import com.lgcns.bebee.chat.domain.service.ChatroomManagement;
 import com.lgcns.bebee.chat.domain.service.MemberManagement;
 import com.lgcns.bebee.common.application.Params;
 import com.lgcns.bebee.common.application.UseCase;
+import com.lgcns.bebee.common.data.event.DomainEventPublisher;
+import com.lgcns.bebee.common.data.event.chat.ChatroomCreatedEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,9 @@ import java.util.List;
 public class OpenChatroomUseCase implements UseCase<OpenChatroomUseCase.Param, OpenChatroomUseCase.Result> {
     private final ChatroomManagement chatroomManagement;
     private final MemberManagement memberManagement;
+
+    private final ChatroomRepository chatroomRepository;
+    private final DomainEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -40,10 +46,14 @@ public class OpenChatroomUseCase implements UseCase<OpenChatroomUseCase.Param, O
                 .map(HelpCategorySync::from)
                 .toList();
 
-        Chatroom chatroom = chatroomManagement.findChatroomWithMembers(currentMember, otherMember, param.postId, param.postTitle, helpCategories);
-        otherMember = getOtherMember(chatroom, param.currentMemberId);
+        Chatroom chatroom = chatroomRepository.findChatroomWithMembers(currentMember, otherMember, param.postId).orElseGet(() -> {
+            Chatroom savedChatroom = chatroomRepository.save(currentMember, otherMember, param.postId, param.postTitle, helpCategories);
 
-        return Result.from(chatroom, param.currentMemberId, otherMember);
+            eventPublisher.publish(new ChatroomCreatedEvent(currentMember.getId(), currentMember.getNickname(), otherMember.getId(), savedChatroom.getId()));
+            return savedChatroom;
+        });
+
+        return Result.from(chatroom, param.currentMemberId, getOtherMember(chatroom, param.otherMemberId));
     }
 
     private MemberSync getOtherMember(Chatroom chatroom, Long currentMemberId) {

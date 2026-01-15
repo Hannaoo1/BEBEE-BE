@@ -9,6 +9,7 @@ import java.time.LocalDate;
 public class EngagementCompletedEvent implements DomainEvent {
     private final Long engagementId;
     private final Long agreementId;
+    private final Long matchId;
     private final Long helperId;
     private final Long disabledId;
     private final LocalDate engagementDate;

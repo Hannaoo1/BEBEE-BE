@@ -48,6 +48,7 @@ public class SendPushNotificationUseCase implements UseCase<SendPushNotification
     @RequiredArgsConstructor
     public static class Param implements Params{
         private final Long senderId;
+        private final String senderNickname;
         private final Long receiverId;
         private final String notificationType;
         private final Long applicationId;
@@ -62,7 +63,7 @@ public class SendPushNotificationUseCase implements UseCase<SendPushNotification
         return switch(type){
             case APPLICATION -> ApplicationAppNotification.create(params.senderId, params.receiverId, params.applicationId);
             case MATCH -> MatchAppNotification.create(params.senderId, params.receiverId, params.matchId);
-            case CHAT -> ChatAppNotification.create(params.senderId, params.receiverId, params.chatroomId, params.messagePreview);
+            case CHAT -> ChatAppNotification.create(params.senderId, params.senderNickname, params.receiverId, params.chatroomId, params.messagePreview);
         };
     }
 }

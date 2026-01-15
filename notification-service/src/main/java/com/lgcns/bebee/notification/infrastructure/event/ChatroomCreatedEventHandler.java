@@ -1,31 +1,31 @@
 package com.lgcns.bebee.notification.infrastructure.event;
 
 import com.lgcns.bebee.common.data.event.EventHandler;
-import com.lgcns.bebee.common.data.event.match.PostAppliedEvent;
+import com.lgcns.bebee.common.data.event.chat.ChatroomCreatedEvent;
 import com.lgcns.bebee.notification.application.SendPushNotificationUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class PostAppliedEventHandler implements EventHandler<PostAppliedEvent> {
+public class ChatroomCreatedEventHandler implements EventHandler<ChatroomCreatedEvent> {
     private final SendPushNotificationUseCase sendPushNotificationUseCase;
 
     @Override
-    public Class<PostAppliedEvent> getEventClass() {
-        return PostAppliedEvent.class;
+    public Class<ChatroomCreatedEvent> getEventClass() {
+        return ChatroomCreatedEvent.class;
     }
 
     @Override
-    public void handle(PostAppliedEvent event) {
+    public void handle(ChatroomCreatedEvent event) {
         SendPushNotificationUseCase.Param param = new SendPushNotificationUseCase.Param(
-                event.getHelperId(),
-                null,
                 event.getDisabledId(),
-                "APPLICATION",
-                event.getApplicationId(),
+                event.getDisabledNickname(),
+                event.getHelperId(),
+                "CHAT",
                 null,
                 null,
+                event.getChatroomId(),
                 null
         );
 
