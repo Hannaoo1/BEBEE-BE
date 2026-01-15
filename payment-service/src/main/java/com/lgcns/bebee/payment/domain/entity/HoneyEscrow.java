@@ -64,4 +64,8 @@ public class HoneyEscrow extends BaseTimeEntity {
         return honeyEscrow;
     }
 
+    public void transfer(Long amount) {
+        this.completedAt = LocalDateTime.now();
+        this.amount -= amount;
+    }
 }

@@ -24,6 +24,7 @@ public class CompleteEngagementUseCase implements UseCase<CompleteEngagementUseC
     private final MemberManager memberManager;
     private final EngagementManager engagementManager;
     private final DomainEventPublisher eventPublisher;
+
     @Override
     public Result execute(Param param) {
         MemberSync member = memberManager.findExistingMember(param.currentMemberId);
@@ -32,14 +33,15 @@ public class CompleteEngagementUseCase implements UseCase<CompleteEngagementUseC
         check(member, engagement);
         engagement.complete();
 
-        if(engagement.getStatus() == EngagementStatus.COMPLETED) {
+        if(engagement.getIsDisabledCheck() == true) {
             Match match = engagement.getMatch();
             eventPublisher.publish(new EngagementCompletedEvent(
-                engagement.getId(),
-                match.getAgreementId(),
-                match.getHelperId(),
-                match.getDisabledId(),
-                engagement.getDate()
+                    engagement.getId(),
+                    match.getAgreementId(),
+                    match.getMatchId(),
+                    match.getHelperId(),
+                    match.getDisabledId(),
+                    engagement.getDate()
             ));
         }
 
