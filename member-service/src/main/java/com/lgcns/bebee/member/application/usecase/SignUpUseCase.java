@@ -67,7 +67,8 @@ public class SignUpUseCase implements UseCase<SignUpUseCase.Param, SignUpUseCase
                 params.getAddressRoad(),
                 params.getLatitude(),
                 params.getLongitude(),
-                params.getDistrictCode());
+                params.getDistrictCode(),
+                params.getIntroduction());
 
         Member savedMember = memberRepository.save(newMember);
 
@@ -108,9 +109,9 @@ public class SignUpUseCase implements UseCase<SignUpUseCase.Param, SignUpUseCase
             if (!java.util.Set.of("HELPER", "DISABLED").contains(params.getRole())) {
                 throw new IllegalArgumentException("문서 저장 시 유효한 role이 필요합니다: " + params.getRole());
             }
-            
+
             log.info("문서 검증 정보 저장 시작: fileUrl={}, systemFlag={}", params.getFileUrl(), params.getSystemFlag());
-            
+
             // Document 생성
             String docCode = "DOC_" + java.util.UUID.randomUUID().toString().substring(0, 8);
             String docNameKo = "HELPER".equals(params.getRole()) ? "활동지원사 교육 이수증" : "장애인 복지카드";
@@ -126,10 +127,9 @@ public class SignUpUseCase implements UseCase<SignUpUseCase.Param, SignUpUseCase
             DocumentVerification verification = DocumentVerification.of(params.getFileUrl(), document);
             verification.applyAnalysisResult(0, 0, 0, params.getSystemFlag() != null ? params.getSystemFlag() : "MID");
             documentVerificationRepository.save(verification);
-            
+
             log.info("문서 검증 정보 저장 완료: verificationId={}", verification.getId());
         }
-
 
         eventPublisher.publish(new MemberSignedUpEvent(
                 savedMember.getId(),
@@ -143,8 +143,7 @@ public class SignUpUseCase implements UseCase<SignUpUseCase.Param, SignUpUseCase
                 savedMember.getAddressRoad(),
                 savedMember.getDistrictCode(),
                 disabilityCategoryIds,
-                helpCategoryIds
-        ));
+                helpCategoryIds));
 
         return new Result(savedMember.getId());
     }
@@ -165,12 +164,13 @@ public class SignUpUseCase implements UseCase<SignUpUseCase.Param, SignUpUseCase
         private final Double longitude;
         private final String districtCode;
 
-        // HELPER용: 도움 유형 목록
+        // HELPER용: 도움 유형 목록, 자기소개
         private final java.util.List<String> helpTypes;
+        private final String introduction;
 
         // DISABLED용: 장애 유형, 등급 및 설명
         private final String disabilityType;
-        private final String disabilityGrade;       // "1" = 중증, "2" = 경증
+        private final String disabilityGrade; // "1" = 중증, "2" = 경증
         private final String disabilityDescription;
 
         // 문서 관련 (Step 5에서 업로드 및 분석 완료)
@@ -223,4 +223,3 @@ public class SignUpUseCase implements UseCase<SignUpUseCase.Param, SignUpUseCase
         return memberRepository.existsByNickname(nickname);
     }
 }
-// Force git tracking for conflict resolution
