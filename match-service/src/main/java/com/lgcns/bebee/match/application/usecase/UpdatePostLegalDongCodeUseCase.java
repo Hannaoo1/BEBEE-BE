@@ -21,7 +21,7 @@ public class UpdatePostLegalDongCodeUseCase implements UseCase<UpdatePostLegalDo
         String legalDongCode = regionCodeClient.resolveLegalDongCode(params.latitude, params.longitude);
 
         Post post = postManager.findSinglePost(params.postId);
-        post.updateLegalDongCode(legalDongCode);
+        post.updateRegion(legalDongCode);
 
         return null;
     }

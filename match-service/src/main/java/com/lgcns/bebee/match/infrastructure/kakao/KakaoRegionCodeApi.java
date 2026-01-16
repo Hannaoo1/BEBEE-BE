@@ -39,7 +39,7 @@ public class KakaoRegionCodeApi implements RegionCodeClient {
             String legalDongCode = response.documents().stream()
                     .filter(doc -> "B".equals(doc.regionType()))
                     .findFirst()
-                    .map(KakaoRegionResponse.Document::code)
+                    .map(KakaoRegionResponse.Document::addressName)
                     .orElse(null);
 
             log.debug("카카오 지역 코드 조회 완료: code={}", legalDongCode);
@@ -67,7 +67,10 @@ public class KakaoRegionCodeApi implements RegionCodeClient {
                 String regionType,
 
                 @JsonProperty("code")
-                String code
+                String code,
+
+                @JsonProperty("address_name")
+                String addressName
         ) {
         }
 

@@ -121,6 +121,10 @@ public class Post extends BaseTimeEntity {
         this.legalDongCode = legalDongCode;
     }
 
+    public void updateRegion(String region){
+        this.region = region;
+    }
+
     public void updateStatus(PostStatus status) {
         this.status = status;
     }
