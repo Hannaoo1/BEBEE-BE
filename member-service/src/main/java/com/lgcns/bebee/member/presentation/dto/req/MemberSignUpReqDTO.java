@@ -1,6 +1,5 @@
 package com.lgcns.bebee.member.presentation.dto.req;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,12 +20,13 @@ public class MemberSignUpReqDTO {
     private Double longitude;
     private String districtCode;
 
-    // HELPER용: 도움 유형 목록
+    // HELPER용: 도움 유형 목록, 자기소개
     private java.util.List<String> helpTypes;
+    private String introduction;
 
     // DISABLED용: 장애 유형, 등급 및 설명
     private String disabilityType;
-    private String disabilityGrade;         // "1" = 중증, "2" = 경증
+    private String disabilityGrade; // "1" = 중증, "2" = 경증
     private String disabilityDescription;
 
     // 문서 관련 (Step 5에서 업로드 및 분석 완료)
