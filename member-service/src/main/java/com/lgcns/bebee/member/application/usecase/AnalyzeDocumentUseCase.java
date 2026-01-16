@@ -33,18 +33,18 @@ public class AnalyzeDocumentUseCase implements UseCase<AnalyzeDocumentUseCase.Pa
         log.info("문서 분석 시작 (회원가입 전): fileUrl={}, role={}", param.getFileUrl(), param.getRole());
 
         // Domain Service 호출하여 분석 수행
-        DocumentVerificationService.AnalysisResult analysis = 
-                documentVerificationService.analyze(param.getFileUrl(), param.getRole());
+        DocumentVerificationService.AnalysisResult analysis = documentVerificationService.analyze(param.getFileUrl(),
+                param.getRole());
 
-        log.info("문서 분석 완료: systemFlag={}, forgeryScore={}", 
+        log.info("문서 분석 완료: systemFlag={}, forgeryScore={}",
                 analysis.systemFlag(), analysis.forgeryScore());
 
         return new Result(
                 analysis.exifScore(),
                 analysis.ocrScore(),
                 analysis.forgeryScore(),
-                analysis.systemFlag()
-        );
+                analysis.systemFlag(),
+                analysis.fields());
     }
 
     /**
@@ -75,6 +75,7 @@ public class AnalyzeDocumentUseCase implements UseCase<AnalyzeDocumentUseCase.Pa
             Integer exifScore,
             Integer ocrScore,
             Integer forgeryScore,
-            String systemFlag
-    ) {}
+            String systemFlag,
+            java.util.Map<String, String> fields) {
+    }
 }

@@ -38,11 +38,20 @@ public class DocumentVerificationService {
 
         int baseScore = calcBaseScoreFromUrl(fileUrl);
         int exifScore = calcExifScore(fileUrl);
-        int ocrScore = calcOcrScore(fileUrl, role);
+
+        // OCR 분석 실행 및 결과 보존
+        OcrClient.OcrResult ocrResult = performOcrAnalysis(fileUrl, role);
+        int ocrScore = processOcrResult(ocrResult);
+
         int forgeryScore = calcForgeryScore(baseScore, exifScore, ocrScore);
         String systemFlag = decideSystemFlag(forgeryScore);
 
-        return new AnalysisResult(exifScore, ocrScore, forgeryScore, systemFlag);
+        // fields 추출 (null인 경우 빈 Map 반환)
+        java.util.Map<String, String> fields = ocrResult != null && ocrResult.fields() != null
+                ? ocrResult.fields()
+                : java.util.Collections.emptyMap();
+
+        return new AnalysisResult(exifScore, ocrScore, forgeryScore, systemFlag, fields);
     }
 
     /**
@@ -51,11 +60,48 @@ public class DocumentVerificationService {
     public AnalysisResult analyze(MultipartFile file, String role) {
         int baseScore = calcBaseScore(file);
         int exifScore = calcExifScore(file);
-        int ocrScore = calcOcrScore(file, role);
+
+        // OCR 분석 실행 및 결과 보존
+        OcrClient.OcrResult ocrResult = performOcrAnalysisFromFile(file, role);
+        int ocrScore = processOcrResult(ocrResult);
+
         int forgeryScore = calcForgeryScore(baseScore, exifScore, ocrScore);
         String systemFlag = decideSystemFlag(forgeryScore);
 
-        return new AnalysisResult(exifScore, ocrScore, forgeryScore, systemFlag);
+        // fields 추출 (null인 경우 빈 Map 반환)
+        java.util.Map<String, String> fields = ocrResult != null && ocrResult.fields() != null
+                ? ocrResult.fields()
+                : java.util.Collections.emptyMap();
+
+        return new AnalysisResult(exifScore, ocrScore, forgeryScore, systemFlag, fields);
+    }
+
+    /**
+     * URL 기반 OCR 분석 수행
+     */
+    private OcrClient.OcrResult performOcrAnalysis(String fileUrl, String role) {
+        if (!isValidS3Url(fileUrl)) {
+            log.warn("OCR 분석 - 유효하지 않은 S3 URL: {}", maskUrl(fileUrl));
+            return null;
+        }
+        try {
+            return ocrClient.extract(fileUrl, role);
+        } catch (Exception e) {
+            log.warn("OCR 분석 실패: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 파일 기반 OCR 분석 수행
+     */
+    private OcrClient.OcrResult performOcrAnalysisFromFile(MultipartFile file, String role) {
+        try {
+            return ocrClient.analyze(file, role);
+        } catch (Exception e) {
+            log.warn("OCR 분석 실패 (파일): {}", e.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -127,7 +173,8 @@ public class DocumentVerificationService {
      * URL 마스킹 (민감 정보 로깅 방지)
      */
     private String maskUrl(String url) {
-        if (url == null) return null;
+        if (url == null)
+            return null;
         int queryIndex = url.indexOf('?');
         return queryIndex > 0 ? url.substring(0, queryIndex) + "?[MASKED]" : url;
     }
@@ -139,21 +186,21 @@ public class DocumentVerificationService {
         // SSRF 방지: S3 URL 패턴만 허용
         if (!isValidS3Url(fileUrl)) {
             log.warn("유효하지 않은 S3 URL: {}", maskUrl(fileUrl));
-            return 70;  // EXIF 실패 시 기본값 상향 (OCR 실패 시에도 MID 보장)
+            return 70; // EXIF 실패 시 기본값 상향 (OCR 실패 시에도 MID 보장)
         }
 
         HttpURLConnection conn = null;
         try {
             conn = (HttpURLConnection) new URI(fileUrl).toURL().openConnection();
-            conn.setInstanceFollowRedirects(false);  // SSRF 방지: 리다이렉트 비활성화
-            conn.setConnectTimeout(5000);  // 연결 타임아웃 5초
-            conn.setReadTimeout(10000);    // 읽기 타임아웃 10초
+            conn.setInstanceFollowRedirects(false); // SSRF 방지: 리다이렉트 비활성화
+            conn.setConnectTimeout(5000); // 연결 타임아웃 5초
+            conn.setReadTimeout(10000); // 읽기 타임아웃 10초
             conn.setRequestMethod("GET");
 
             int responseCode = conn.getResponseCode();
             if (responseCode != HttpURLConnection.HTTP_OK) {
                 log.warn("S3 파일 접근 실패, 응답 코드: {}", responseCode);
-                return 70;  // EXIF 실패 시 기본값 상향
+                return 70; // EXIF 실패 시 기본값 상향
             }
 
             try (InputStream is = conn.getInputStream()) {
@@ -161,7 +208,7 @@ public class DocumentVerificationService {
             }
         } catch (Exception e) {
             log.error("URL 기반 EXIF 분석 중 오류 발생: {}", e.getMessage());
-            return 70;  // EXIF 실패 시 기본값 상향
+            return 70; // EXIF 실패 시 기본값 상향
         } finally {
             if (conn != null) {
                 conn.disconnect();
@@ -177,7 +224,7 @@ public class DocumentVerificationService {
             return extractExifScore(is);
         } catch (Exception e) {
             log.error("파일 기반 EXIF 분석 중 오류 발생: {}", e.getMessage());
-            return 70;  // EXIF 실패 시 기본값 상향
+            return 70; // EXIF 실패 시 기본값 상향
         }
     }
 
@@ -203,7 +250,7 @@ public class DocumentVerificationService {
                     }
                 }
                 score += 20;
-                
+
                 // EXIF 메타데이터가 있어도 유효한 태그가 없으면 최소 70점 보장
                 if (score < 70) {
                     log.warn("EXIF 메타데이터는 있으나 유효한 태그가 부족합니다. 기본값 70점 적용");
@@ -211,11 +258,11 @@ public class DocumentVerificationService {
                 }
             } else {
                 log.warn("파일에 EXIF 메타데이터가 없습니다.");
-                score = 70;  // EXIF 없을 때 기본값 상향
+                score = 70; // EXIF 없을 때 기본값 상향
             }
         } catch (Exception e) {
             log.error("EXIF 추출 중 오류: {}", e.getMessage());
-            return 70;  // EXIF 실패 시 기본값 상향
+            return 70; // EXIF 실패 시 기본값 상향
         }
         return clamp(score);
     }
@@ -235,7 +282,7 @@ public class DocumentVerificationService {
             return processOcrResult(result);
         } catch (Exception e) {
             log.warn("OCR 분석 실패 (기본값 50점 적용): {}", e.getMessage());
-            return 50;  // OCR 실패 시 기본 점수 반환
+            return 50; // OCR 실패 시 기본 점수 반환
         }
     }
 
@@ -248,7 +295,7 @@ public class DocumentVerificationService {
             return processOcrResult(result);
         } catch (Exception e) {
             log.warn("OCR 분석 실패 (기본값 50점 적용): {}", e.getMessage());
-            return 50;  // OCR 실패 시 기본 점수 반환
+            return 50; // OCR 실패 시 기본 점수 반환
         }
     }
 
@@ -309,6 +356,7 @@ public class DocumentVerificationService {
             Integer exifScore,
             Integer ocrScore,
             Integer forgeryScore,
-            String systemFlag) {
+            String systemFlag,
+            java.util.Map<String, String> fields) {
     }
 }
