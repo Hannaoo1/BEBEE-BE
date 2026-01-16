@@ -48,7 +48,7 @@ public class ChatAppNotification extends AppNotification {
 
     @Override
     public String getBody() {
-        return messagePreview != null ? messagePreview : "새로운 메시지를 확인하세요.";
+        return messagePreview != null ? messagePreview : this.senderNickname + "과의 대화를 시작해보세요.";
     }
 
     @Override
