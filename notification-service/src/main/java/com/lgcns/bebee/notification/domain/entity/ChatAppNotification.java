@@ -43,12 +43,12 @@ public class ChatAppNotification extends AppNotification {
 
     @Override
     public String getTitle() {
-        return "새로운 메시지가 도착했습니다";
+        return "새로운 채팅방 생성되었습니다.";
     }
 
     @Override
     public String getBody() {
-        return messagePreview != null ? messagePreview : this.senderNickname + "과의 대화를 시작해보세요.";
+        return messagePreview != null ? messagePreview : this.senderNickname + "님과의 대화를 시작해보세요.";
     }
 
     @Override
